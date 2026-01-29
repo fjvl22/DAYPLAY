@@ -1,0 +1,17 @@
+<h2>Usuarios Pendientes de Aprobación</h2>
+    <form [formGroup]="usersForm">
+      <table border="1">
+        <tr>
+          <th>Usuario</th>
+          <th>Email</th>
+          <th>Acción</th>
+        </tr>
+        <tr *ngFor="let userCtrl of usersArray.controls; let i=index" [formGroupName]="i">
+          <td>{{ userCtrl.value.nickname }}</td>
+          <td>{{ userCtrl.value.email }}</td>
+          <td>
+            <button type="button" (click)="approve(i)">Aprobar</button>
+          </td>
+        </tr>
+      </table>
+    </form>

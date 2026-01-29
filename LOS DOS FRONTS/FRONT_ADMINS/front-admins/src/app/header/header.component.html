@@ -1,0 +1,16 @@
+<header class="header">
+    <div class="header-left">
+        <img src="assets/logodayplay.png" alt="LOGO" class="logo">
+    </div>
+    <div class="header-center">
+        <span>Bienvenido, {{ nickname }}</span>
+    </div>
+    <div class="header-right">
+        <select (change)="onOptionSelected($event)">
+            <option value="" disabled selected>Opciones</option>
+            <option value="logout">Cerrar sesión</option>
+            <option value="password">Cambiar contraseña</option>
+            <option value="delete">Eliminar cuenta</option>
+        </select>
+    </div>
+</header>

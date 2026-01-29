@@ -1,0 +1,14 @@
+<div class="container danger">
+    <h2>Eliminar cuenta</h2>
+    <p>⚠️ Esta acción es <b>irreversible</b>. Se eliminarán todos tus datos.</p>
+    <form [formGroup]="deleteForm" (ngSubmit)="deleteAccount">
+        <label class="checkbox">
+            <input type="checkbox" formControlName="confirm">
+            Confirmo que deseo eliminar mi cuenta
+        </label>
+        <div class="error" *ngIf="deleteForm.controls.confirm.touched && deleteForm.controls.confirm.invalid">
+            Debes confirmar la eliminación
+        </div>
+        <button class="delete" type="submit" [disabled]="deleteForm.invalid">Eliminar cuenta</button>
+    </form>
+</div>

@@ -1,0 +1,25 @@
+import { DataTypes } from "sequelize";
+import sequelize from "../config/db.js";
+
+const AppUser = sequelize.define("AppUser", {
+  personId: {
+    type: DataTypes.INTEGER.UNSIGNED,
+    primaryKey: true,
+    field: "PERSON_ID"
+  },
+  subscriptionDate: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+    field: "SUBSCRIPTION_DATE"
+  },
+  planType: {
+    type: DataTypes.ENUM("BASIC", "PREMIUM"),
+    defaultValue: "BASIC",
+    field: "PLAN_TYPE"
+  }
+}, {
+  tableName: "APP_USER",
+  timestamps: false
+});
+
+export default AppUser;

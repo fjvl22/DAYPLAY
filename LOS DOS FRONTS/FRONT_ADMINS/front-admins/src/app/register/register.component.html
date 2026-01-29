@@ -1,0 +1,15 @@
+<h2>Registro</h2>
+<form [formGroup]="registerForm" (ngSubmit)="registrar()">
+    <input formControlName="nickname" placeholder="Nombre de Usuario">
+    <div *ngIf="registroForm.get('user')?.invalid && registroForm.get('user')?.touched">
+    Usuario es obligatorio
+    </div>
+
+    <input formControlName="password" type="password" placeholder="Contraseña">
+    <div *ngIf="registroForm.get('password')?.invalid && registroForm.get('password')?.touched">
+    Contraseña es obligatoria
+    </div>
+
+    <button type="submit" [disabled]="registroForm.invalid">Registrar</button>
+</form>
+<p>¿Ya tienes cuenta? <a #link>Login</a></p>

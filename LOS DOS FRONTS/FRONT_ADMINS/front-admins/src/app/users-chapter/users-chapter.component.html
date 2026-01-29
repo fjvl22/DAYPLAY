@@ -1,0 +1,17 @@
+<h2>Usuarios Pendientes de Capítulo</h2>
+<form [formGroup]="chaptersForm">
+    <table border="1">
+    <tr>
+        <th>Usuario</th>
+        <th>Capítulo Pendiente</th>
+        <th>Acción</th>
+    </tr>
+    <tr *ngFor="let userCtrl of usersArray.controls; let i=index" [formGroupName]="i">
+        <td>{{ userCtrl.value.nombre }}</td>
+        <td>{{ userCtrl.value.capitulo }}</td>
+        <td>
+        <button type="button" (click)="activateChapter(i)">Activar</button>
+        </td>
+    </tr>
+    </table>
+</form>
