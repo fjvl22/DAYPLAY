@@ -1,0 +1,7 @@
+<table class="table">
+    <tr *ngFor="let row of getRows()">
+        <td *ngFor="let cell of row">
+            <app-cell [src]="cell.src" (clicked)="onClick(cell)"></app-cell>
+        </td>
+    </tr>
+</table>

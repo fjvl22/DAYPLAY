@@ -1,0 +1,11 @@
+.imagen {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.imagen:hover {
+  transform: scale(1.05);
+}

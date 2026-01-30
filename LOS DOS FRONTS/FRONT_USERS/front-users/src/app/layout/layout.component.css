@@ -1,0 +1,7 @@
+.layout {
+  min-height: 100vh;
+  background-image: url('/assets/logodayplay.png');
+  background-size: cover;
+  background-position: center;
+  padding: 40px;
+}

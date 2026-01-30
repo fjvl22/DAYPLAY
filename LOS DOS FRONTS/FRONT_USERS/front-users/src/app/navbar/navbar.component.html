@@ -1,0 +1,8 @@
+<nav class="navbar">
+  <a *ngFor="let nav of navs"
+     [routerLink]="nav.path"
+     routerLinkActive="active"
+     [routerLinkActiveOptions]="{ exact: true }">
+    {{ nav.label }}
+  </a>
+</nav>
