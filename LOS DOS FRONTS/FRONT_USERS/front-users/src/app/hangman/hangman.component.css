@@ -1,0 +1,42 @@
+.hangman-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+h1 {
+    font-size: 36px;
+    letter-spacing: 3px;
+}
+
+.hangman-image {
+    width: 220px;
+}
+
+.word {
+    display: flex;
+    gap: 12px;
+}
+
+.letter {
+    width: 40px;
+    height: 50px;
+    border-bottom: 4px solid #000;
+    text-align: center;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.status {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.won {
+    color: #6aaa64;
+}
+
+.lost {
+    color: #d32f2f;
+}

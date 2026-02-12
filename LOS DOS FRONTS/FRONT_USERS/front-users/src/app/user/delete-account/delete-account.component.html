@@ -1,16 +1,18 @@
-<div class="container danger">
+<div class="container">
     <h2>Eliminar cuenta</h2>
-    <p>⚠️ Esta acción es <b>irreversible</b>. Se eliminarán todos tus datos.</p>
+    <p class="warning">Esta acción es <strong>irreversible</strong>. Se eliminarán todos tus datos.</p>
     <form [formGroup]="deleteForm" (ngSubmit)="deleteAccount()">
-        <input type="password" formControlName="password" placeholder="Introduce tu contraseña"/>
-        <div class="error" *ngIf="deleteForm.controls.password.touched && deleteForm.controls.password.invalid">La contraseña es obligatoria</div>
         <label class="checkbox">
             <input type="checkbox" formControlName="confirm">
-            Confirmo que deseo eliminar mi cuenta
+            Confirmo que quiero eliminar mi cuenta
         </label>
-        <div class="error" *ngIf="deleteForm.controls.confirm.touched && deleteForm.controls.confirm.invalid">
+        <ddiv *ngIf="deleteForm.get('confirm')?.touched && deleteForm.get('confirm')?.invalid" class="error">
             Debes confirmar la eliminación
-        </div>
-        <button class="delete" type="submit" [disabled]="deleteForm.invalid">Eliminar cuenta</button>
+        </ddiv>
+        <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+        <button type="submit" [disabled]="loading">
+            {{ loading ? 'Eliminando...' : 'Eliminar cuenta' }}
+        </button>
+        <button type="button" class="cancel" (click)="cancel()">Cancelar</button>
     </form>
 </div>

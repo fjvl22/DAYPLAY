@@ -13,4 +13,5 @@ export class ChooseGameComponent {
   action(path: string){
     this.router.navigate([path]);
   }
+  goToRanking(){this.router.navigate(['/ranking']);}
 }

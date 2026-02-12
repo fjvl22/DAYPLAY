@@ -1,15 +1,5 @@
 <div class="keyboard">
   <div class="keyboard-row" *ngFor="let row of keyboardRows">
-    <button
-      *ngFor="let letter of row"
-      (click)="pressLetter(letter)"
-      [disabled]="isPressed(letter)"
-      [class.pressed]="isPressed(letter)">
-      {{ letter.toUpperCase() }}
-    </button>
+    <button *ngFor="let letter of row" (click)="pressLetter(letter)" [ngClass]="getKeyClass(letter)">{{ letter }}</button>
   </div>
-
-  <div class="keyboard-row">
-    <button class="reset-btn" (click)="resetKeyboard()">REINICIAR</button>
-  </div>
-</div>
+</div>>

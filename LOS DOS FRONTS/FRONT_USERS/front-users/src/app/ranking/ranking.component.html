@@ -1,0 +1,13 @@
+<h2>RANKING</h2>
+<div class="game-nav">
+    <button *ngFor="let game of games" (click)="selectGame(game)" [class.active]="game.id === selectedGame.id">{{ game.name }}</button>
+</div>
+<p *ngIf="isBasic">Plan Básico: solo ves tus partidas</p>
+<p *ngIf="isPremium">Plan Premium: ranking global</p>
+<table *ngIf="rankins.length">
+    <tr *ngFor="let r of rankings; index as i">
+        <td>{{ i + 1 }}</td>
+        <td>{{ r.score }}</td>
+        <td>{{ r.date | date }}</td>
+    </tr>
+</table>

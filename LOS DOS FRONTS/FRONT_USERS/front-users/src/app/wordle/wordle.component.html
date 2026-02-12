@@ -1,0 +1,12 @@
+<div class="wordle-container">
+    <h1>WORDLE</h1>
+    <div class="grid">
+        <div class="row" *ngFor="let row of grid: let r = index">
+            <div class="cell" *ngFor="let cell of row; let c = index" [ngClass]="getCellClass(r, c)">{{ cell }}</div>
+        </div>
+    </div>
+    <p *ngIf="status === 'won'">🎉 ¡Has ganado!</p>
+    <p *ngIf="status === 'lost'">💀 Has perdido</p>
+    <app-spanish-keyboard [letterStates]="letterStates" (keyPress)="onKeyPress($event)"></app-spanish-keyboard>
+    <button class="enter" (click)="submitWord()">ENTER</button>
+</div>

@@ -1,3 +1,6 @@
+import Op from 'sequelize';
+import GameMatch from '../models/game_match.js';
+
 export const getAll = (Model) => async (req, res) => {
     try{
         const items = await Model.findAll();
@@ -21,6 +24,23 @@ export const getById = (Model) => async (req, res) => {
 
 export const createItem = (Model) => async (req, res) => {
     try{
+        if(Model===GameMatch){
+            const { userId, gameId } = req.body;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const existing = await GameMatch.findOne({
+                where: {
+                    userId,
+                    gameId,
+                    date: {
+                        [Op.gte]: today
+                    }
+                }
+            });
+            if(existing){
+                return res.status(400).json({ error: 'There is already a game scheduled for this user today in this game.' });
+            }
+        }
         const newItem = await Model.create(req.body);
         res.status(201).json(newItem);
     }catch(error){

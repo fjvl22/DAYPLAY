@@ -1,4 +1,7 @@
 <app-layout>
-    <h1 class="title">Elija Juego</h1>
+    <div class="header">
+        <h1 class="title">Elija Juego</h1>
+        <button class="ranking-btn" title="Ver ranking" (click)="goToRanking()">🏆</button>
+    </div>
     <app-table (selectedCell)="action($event)"></app-table>
 </app-layout>

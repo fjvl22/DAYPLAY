@@ -1,5 +1,30 @@
-.title {
+.header {
+    position: relative;
+  }
+  
+  .title {
     text-align: center;
     margin-bottom: 30px;
     color: white;
-}
+  }
+  
+  .ranking-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+  
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    background-color: #1e40af; /* azul oscuro */
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+  
+    transition: background 0.2s;
+  }
+  
+  .ranking-btn:hover {
+    background-color: #2563eb;
+  }
+  

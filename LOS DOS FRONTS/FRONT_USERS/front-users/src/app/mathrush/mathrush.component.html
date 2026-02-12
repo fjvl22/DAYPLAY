@@ -1,0 +1,31 @@
+<div class="title">
+    <h1>MATH RUSH</h1>
+</div>
+<div class="game-wrapper">
+    <div class="game-container">
+        <div class="punctuation">
+            {{ punctuation$ | async }}
+        </div>
+        <div class="operation" *ngIf="currentOperation$ | async as op">
+            {{ op.operation }}
+        </div>
+        <div class="options-grid" *ngIf="currentOperation">
+            <div
+              class="option"
+              *ngFor="let option of currentOperation.options"
+              [ngClass]="{
+                'correct': selectedOption && option === currentOperation.correct,
+                'wrong': selectedOption && option !== currentOperation.correct,
+                'disabled': selectedOption
+              }"
+              (click)="selectOption(option)"
+            >
+              {{ option }}
+            </div>
+          </div>          
+        <div class="end-message" *ngIf="showEndMessage">
+            <h2>¡Juego terminado!</h2>
+            <p>Tu puntuación obtenida es {{ finalScore }}</p>
+        </div>
+    </div>
+</div>

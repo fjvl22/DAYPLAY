@@ -1,0 +1,8 @@
+<h2>Añadir tarjeta bancaria</h2>
+<label>Foto frontal:</label>
+<input type="file" (change)="onFileChange($event, 'front')" accept="image/*">
+<br>
+<label>Foto trasera:</label>
+<input type="file" (change)="onFileChange($event, 'back')" accept="image/*">
+<br>
+<button (click)="submit()">Subir tarjeta</button>

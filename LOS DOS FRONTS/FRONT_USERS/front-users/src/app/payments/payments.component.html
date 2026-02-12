@@ -1,0 +1,15 @@
+<h2>Historial de pagos</h2>
+<table border="1">
+    <tr>
+    <th>Fecha</th>
+    <th>Importe</th>
+    <th>Método</th>
+    <th>Transacción</th>
+    </tr>
+    <tr *ngFor="let p of payments">
+    <td>{{ p.date | date:'short' }}</td>
+    <td>{{ p.amount }} €</td>
+    <td>{{ p.paymentMethod }}</td>
+    <td>{{ p.transactionId }}</td>
+    </tr>
+</table>

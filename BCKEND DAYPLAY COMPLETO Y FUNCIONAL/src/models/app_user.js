@@ -1,3 +1,4 @@
+// models/app_user.js
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
 
@@ -12,10 +13,10 @@ const AppUser = sequelize.define("AppUser", {
     defaultValue: DataTypes.NOW,
     field: "SUBSCRIPTION_DATE"
   },
-  planType: {
-    type: DataTypes.ENUM("BASIC", "PREMIUM"),
-    defaultValue: "BASIC",
-    field: "PLAN_TYPE"
+  planId: {
+    type: DataTypes.INTEGER.UNSIGNED,
+    allowNull: true,
+    field: "PLAN_ID"
   }
 }, {
   tableName: "APP_USER",

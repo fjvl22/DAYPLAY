@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-spanish-keyboard',
@@ -9,18 +9,24 @@ import { Component, EventEmitter, Output } from '@angular/core';
 })
 export class SpanishKeyboardComponent {
   @Output() keyPress = new EventEmitter<string>();
+  @Input() letterStates: Record<string, number> = {};
   keyboardRows: string[][] = [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
     ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ñ'],
     ['Z', 'X', 'C', 'V', 'B', 'N', 'M']
   ];
-  pressedLetters: Set<string> = new Set();
   pressLetter(letter: string){
-    if(!this.pressedLetters.has(letter)){
-      this.pressedLetters.add(letter);
-      this.keyPress.emit(letter.toUpperCase());
+    if(letter==='⌫'){
+      this.keyPress.emit('BACKSPACE');
+      return;
     }
+    this.keyPress.emit(letter);
   }
-  isPressed(letter: string): boolean{return this.pressedLetters.has(letter);}
-  resetKeyboard(){this.pressedLetters.clear();}
+  getKeyClass(letter: string): string{
+    const state = this.letterStates[letter];
+    if(state===2) return 'correct';
+    if(state===1) return 'present';
+    if(state===0) return 'absent';
+    return '';
+  }
 }

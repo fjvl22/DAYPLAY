@@ -76,3 +76,40 @@ button.pressed {
     width: 100px;
   }
 }
+.keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.keyboard-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+button {
+  width: 46px;
+  height: 58px;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: #d3d6da;
+}
+
+.correct {
+  background-color: #6aaa64;
+  color: white;
+}
+
+.present {
+  background-color: #c9b458;
+  color: white;
+}
+
+.absent {
+  background-color: #787c7e;
+  color: white;
+}

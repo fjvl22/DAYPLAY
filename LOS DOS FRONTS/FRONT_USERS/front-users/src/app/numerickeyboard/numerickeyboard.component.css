@@ -1,0 +1,32 @@
+.keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-width: 240px;
+}
+  
+button {
+    height: 60px;
+    font-size: 1.5rem;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background: #f1f1f1;
+}
+  
+button:hover:not(:disabled) {
+    background: #e0e0e0;
+}
+  
+button:active:not(:disabled) {
+    transform: scale(0.95);
+}
+  
+button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+  
+.action {
+    font-weight: bold;
+}  

@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { FormArray, FormControl, FormGroup } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { RequestsService } from '../requests.service';
 
 @Component({
   selector: 'app-users-pending',
@@ -8,23 +8,26 @@ import { FormArray, FormControl, FormGroup } from '@angular/forms';
   templateUrl: './users-pending.component.html',
   styleUrl: './users-pending.component.css'
 })
-export class UsersPendingComponent {
-  users = [
-    { nickname: "John", email: "john@mail.com" },
-    { nickname: "Anne", email: "anne@mail.com" }
-  ];
-  usersForm = new FormGroup({
-    users: new FormArray(this.users.map(user=>
-      new FormGroup({
-        nickname: new FormControl(user.nickname),
-        email: new FormControl(user.email)
-      })
-    ))
-  });
-  get usersArray(){return this.usersForm.get('users') as FormArray;}
-  approve(index: number){
-    const user = this.usersArray.at(index)?.value;
-    console.log("Approved: ", user);
-    this.usersArray.removeAt(index);
+export class UsersPendingComponent implements OnInit {
+  pendingUsers: any[] = [];
+  constructor(private requests: RequestsService){}
+  ngOnInit(): void {
+    this.loadPendingUsers();
+  }
+  loadPendingUsers(){
+    this.requests.getPendingUsers().subscribe({
+      next: (res: any) => this.pendingUsers = res,
+      error: (err) => console.error('Error al cargar pendientes: ', err)
+    });
+  }
+  approve(userId: number){
+    if(!confirm("¿Seguro que quieres aprobar a este usuario?")) return;
+    this.requests.approveUser(userId).subscribe({
+      next: () => {
+        alert("Usuario aprobado");
+        this.pendingUsers = this.pendingUsers.filter(u => u.personId !== userId);
+      },
+      error: (err) => alert("Error al aprobar usuario: "+err.message)
+    });
   }
 }

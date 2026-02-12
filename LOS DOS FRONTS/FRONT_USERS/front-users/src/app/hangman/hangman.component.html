@@ -1,0 +1,10 @@
+<div class="hangman-container">
+    <h1>AHORCADO</h1>
+    <img class="hangman-image" [src]="getImagePath()" alt="Ahorcado">
+    <div class="word">
+        <div class="letter" *ngFor="let v of wordProgress; let i = index">{{ getDisplayedLetter(i) }}</div>
+    </div>
+    <p class="status won" *ngIf="status === 'won'">🎉 ¡Has ganado!</p>
+    <p class="status lost" *ngIf="status === 'lost'">💀 Has perdido</p>
+    <app-spanish-keyboard [letterStates]="usedLetterStates" (keyPress)="onKeyPress($event)"></app-spanish-keyboard>
+</div>

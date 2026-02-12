@@ -1,0 +1,14 @@
+<div class="keyboard">
+    <button (click)="pressNumber(1)">1</button>
+    <button (click)="pressNumber(2)">2</button>
+    <button (click)="pressNumber(3)">3</button>
+    <button (click)="pressNumber(4)">4</button>
+    <button (click)="pressNumber(5)">5</button>
+    <button (click)="pressNumber(6)">6</button>
+    <button (click)="pressNumber(7)">7</button>
+    <button (click)="pressNumber(8)">8</button>
+    <button (click)="pressNumber(9)">9</button>
+    <button class="action" [disabled]="disableActions" (click)="pressDelete()">⌫</button>
+    <button (click)="pressNumber(0)">0</button>
+    <button class="action" [disabled]="disableActions" (click)="pressEnter()">↵</button>
+</div>

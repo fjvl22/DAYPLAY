@@ -1,0 +1,58 @@
+/* Contenedor de los navs */
+.game-nav {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+/* Botones de juegos */
+.game-nav button {
+  padding: 8px 14px;
+  border: none;
+  background-color: #e0e0e0;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+/* Botón activo */
+button.active {
+  background-color: #1976d2;
+  color: white;
+}
+
+/* Hover sobre cualquier botón */
+.game-nav button:hover {
+  background-color: #cfd8dc;
+}
+
+/* Información del plan */
+p {
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+p:is(.basic) {
+  color: #b36b00;
+}
+
+p:is(.premium) {
+  color: #0066cc;
+}
+
+/* Tabla ranking */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f5f5f5;
+}

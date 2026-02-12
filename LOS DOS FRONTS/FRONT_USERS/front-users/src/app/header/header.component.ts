@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { Requests } from '../services/requests';
 
 @Component({
   selector: 'app-header',
@@ -9,8 +10,8 @@ import { Router } from '@angular/router';
   styleUrl: './header.component.css'
 })
 export class HeaderComponent {
-  nickname: string = "USER";
-  constructor(private router: Router){}
+  nickname: string = "";
+  constructor(private router: Router, private requests: Requests){this.nickname = requests.getNickname() || "USER";}
   optionSelected(event: Event){
     const value = (event.target as HTMLSelectElement).value;
     switch(value){
@@ -28,7 +29,7 @@ export class HeaderComponent {
   }
   logout(){
     console.log('Cerrar sesión');
-    // borrar token, localStorage, etc.
+    this.requests.logout();
     this.router.navigate(['/login']);
   }
   changePassword(){
@@ -39,7 +40,22 @@ export class HeaderComponent {
     const confirmDelete = confirm('¿Estás seguro de eliminar tu cuenta?');
     if(confirmDelete){
       console.log('Eliminar cuenta');
-      // Llamada al backend
+      const token = this.requests.getToken();
+      if(!token){
+        alert("No estás autenticado");
+        return;
+      }
+      this.requests.deleteAccount(token).subscribe({
+        next: () => {
+          alert('Cuenta eliminada');
+          this.requests.logout();
+          this.router.navigate(['/register']);
+        },
+        error: (err) => {
+          console.error(err);
+          alert('Error al eliminar la cuenta');
+        }
+      });
     }
   }
 }
