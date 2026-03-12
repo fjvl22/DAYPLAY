@@ -1,0 +1,31 @@
+<h2>Gestión de Juegos</h2>
+
+<h3>Crear Juego</h3>
+
+<input [(ngModel)]="newGame.name" placeholder="Nombre">
+<input [(ngModel)]="newGame.description" placeholder="Descripción">
+<input [(ngModel)]="newGame.url" placeholder="URL">
+
+<button (click)="create()">Crear</button>
+
+<hr>
+
+<table border="1" width="100%">
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>URL</th>
+        <th>Acciones</th>
+    </tr>
+
+    <tr *ngFor="let g of games">
+        <td>{{ g.id }}</td>
+        <td>{{ g.name }}</td>
+        <td>{{ g.description }}</td>
+        <td>{{ g.url }}</td>
+        <td>
+            <button (click)="delete(g.id)">Eliminar</button>
+        </td>
+    </tr>
+</table>

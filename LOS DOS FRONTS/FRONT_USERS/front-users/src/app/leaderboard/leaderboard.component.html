@@ -1,0 +1,29 @@
+<div class="leaderboard-container">
+    <nav class="games-navbar">
+        <button *ngFor="let game of games" (click)="selectGame(game.id)" [class.active]="game.id === selectedGameId">{{ game.name }}</button>
+    </nav>
+    <div class="sorting" *ngIf="games.length > 0">
+        <button (click)="changeSort('score')" [class.active]="sortBy === 'score'">Ordenar por Puntuación</button>
+        <button (click)="changeSort('date')" [class.active]="sortBy === 'date'">Ordenar por Fecha</button>
+    </div>
+    <div *ngIf="loading" class="loading">Cargando...</div>
+    <table *ngIf="!loading && leaderboard.length > 0">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Usuario</th>
+                <th>Fecha</th>
+                <th>Puntuación</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let player of leaderboard; let i = index" [class.current-user]="isCurrentUser(player.nickname)">
+                <td>{{ getMedal(i) || i + 1 }}</td>
+                <td>{{ player.nickname }}</td>
+                <td>{{ player.date | date: 'dd/MM/yyyy' }}</td>
+                <td>{{ player.score }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <div *ngIf="!loading && leaderboard.length === 0">No hay datos</div>
+</div>

@@ -1,0 +1,13 @@
+<div class="game-container">
+    <h1 class="title">MATH RUSH</h1>
+    <div class="center-area" *ngIf="!mathRushService.isFinished()">
+        <div class="egg large-egg">{{ currentOperation.operation }}</div>
+        <div class="egg-grid">
+            <div class="egg small-egg" *ngFor="let option of options" (click)="selectAnswer(option)" [ngClass]="{'correct': showResult && isCorrect(option), 'wrong': showResult && !isCorrect(option)}">{{ option }}</div>
+        </div>
+    </div>
+    <div class="final-screen" *ngIf="mathRushService.isFinished()">
+        <h2>Juego terminado</h2>
+        <p>Puntuación: {{ mathRushService.getScore() }} / {{ mathRushService.getTotalOperations() }}
+    </div>
+</div>

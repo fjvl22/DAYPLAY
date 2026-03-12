@@ -1,0 +1,32 @@
+.container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .payment-card {
+    padding: 15px;
+  }
+  
+  .badge-success { background-color: #2ecc71; color: white; padding: 3px 10px; border-radius: 5px; }
+  .badge-failed { background-color: #e74c3c; color: white; padding: 3px 10px; border-radius: 5px; }
+  .badge-pending { background-color: #f1c40f; color: white; padding: 3px 10px; border-radius: 5px; }
+  
+  .filter-input {
+    width: 100%;
+  }
+  
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    padding: 50px;
+  }

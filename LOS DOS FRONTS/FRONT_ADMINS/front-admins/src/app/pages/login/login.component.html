@@ -1,0 +1,8 @@
+<div class="login">
+    <h2>Admin Login</h2>
+    <input [(ngModel)]="nickname" placeholder="Nombre de Usuario">
+    <input [(ngModel)]="password" type="password" placeholder="Contraseña">
+    <button (click)="login()">Login</button>
+    <p>¿Aún no tienes cuenta en DAYPLAY?</p>
+    <p>¿Y a qué estás esperando?<a (click)="goToRegister()" style="cursor: pointer;">¡REGÍSTRATE YA!</a></p>
+</div>

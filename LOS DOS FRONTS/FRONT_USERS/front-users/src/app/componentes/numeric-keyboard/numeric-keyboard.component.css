@@ -1,0 +1,13 @@
+.keyboard {
+    display: grid;
+    grid-template-columns: repeat(3, 70px);
+    gap: 10px;
+    justify-content: center;
+}
+
+button {
+    height: 70px;
+    font-size: 1.5rem;
+    border-radius: 10px;
+    cursor: pointer;
+}

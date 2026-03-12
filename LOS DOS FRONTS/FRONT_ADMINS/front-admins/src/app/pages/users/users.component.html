@@ -1,0 +1,19 @@
+<h2>Usuarios Activos</h2>
+
+<table border="1" width="100%">
+    <tr>
+        <th>ID</th>
+        <th>Nickname</th>
+        <th>Email</th>
+        <th>Acciones</th>
+    </tr>
+    <tr *ngFor="let u of users">
+        <td>{{ u.personId }}</td>
+        <td>{{ u.person?.nickname }}</td>
+        <td>{{ u.person?.email }}</td>
+        <td>{{ u.person?.active }}</td>
+        <td>
+            <button (click)="delete(u.personId)">Eliminar</button>
+        </td>
+    </tr>
+</table>

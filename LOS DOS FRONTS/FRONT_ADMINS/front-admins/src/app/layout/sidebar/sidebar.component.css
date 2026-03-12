@@ -1,0 +1,10 @@
+a { color: white; text-decoration: none; }
+.sidebar {
+    width: 220px;
+    background: #111;
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}

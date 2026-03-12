@@ -1,0 +1,15 @@
+<h2>Pagos</h2>
+<table border="1" width="100%">
+    <tr>
+        <th>ID</th>
+        <th>User</th>
+        <th>Amount</th>
+        <th>Date</th>
+    </tr>
+    <tr *ngFor="let p of payments">
+        <td>{{ p.id }}</td>
+        <td>{{ p.userId }}</td>
+        <td>{{ p.amount }}</td>
+        <td>{{ p.date }}</td>
+    </tr>
+</table>

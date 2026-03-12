@@ -1,0 +1,16 @@
+<h2>AHORCADO</h2>
+<img [src]="getImageByErrors()" [alt]="contadorErrores">
+<label #secretWord></label>
+<app-keyboard [usedLetters]="usedLetters" [keyClasses]="keyClasses" [gameMode]="hangmanService" (letterPressed)="onLetter($event)"></app-keyboard>
+<div *ngIf="hangmanService.isGameOver() && hangmanService.isWin()">
+    <p>¡Felicidades!</p>
+    <p>Has ganado</p>
+    <p>¿Deseas guardar tus resultados de hoy?</p>
+    <button (click)="save()">Guardar</button>
+    <button (click)="return()">Salir</button>
+</div>
+<div *ngIf="hangmanService.isGameOver() && !hangmanService.isWin()">
+    <p>¡Ohhhh, has perdido!</p>
+    <p>La palabra era {{ hangmanService.getMaskedWord() }}</p>
+    <button (click)="return()">Salir</button>
+</div>

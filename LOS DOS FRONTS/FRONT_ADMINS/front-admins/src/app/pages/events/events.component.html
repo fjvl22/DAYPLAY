@@ -1,0 +1,15 @@
+<h2>Eventos del Sistema</h2>
+<table border="1" width="100%">
+    <tr>
+        <th>ID</th>
+        <th>Tipo</th>
+        <th>Descripción</th>
+        <th>Fecha</th>
+    </tr>
+    <tr *ngFor="let e of events">
+        <td>{{ e.id }}</td>
+        <td>{{ e.type }}</td>
+        <td>{{ e.description }}</td>
+        <td>{{ e.createdAt | date }}</td>
+    </tr>
+</table>

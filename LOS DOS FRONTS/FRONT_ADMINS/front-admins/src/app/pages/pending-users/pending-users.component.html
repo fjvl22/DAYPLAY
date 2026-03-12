@@ -1,0 +1,18 @@
+<h2>Usuarios Pendientes</h2>
+<table border="1" width="100%">
+    <tr>
+        <th>ID</th>
+        <th>Nickname</th>
+        <th>Plan</th>
+        <th>Acciones</th>
+    </tr>
+    <tr *ngFor="let u of pending">
+        <td>{{ u.personId }}</td>
+        <td>{{ u.person?.nickname }}</td>
+        <td>{{ u.planType }}</td>
+        <td>
+            <button (click)="approve(u.personId)">Aprobar</button>
+            <button (click)="reject(u.personId)">Rechazar</button>
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,40 @@
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #1f2937;
+    color: white;
+}
+
+.user-menu {
+    position: relative;
+}
+
+.user-menu button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.dropdown {
+    position: absolute;
+    right: 0;
+    top: 35px;
+    background: white;
+    color: black;
+    min-width: 180px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.dropdown div {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.dropdown div:hover {
+    background-color: #f3f4f6;
+}

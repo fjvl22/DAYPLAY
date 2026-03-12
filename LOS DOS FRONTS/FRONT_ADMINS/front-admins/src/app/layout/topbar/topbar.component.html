@@ -1,0 +1,15 @@
+<div class="topbar">
+    <div class="left">
+        <h3>Panel Administración</h3>
+    </div>
+    <div class="right">
+        <div class="user-menu">
+            <button (click)="toggleMenu()">{{ getAdminType() }}</button>
+            <div class="dropdown" *ngIf="menuOpen">
+                <div (click)="goToChangePassword()">Cambiar contraseña</div>
+                <div (click)="goToDeleteAccount()">Eliminar cuenta</div>
+                <div (click)="logout()">Cerrrar sesión</div>
+            </div>
+        </div>
+    </div>
+</div>
