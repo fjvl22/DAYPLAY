@@ -1,238 +1,209 @@
+const admin = require('../../models/admin');
 const adminService = require('./admin.service');
-
-
-/* =========================
-   USERS
-========================= */
 
 exports.getUsers = async (req, res) => {
     try {
-        const users = await adminService.getUsers(req.admin);
-        res.json(users);
+        const data = await adminService.getUsers(req.admin);
+        res.json(data);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
-
-exports.updateUser = async (req, res) => {
-    try {
-        const updatedUser = await adminService.updateUser(
-            req.admin,
-            req.params.id,
-            req.body
-        );
-        res.json(updatedUser);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-exports.deleteUser = async (req, res) => {
-    try {
-        await adminService.deleteUser(req.admin, req.params.id);
-        res.json({ message: 'User correctly deleted' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-
-/* =========================
-   PENDING USERS
-========================= */
 
 exports.getPendingUsers = async (req, res) => {
     try {
-        const pendingUsers = await adminService.getPendingUsers(req.admin);
-        res.json(pendingUsers);
+        const data = await adminService.getPendingUsers(req.admin);
+        res.json(data);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
 exports.approvePendingUser = async (req, res) => {
     try {
-        const { plan } = req.body; // ahora viene del body correctamente
-
-        const result = await adminService.approvePendingUser(
-            req.admin,
-            req.params.id,
-            plan
-        );
-
-        res.json(result);
+        const { pendingUserId, plan } = req.body;
+        const data = await adminService.approvePendingUser(req.admin, pendingUserId, plan);
+        res.json(data);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
 exports.rejectPendingUser = async (req, res) => {
     try {
-        const result = await adminService.rejectPendingUser(
-            req.admin,
-            req.params.id
-        );
-
-        res.json(result);
+        const { id } = req.params;
+        const data = await adminService.rejectPendingUser(req.admin, id);
+        res.json(data);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
+exports.updateUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const data = await adminService.updateUser(req.admin, id, req.body);
+        res.json(data);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
 
-/* =========================
-   GAMES
-========================= */
+exports.deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const data = await adminService.deleteUser(req.admin, id);
+        res.json(data);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
 
 exports.getGames = async (req, res) => {
     try {
-        const games = await adminService.getGames(req.admin);
-        res.json(games);
+        const data = await adminService.getGames(req.admin);
+        res.json(data);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
-exports.createGame = async (req, res) => {
+exports.getHangmanWords = async (req, res) => {
     try {
-        const game = await adminService.createGame(req.admin, req.body);
-        res.json(game);
+        const data = await adminService.getHangmanWords(req.admin);
+        res.json(data);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
-exports.updateGame = async (req, res) => {
+exports.getWordleWords = async (req, res) => {
     try {
-        const game = await adminService.updateGame(
-            req.admin,
-            req.params.id,
-            req.body
-        );
-        res.json(game);
+        const data = await adminService.getWordleWords(req.admin);
+        res.json(data);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
-exports.deleteGame = async (req, res) => {
+exports.getMathOperations = async (req, res) => {
     try {
-        await adminService.deleteGame(req.admin, req.params.id);
-        res.json({ message: 'Game correctly deleted' });
+        const data = await adminService.getMathOperations(req.admin);
+        res.json(data);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
-exports.getActiveGames = async (req, res) => {
+exports.insertGameWord = async (req, res) => {
     try {
-        await adminService.getActiveGames(req.admin, req.params.id);
-        res.json(game);
+        const data = await adminService.insertGameWord(req.admin, req.body);
+        res.json(data);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
+exports.insertMathOperation = async (req, res) => {
+    try {
+        const data = await adminService.insertMathOperation(req.admin, req.body);
+        res.json(data);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
 
-/* =========================
-   DAILY REWARDS
-========================= */
+exports.canUserPlayToday = async (req, res) => {
+    try {
+        const { userId, gameId } = req.query;
+        const data = await adminService.canUserPlayToday(req.admin, userId, gameId);
+        res.json(data);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
 
 exports.getDailyRewardRequests = async (req, res) => {
     try {
-        const requests = await adminService.getDailyRewardRequests(req.admin);
-        res.json(requests);
+        const data = await adminService.getDailyRewardRequests(req.admin);
+        res.json(data);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
 exports.approveDailyReward = async (req, res) => {
     try {
-        const result = await adminService.approveDailyReward(
-            req.admin,
-            req.params.userId,
-            req.ip
-        );
-        res.json(result);
+        const { userId, ipAddress } = req.body;
+        const data = await adminService.approveDailyReward(req.admin, userId, ipAddress);
+        res.json(data);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
 exports.rejectDailyReward = async (req, res) => {
     try {
-        const result = await adminService.rejectDailyReward(
-            req.admin,
-            req.params.id
-        );
-        res.json(result);
+        const { rewardId } = req.params;
+        const data = await adminService.rejectDailyReward(req.admin, rewardId);
+        res.json(data);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
-
-/* =========================
-   PAYMENTS
-========================= */
-
 exports.getPayments = async (req, res) => {
     try {
-        const payments = await adminService.getPayments(req.admin);
-        res.json(payments);
+        const data = await adminService.getPayments(req.admin);
+        res.json(data);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
 exports.getPaymentDetail = async (req, res) => {
     try {
-        const details = await adminService.paymentDetail(req.admin, req.paymentId);
-        res.json(details);
+        const { id } = req.params;
+        const data = await adminService.getPaymentDetail(req.admin, id);
+        res.json(data);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
-
-
-/* =========================
-   NOTIFICATIONS
-========================= */
 
 exports.getNotifications = async (req, res) => {
     try {
-        const notifications = await adminService.getNotifications(req.admin);
-        res.json(notifications);
+        const data = await adminService.getNotifications(req.admin);
+        res.json(data);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
-
-
-/* =========================
-   EVENTS
-========================= */
 
 exports.getEvents = async (req, res) => {
     try {
-        const events = await adminService.getEvents(req.admin);
-        res.json(events);
+        const data = await adminService.getEvents(req.admin);
+        res.json(data);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ error: error.message });
     }
 };
 
-
-/* =========================
-   ADMINS
-========================= */
-
 exports.getAdmins = async (req, res) => {
     try {
-        const admins = await adminService.getAdmins(req.admin);
-        res.json(admins);
+        const data = await adminService.getAdmins(req.admin);
+        res.json(data);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(400).json({ error: error.message });
+    }
+};
+
+exports.getPermissionsByDepartment = async (req, res) => {
+    try {
+        const { department } = req.params;
+        const data = await adminService.getPermissionsByDepartment(department);
+        res.json(data);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
     }
 };

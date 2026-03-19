@@ -1,5 +1,5 @@
 export interface MathOption {
-    id: number;
-    optionValue: string;
-    operationId?: number;
-  }
+  id?: number;
+  optionValue: string;
+  operationId?: number;
+}

@@ -1,0 +1,19 @@
+<header class="app-header">
+    <div class="logo"><img src="assets/LOGO.png" alt="LOGO"></div>
+    <div class="welcome">Welcome, {{ nickname }}</div>
+    <div class="user-icon">
+        <select (change)="
+            $event.target.value === 'logout' ? logout() :
+            $event.target.value === 'delete' ? openDeleteAccount(deleteAccount) :
+            $event.target.value === 'change' ? openChangePassword(changePassword) : null
+        ">
+            <option value="" selected><img src="assets/perfildonutmordido.jpg" alt="Perfil"></option>
+            <option value="logout">Cerrar Sesión</option>
+            <option value="delete">Eliminar Cuenta</option>
+            <option value="change">Cambiar Contraseña</option>
+        </select>
+    </div>
+
+    <app-delete-account #deleteAccount></app-delete-account>
+    <app-change-password #changePassword></app-change-password>
+</header>

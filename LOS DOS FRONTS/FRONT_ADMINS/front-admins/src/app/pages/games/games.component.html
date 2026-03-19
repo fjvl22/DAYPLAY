@@ -1,31 +1,102 @@
-<h2>Gestión de Juegos</h2>
+<h2>JUEGOS</h2>
 
-<h3>Crear Juego</h3>
-
-<input [(ngModel)]="newGame.name" placeholder="Nombre">
-<input [(ngModel)]="newGame.description" placeholder="Descripción">
-<input [(ngModel)]="newGame.url" placeholder="URL">
-
-<button (click)="create()">Crear</button>
-
-<hr>
-
-<table border="1" width="100%">
-    <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Descripción</th>
-        <th>URL</th>
-        <th>Acciones</th>
-    </tr>
-
-    <tr *ngFor="let g of games">
-        <td>{{ g.id }}</td>
-        <td>{{ g.name }}</td>
-        <td>{{ g.description }}</td>
-        <td>{{ g.url }}</td>
-        <td>
-            <button (click)="delete(g.id)">Eliminar</button>
-        </td>
-    </tr>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Imagen</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let g of games">
+            <td>{{ g.id }}</td>
+            <td>{{ g.name }}</td>
+            <td>{{ g.description }}</td>
+            <td>{{ g.url }}</td>
+        </tr>
+    </tbody>
 </table>
+
+<button (click)="showManager = !showManager">AdministrarDatos de Juegos</button>
+
+<div *ngIf="showManager" class="manager">
+
+    <nav class="tabs">
+        <button (click)="selectTab('hangman')">Ahorcado</button>
+        <button (click)="selectTab('wordle')">Wordle</button>
+        <button (click)="selectTab('math')">Math Rush</button>
+    </nav>
+
+    <div *ngIf="activeTab==='hangman'">
+        <button (click)="showForm=!showForm">Añadir Palabra</button>
+
+        <table>
+            <tr *ngFor="let w of hangmanWords">
+                <td>{{ w.word }}</td>
+                <td>{{ w.language }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div *ngIf="activeTab==='wordle'">
+        <button (click)="showForm=!showForm">Añadir Palabra</button>
+
+        <table>
+            <tr *ngFor="let w of wordleWords">
+                <td>{{ w.word }}</td>
+                <td>{{ w.language }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div *ngIf="activeTab==='math'">
+        <button (click)="showForm=!showForm">Añadir Operación</button>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Operación</th>
+                    <th>Opciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let op of mathOperations">
+                    <td>{{ op.operation }}</td>
+                    <td>
+                        <span *ngFor="let opt of op.MathOptions" [style.color]="opt.optionValue == op.result ? 'green' : 'red'">{{ opt.optionValue }}</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div *ngIf="showForm" class="form">
+
+        <div *ngIf="activeTab!=='math'">
+            <input placeholder="word" [(ngModel)]="newWord.word">
+
+            <select [(ngModel)]="newWord.language">
+                <option value="es">Español</option>
+                <option value="en">Inglés</option>
+            </select>
+
+            <button (click)="addWord()">Guardar</button>
+        </div>
+
+        <div *ngIf="activeTab==='math'">
+            <input placeholder="Operación" [(ngModel)]="newOperation.operation">
+
+            <input placeholder="Opción 1" [(ngModel)]="newOperation.options[0]">
+            <input placeholder="Opción 2" [(ngModel)]="newOperation.options[1]">
+            <input placeholder="Opción 3" [(ngModel)]="newOperation.options[2]">
+            <input placeholder="Opción 4" [(ngModel)]="newOperation.options[3]">
+
+            <input type="number" placeholder="Resultado correcto" [(ngModel)]="newOperation.result">
+
+            <button (click)="addOperation()">Guardar</button>
+        </div>
+
+    </div>
+</div>

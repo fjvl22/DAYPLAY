@@ -7,7 +7,7 @@ router.post('/match', authGuard(), controller.registerMatch);
 router.post('/match/finish', authGuard(), controller.finishMatch);
 router.post('/streak', authGuard(), controller.updateStreak);
 router.post('/leaderboard', authGuard(), controller.updateLeaderboard);
-router.get('/games', authGuard(), controller.getGameNames);
+router.get('/games', authGuard(), controller.getGames);
 router.get('/hangman/words', authGuard(), controller.getHangmanWords);
 router.get('/wordle/words', authGuard(), controller.getWordleWords);
 router.get('/operations', authGuard(), controller.getMathOperations);

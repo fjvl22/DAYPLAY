@@ -1,5 +1,5 @@
 export interface UserGame {
-    userId: number;
-    gameId: number;
-    active: boolean;
-  }
+  userId: number;
+  gameId: number;
+  active: boolean;
+}

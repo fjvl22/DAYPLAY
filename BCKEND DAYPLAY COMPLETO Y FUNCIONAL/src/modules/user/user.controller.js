@@ -57,10 +57,10 @@ async function updateLeaderboard(req, res) {
     }
 }
 
-async function getGameNames(req, res) {
+async function getGames(req, res) {
     try {
-        const games = await service.getGameNames();
-        res.json({ message: 'Games retrieved', games });
+        const games = await service.getGames();
+        res.json(games);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -100,7 +100,7 @@ module.exports = {
     finishMatch,
     updateStreak,
     updateLeaderboard,
-    getGameNames,
+    getGames,
     getHangmanWords,
     getWordleWords,
     getMathOperations

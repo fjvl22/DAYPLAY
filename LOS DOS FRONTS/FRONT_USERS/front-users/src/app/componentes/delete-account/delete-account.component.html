@@ -1,0 +1,11 @@
+<div *ngIf="showModal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>Eliminar Cuenta</h3>
+        <form [formGroup]="form" (ngSubmit)="submit()">
+            <input formControlName="password" type="password" placeholder="Confirma tu contraseña">
+            <button type="submit">Eliminar</button>
+            <button type="button" (click)="closeModal()">Cancelar</button>
+        </form>
+        <div *ngIf="message">{{ message }}</div>
+    </div>
+</div>

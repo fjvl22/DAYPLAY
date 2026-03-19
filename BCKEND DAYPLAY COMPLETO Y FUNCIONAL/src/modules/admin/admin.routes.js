@@ -1,63 +1,39 @@
 const router = require('express').Router();
-const controller = require('./admin.controller');
-const { authGuard } = require('../../middlewares/auth.guard');
+const admin = require('./admin.controller');
+const auth = require('../../middlewares/checkRole');
 
-/* =========================
-   USERS
-========================= */
+router.use(auth);
 
-router.get('/users', authGuard('USER_MANAGE'), controller.getUsers);
-router.put('/users/:id', authGuard('USER_EDIT'), controller.updateUser);
-router.delete('/users/:id', authGuard('USER_DELETE'), controller.deleteUser);
+router.get('/users',admin.getUsers);
+router.get('/users/pending',admin.getPendingUsers);
+router.post('/users/approve',admin.approvePendingUser);
+router.delete('/users/reject/:id',admin.rejectPendingUser);
+router.put('/users/:id',admin.updateUser);
+router.delete('/users/:id',admin.deleteUser);
 
-/* =========================
-   PENDING USERS
-========================= */
+router.get('/games',admin.getGames);
+router.get('/games/hangman',admin.getHangmanWords);
+router.get('/games/wordle',admin.getWordleWords);
+router.get('/games/math',admin.getMathOperations);
 
-router.get('/pending-users', authGuard('USER_MANAGE'), controller.getPendingUsers);
-router.post('/pending-users/:id/approve', authGuard('USER_CREATE'), controller.approvePendingUser);
-router.delete('/pending-users/:id', authGuard('USER_DELETE'), controller.rejectPendingUser);
+router.post('/games/word',admin.insertGameWord);
+router.post('/games/math',admin.insertMathOperation);
 
-/* =========================
-   GAMES
-========================= */
+router.get('/games/canPlay',admin.canUserPlayToday);
 
-router.get('/games', authGuard('GAME_MANAGE'), controller.getGames);
-router.post('/games', authGuard('GAME_CREATE'), controller.createGame);
-router.put('/games/:id', authGuard('GAME_EDIT'), controller.updateGame);
-router.delete('/games/:id', authGuard('GAME_DELETE'), controller.deleteGame);
+router.get('/rewards',admin.getDailyRewardRequests);
+router.post('/rewards/approve',admin.approveDailyReward);
+router.delete('/rewards/:rewardId',admin.rejectDailyReward);
 
-/* =========================
-   DAILY REWARDS
-========================= */
+router.get('/payments',admin.getPayments);
+router.get('/payments/:id',admin.getPaymentDetail);
 
-router.get('/daily-rewards', authGuard('DAILY_REWARD_MANAGE'), controller.getDailyRewardRequests);
-router.post('/daily-rewards/:userId/approve', authGuard('DAILY_REWARD_MANAGE'), controller.approveDailyReward);
-router.delete('/daily-rewards/:id', authGuard('DAILY_REWARD_MANAGE'), controller.rejectDailyReward);
+router.get('/notifications',admin.getNotifications);
 
-/* =========================
-   PAYMENTS
-========================= */
+router.get('/events',admin.getEvents);
 
-router.get('/payments', authGuard('PAYMENT_MANAGE'), controller.getPayments);
-router.get('/admin/payments/:id', authGuard('PAYMENT_MANAGE'), controller.getPaymentDetail);
+router.get('/admins',admin.getAdmins);
 
-/* =========================
-   NOTIFICATIONS
-========================= */
-
-router.get('/notifications', authGuard('NOTIF_MANAGE'), controller.getNotifications);
-
-/* =========================
-   EVENTS
-========================= */
-
-router.get('/events', authGuard('EVENT_MANAGE'), controller.getEvents);
-
-/* =========================
-   ADMINS
-========================= */
-
-router.get('/admins', controller.getAdmins);
+router.get('/permissions/:department',admin.getPermissionsByDepartment);
 
 module.exports = router;

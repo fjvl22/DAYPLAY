@@ -209,8 +209,8 @@ async function updateStreak(userId, gameId) {
 
 // ======================= GAMES =======================
 
-async function getGameNames() {
-    return await Game.findAll({ attributes: ['id','name'], order: [['id','ASC']] });
+async function getGames() {
+    return await Game.findAll();
 }
 
 async function getHangmanWords() {
@@ -238,7 +238,7 @@ module.exports = {
     finishMatch,
     updateStreak,
     updateLeaderboard,
-    getGameNames,
+    getGames,
     getHangmanWords,
     getWordleWords,
     getMathOperations

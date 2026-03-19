@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 
-const trenaporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
@@ -15,7 +15,7 @@ const trenaporter = nodemailer.createTransport({
  * @param {string} options.html - Contenido HTML
 */
 exports.sendEmail = async ({ to, subject, html }) => {
-    await trenaporter.sendMail({
+    await transporter.sendMail({
         from: `"DAYPLAY" <${process.env.EMAIL_USER}>`,
         to,
         subject,

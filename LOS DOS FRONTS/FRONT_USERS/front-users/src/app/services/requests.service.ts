@@ -1,10 +1,13 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Leaderboard } from '../interfaces/leaderboard';
-import { Game } from '../interfaces/game';
-import { MathOperation } from '../interfaces/math-operation';
-import { GameWord } from '../interfaces/game-word';
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { Observable } from "rxjs";
+import { LeaderboardResponse } from "../interfaces/leaderboard-response";
+import { Game } from "../interfaces/game";
+import { MathOperation } from "../interfaces/math-operation";
+import { GameWord } from "../interfaces/game-word";
+import { MessageResponse } from "../interfaces/message-response";
+import { MatchResponse } from "../interfaces/match-response";
+import { StreakResponse } from "../interfaces/streak-response";
 
 @Injectable({
   providedIn: 'root'
@@ -15,28 +18,85 @@ export class RequestsService {
 
   constructor(private http: HttpClient) {}
 
-  getLeaderboard(gameId: number, sortBy: string): Observable<Leaderboard[]> {
+  private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    return new HttpHeaders({ Authorization: `Bearer ${token}` });
+  }
+
+  getLeaderboard(gameId: number, sortBy: string): Observable<LeaderboardResponse> {
+    const headers = this.getAuthHeaders();
     const params = new HttpParams().set('sortBy', sortBy);
-    return this.http.get<Leaderboard[]>(`${this.API_URL}/leaderboard/${gameId}`, { headers, params });
+    return this.http.get<LeaderboardResponse>(
+      `${this.API_URL}/leaderboard/${gameId}`,
+      { headers, params }
+    );
+  }
+
+  updateLeaderboard(gameId: number, score: number): Observable<MessageResponse> {
+    const headers = this.getAuthHeaders();
+    return this.http.post<MessageResponse>(
+      `${this.API_URL}/leaderboard`,
+      { gameId, score },
+      { headers }
+    );
+  }
+
+  createMatch(gameId: number): Observable<MatchResponse> {
+    const headers = this.getAuthHeaders();
+    return this.http.post<MatchResponse>(
+      `${this.API_URL}/match`,
+      { gameId },
+      { headers }
+    );
+  }
+
+  finishMatch(matchId: number, score: number, extraData: string): Observable<MessageResponse> {
+    const headers = this.getAuthHeaders();
+    return this.http.post<MessageResponse>(
+      `${this.API_URL}/match/finish`,
+      { matchId, score, extraData },
+      { headers }
+    );
+  }
+
+  updateStreak(gameId: number): Observable<StreakResponse> {
+    const headers = this.getAuthHeaders();
+    return this.http.post<StreakResponse>(
+      `${this.API_URL}/streak`,
+      { gameId },
+      { headers }
+    );
   }
 
   getGames(): Observable<Game[]> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
-    return this.http.get<Game[]>(this.API_URL+"/games", { headers });
+    const headers = this.getAuthHeaders();
+    return this.http.get<Game[]>(
+      `${this.API_URL}/games`,
+      { headers }
+    );
   }
 
-  getHangmanWord(): Observable<GameWord[]> {
-    return this.http.get<GameWord[]>(`${this.API_URL}/hangman`);
+  getHangmanWords(): Observable<GameWord[]> {
+    const headers = this.getAuthHeaders();
+    return this.http.get<GameWord[]>(
+      `${this.API_URL}/hangman/words`,
+      { headers }
+    );
   }
 
-  getWordleWord(): Observable<GameWord[]> {
-    return this.http.get<GameWord[]>(`${this.API_URL}/wordle`);
+  getWordleWords(): Observable<GameWord[]> {
+    const headers = this.getAuthHeaders();
+    return this.http.get<GameWord[]>(
+      `${this.API_URL}/wordle/words`,
+      { headers }
+    );
   }
 
-  getMathOperations(page: number = 1): Observable<MathOperation[]> {
-    return this.http.get<MathOperation[]>(`${this.API_URL}/mathrush?page=${page}`);
+  getMathOperations(page: number = 1): Observable<MathOperation[]>{
+    const headers = this.getAuthHeaders();
+    return this.http.get<MathOperation[]>(
+      `${this.API_URL}/operations?page=${page}`,
+      { headers }
+    );
   }
 }

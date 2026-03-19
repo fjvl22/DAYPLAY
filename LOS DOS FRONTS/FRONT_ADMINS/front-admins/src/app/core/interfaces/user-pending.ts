@@ -1,6 +1,6 @@
 import { Person } from "./person";
 
 export interface UserPending {
-    personId: number;
-    person: Person;
-  }
+  personId?: number;
+  person: Person;
+}

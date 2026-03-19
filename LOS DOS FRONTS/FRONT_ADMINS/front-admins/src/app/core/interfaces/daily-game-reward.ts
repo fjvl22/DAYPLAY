@@ -1,7 +1,7 @@
 export interface DailyGameReward {
-    id: number;
-    userId: number;
-    rewardDate: string;
-    totalScore: number;
-    createdAt: string;
-  }
+  id?: number;
+  userId: number;
+  rewardDate: string;
+  totalScore: number;
+  createdAt: string;
+}

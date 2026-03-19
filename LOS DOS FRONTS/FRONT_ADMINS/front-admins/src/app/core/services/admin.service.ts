@@ -1,14 +1,16 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+
+import { AppUser } from '../interfaces/app-user';
 import { UserPending } from '../interfaces/user-pending';
 import { Game } from '../interfaces/game';
+import { GameWord } from '../interfaces/game-word';
+import { MathOperation } from '../interfaces/math-operation';
 import { DailyGameReward } from '../interfaces/daily-game-reward';
 import { Payment } from '../interfaces/payment';
-import { SystemEvent } from '../interfaces/system-event';
 import { Notification } from '../interfaces/notification';
-import { AppUser } from '../interfaces/app-user';
-import { PaymentDetailResponse } from '../interfaces/payment-detail-response';
+import { SystemEvent } from '../interfaces/system-event';
 import { Admin } from '../interfaces/admin';
 
 @Injectable({
@@ -16,100 +18,134 @@ import { Admin } from '../interfaces/admin';
 })
 export class AdminService {
 
-  private api = 'http://localhost:3000/admin';
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {}
+  private apiUrl = 'http://localhost:3000/admin';
 
-  // =============================
-  // USERS
-  // =============================
+  // ================= USERS =================
 
   getUsers(): Observable<AppUser[]> {
-    return this.http.get<AppUser[]>(`${this.api}/users`);
+    return this.http.get<AppUser[]>(`${this.apiUrl}/users`);
   }
 
-  deleteUser(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.api}/users/${id}`);
+  getUserPendings(): Observable<UserPending[]> {
+    return this.http.get<UserPending[]>(`${this.apiUrl}/users/pending`);
   }
 
-  getPendingUsers(): Observable<UserPending[]> {
-    return this.http.get<UserPending[]>(`${this.api}/users/pending`);
+  approveUserPending(UserPendingId: number, plan: string): Observable<AppUser> {
+    return this.http.post<AppUser>(`${this.apiUrl}/users/approve`, {
+      UserPendingId,
+      plan
+    });
   }
 
-  approvePendingUser(id: number): Observable<void> {
-    return this.http.post<void>(`${this.api}/users/pending/${id}/approve`, {});
+  rejectUserPending(id: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(
+      `${this.apiUrl}/users/reject/${id}`
+    );
   }
 
-  rejectPendingUser(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.api}/users/pending/${id}`);
+  updateUser(id: number, user: Partial<AppUser>): Observable<AppUser> {
+    return this.http.put<AppUser>(`${this.apiUrl}/users/${id}`, user);
   }
 
-  // =============================
-  // GAMES
-  // =============================
+  deleteUser(id: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(
+      `${this.apiUrl}/users/${id}`
+    );
+  }
+
+  // ================= GAMES =================
 
   getGames(): Observable<Game[]> {
-    return this.http.get<Game[]>(`${this.api}/games`);
+    return this.http.get<Game[]>(`${this.apiUrl}/games`);
   }
 
-  createGame(data: Game): Observable<Game> {
-    return this.http.post<Game>(`${this.api}/games`, data);
+  getHangmanWords(): Observable<GameWord[]> {
+    return this.http.get<GameWord[]>(`${this.apiUrl}/games/hangman`);
   }
 
-  deleteGame(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.api}/games/${id}`);
+  getWordleWords(): Observable<GameWord[]> {
+    return this.http.get<GameWord[]>(`${this.apiUrl}/games/wordle`);
   }
 
-  // =============================
-  // DAILY REWARDS
-  // =============================
-
-  getDailyRewards(): Observable<DailyGameReward[]> {
-    return this.http.get<DailyGameReward[]>(`${this.api}/daily-rewards`);
+  getMathOperations(): Observable<MathOperation[]> {
+    return this.http.get<MathOperation[]>(`${this.apiUrl}/games/math`);
   }
 
-  approveDailyReward(id: number): Observable<void> {
-    return this.http.post<void>(`${this.api}/daily-rewards/${id}/approve`, {});
+  insertGameWord(word: GameWord): Observable<GameWord> {
+    return this.http.post<GameWord>(
+      `${this.apiUrl}/games/word`,
+      word
+    );
   }
 
-  rejectDailyReward(id: number): Observable<void> {
-    return this.http.post<void>(`${this.api}/daily-rewards/${id}/reject`, {});
+  insertMathOperation(operation: MathOperation): Observable<MathOperation> {
+    return this.http.post<MathOperation>(
+      `${this.apiUrl}/games/math`,
+      operation
+    );
   }
 
-  // =============================
-  // PAYMENTS
-  // =============================
+  canUserPlayToday(userId: number, gameId: number): Observable<{ canPlay: boolean }> {
+
+    const params = new HttpParams()
+      .set('userId', userId)
+      .set('gameId', gameId);
+
+    return this.http.get<{ canPlay: boolean }>(
+      `${this.apiUrl}/games/canPlay`,
+      { params }
+    );
+  }
+
+  // ================= REWARDS =================
+
+  getDailyRewardRequests(): Observable<DailyGameReward[]> {
+    return this.http.get<DailyGameReward[]>(`${this.apiUrl}/rewards`);
+  }
+
+  approveDailyReward(userId: number, ipAddress?: string):
+    Observable<{ approved: boolean; message?: string }> {
+
+    return this.http.post<{ approved: boolean; message?: string }>(
+      `${this.apiUrl}/rewards/approve`,
+      { userId, ipAddress }
+    );
+  }
+
+  rejectDailyReward(rewardId: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(
+      `${this.apiUrl}/rewards/${rewardId}`
+    );
+  }
+
+  // ================= PAYMENTS =================
 
   getPayments(): Observable<Payment[]> {
-    return this.http.get<Payment[]>(`${this.api}/payments`);
+    return this.http.get<Payment[]>(`${this.apiUrl}/payments`);
   }
 
-  getPaymentDetail(paymentId: number): Observable<PaymentDetailResponse> {
-    return this.http.get<PaymentDetailResponse>(`${this.api}/payments/${paymentId}`);
+  getPaymentDetail(id: number): Observable<Payment> {
+    return this.http.get<Payment>(`${this.apiUrl}/payments/${id}`);
   }
 
-  // =============================
-  // NOTIFICATIONS
-  // =============================
+  // ================= NOTIFICATIONS =================
 
-  createNotification(data: Notification): Observable<Notification> {
-    return this.http.post<Notification>(`${this.api}/notifications`, data);
+  getNotifications(): Observable<Notification[]> {
+    return this.http.get<Notification[]>(`${this.apiUrl}/notifications`);
   }
 
-  // =============================
-  // EVENTS
-  // =============================
+  // ================= EVENTS =================
 
   getEvents(): Observable<SystemEvent[]> {
-    return this.http.get<SystemEvent[]>(`${this.api}/events`);
+    return this.http.get<SystemEvent[]>(`${this.apiUrl}/events`);
   }
 
-  // =============================
-  // ADMINS
-  // =============================
+  // ================= ADMINS =================
 
   getAdmins(): Observable<Admin[]> {
-    return this.http.get<Admin[]>(`${this.api}/admins`);
+    return this.http.get<Admin[]>(`${this.apiUrl}/admins`);
   }
 
 }

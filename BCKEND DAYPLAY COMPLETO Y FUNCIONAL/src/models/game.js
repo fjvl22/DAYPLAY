@@ -4,10 +4,7 @@ module.exports = (sequelize, DataTypes) => {
       id: { type: DataTypes.INTEGER.UNSIGNED, primaryKey: true, autoIncrement: true },
       name: { type: DataTypes.STRING(50), allowNull: false, unique: true },
       description: { type: DataTypes.STRING(255), allowNull: false },
-      url: { type: DataTypes.STRING(255), allowNull: false, unique: true },
-      type: { type: DataTypes.STRING(20), allowNull: false },
-      config: { type: DataTypes.JSON },
-      active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true }
+      url: { type: DataTypes.STRING(255), allowNull: false, unique: true }
     }, {
       tableName: 'GAME',
       timestamps: false
