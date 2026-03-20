@@ -1,1 +1,28 @@
-<p>register works!</p>
+<div class="auth-container">
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+    <h2>Registro</h2>
+
+    <input type="text" placeholder="Nickname" formControlName="nickname">
+
+    <input type="email" placeholder="Email" formControlName="email">
+
+    <input type="password" placeholder="Contraseña" formControlName="password">
+
+    <select formControlName="plan">
+      <option value="">Selecciona un plan</option>
+      <option *ngFor="let plan of planTypes" [value]="plan">
+        {{ plan }}
+      </option>
+    </select>
+
+    <button type="submit" [disabled]="loading || registerForm.invalid">
+      Registrarse
+    </button>
+
+    <p *ngIf="loading">Cargando...</p>
+    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+    <p *ngIf="successMessage" class="success">{{ successMessage }}</p>
+
+  </form>
+</div>

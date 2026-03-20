@@ -4,6 +4,8 @@ const { Person } = require('../../models/person');
 const { Admin } = require('../../models/admin');
 const { AppUser } = require('../../models/appUser');
 const { UserPending } = require('../../models/userPending');
+const { SystemEvent } = require('../../models/systemEvent');
+const { UserPlan } = require('../../models/userPlan');
 const { TokenBlackList } = require('../../models/tokenBlacklist');
 const { generateToken } = require('../../utils/jwt');
 const { getPermissionsByDepartment } = require('../admin/admin.service');
@@ -235,4 +237,8 @@ exports.changePassword = async (userId, currentPassword, newPassword) => {
         await transaction.rollback();
         throw error;
     }
+};
+
+exports.getPlanTypes = async () => {
+    return UserPlan.getPlanTypes();
 };

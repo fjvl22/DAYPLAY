@@ -1,27 +1,31 @@
-import { Component, OnInit } from '@angular/core';
-import { Game } from '../interfaces/game';
-import { Leaderboard } from '../interfaces/leaderboard';
-import { RequestsService } from '../services/requests.service';
+import { Component, OnInit } from "@angular/core";
+import { Game } from "../../interfaces/game";
+import { RequestsService } from "../../services/requests.service";
+import { Leaderboard } from "../../interfaces/leaderboard";
+import { LeaderboardResponse } from "../../interfaces/leaderboard-response";
 
 @Component({
   selector: 'app-leaderboard',
   standalone: true,
   imports: [],
   templateUrl: './leaderboard.component.html',
-  styleUrl: './leaderboard.component.css'
+  styleUrls: ['./leaderboard.component.css']
 })
-export class LeaderboardComponent implements OnInit {
+export class leaderboardComponent implements OnInit {
   games: Game[] = [];
   selectedGameId: number | null = null;
-  leaderboard: Leaderboard[] = [];
+  leaderboardResponse!: LeaderboardResponse;
   sortBy: string = 'score';
   loading = false;
   currentUserNickname: string = '';
+
   constructor(private requests: RequestsService) {}
+
   ngOnInit(): void {
     this.currentUserNickname = localStorage.getItem('nickname') || '';
     this.loadGames();
   }
+
   loadGames() {
     this.requests.getGames().subscribe({
       next: (res) => {
@@ -34,26 +38,30 @@ export class LeaderboardComponent implements OnInit {
       error: () => console.error('Error cargando juegos')
     });
   }
+
   selectGame(gameId: number) {
     this.selectedGameId = gameId;
     this.loadLeaderboard();
   }
+
   changeSort(sortType: string) {
     this.sortBy = sortType;
     this.loadLeaderboard();
   }
+
   loadLeaderboard() {
     if (!this.selectedGameId) return;
     this.loading = true;
     this.requests.getLeaderboard(this.selectedGameId, this.sortBy)
-    .subscribe({
-      next: (res) => {
-        this.leaderboard = res;
-        this.loading = false;
-      },
-      error: () => this.loading = false
-    });
+      .subscribe({
+        next: (res) => {
+          this.leaderboardResponse = res;
+          this.loading = false;
+        },
+        error: () => this.loading = false
+      });
   }
+
   getMedal(index: number) {
     switch (index) {
       case 0: return '🥇';
@@ -62,5 +70,12 @@ export class LeaderboardComponent implements OnInit {
       default: return '';
     }
   }
-  isCurrentUser(nickname: string) {return nickname === this.currentUserNickname;}
+
+  isCurrentUser(nickname: string) {
+    return nickname === this.currentUserNickname;
+  }
+
+  get leaderboard(): Leaderboard[] {
+    return this.leaderboardResponse?.data || [];
+  }
 }

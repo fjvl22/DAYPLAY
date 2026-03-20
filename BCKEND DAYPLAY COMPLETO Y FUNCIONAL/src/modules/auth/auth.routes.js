@@ -10,4 +10,6 @@ router.post('/logout', authGuard(), controller.logout);
 router.delete('/delete-account', authGuard(), controller.deleteAccount);
 router.put('/change-password', authGuard(), controller.changePassword);
 
+router.get('/plan-types', authGuard(), controller.getPlanTypes);
+
 module.exports = router;

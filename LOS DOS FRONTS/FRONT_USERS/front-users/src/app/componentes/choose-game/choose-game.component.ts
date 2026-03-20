@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { Game } from '../../interfaces/game';
-import { RequestsService } from '../../services/requests.service';
-import { Router } from '@angular/router';
+import { Component, OnInit } from "@angular/core";
+import { Game } from "../../interfaces/game";
+import { RequestsService } from "../../services/requests.service";
+import { Router } from "@angular/router";
 
 @Component({
   selector: 'app-choose-game',
@@ -11,7 +11,8 @@ import { Router } from '@angular/router';
   styleUrl: './choose-game.component.css'
 })
 export class ChooseGameComponent implements OnInit {
-  title: string = '¿A QUÉ JUGAMOS HOY?';
+
+  title: string = '';
 
   games: Game[] = [];
   grid: (Game | null)[][] = [];
@@ -28,6 +29,7 @@ export class ChooseGameComponent implements OnInit {
     this.requests.getGames().subscribe(
       (games: Game[]) => {
         this.games = games;
+
         this.grid = [
           [games[0] || null, games[1] || null],
           [games[2] || null, games[3] || null]
@@ -39,14 +41,15 @@ export class ChooseGameComponent implements OnInit {
 
   onCellClick(game: Game | null): void {
     if (!game) return;
+
     this.requests.createMatch(game.id).subscribe({
-      next: res => {
-        switch(game.id){
+      next: () => {
+        switch (game.id) {
           case 1:
             this.router.navigate(['/hangman']);
             break;
           case 2:
-            this.router.navigate(['/guessecretnumber']);
+            this.router.navigate(['/guesssecretnumber']);
             break;
           case 3:
             this.router.navigate(['/mathrush']);
@@ -69,5 +72,9 @@ export class ChooseGameComponent implements OnInit {
 
   onMouseLeave(): void {
     this.hoveredGame = null;
+  }
+
+  goToRakning(): void {
+    this.router.navigate(['/ranking']);
   }
 }

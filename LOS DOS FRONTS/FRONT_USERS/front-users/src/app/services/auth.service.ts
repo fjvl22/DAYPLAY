@@ -44,4 +44,9 @@ export class AuthService {
       { headers }
     );
   }
+
+  getPlanTypes(): Observable<string[]> {
+    const headers = this.getAuthHeaders();
+    return this.http.get<string[]>(`${this.API_URL}/plan-types`, { headers });
+  }
 }

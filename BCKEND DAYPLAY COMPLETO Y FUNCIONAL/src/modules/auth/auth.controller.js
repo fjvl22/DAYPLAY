@@ -53,3 +53,11 @@ exports.changePassword = async (req, res, next) => {
         next(error);
     }
 };
+exports.getPlanTypes = async (req, res, next) => {
+    try {
+        const types = await authService.getPlanTypes();
+        res.json(types);
+    } catch (error) {
+        next(error);
+    }
+};

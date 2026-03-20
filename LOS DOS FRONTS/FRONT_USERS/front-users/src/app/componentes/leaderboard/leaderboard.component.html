@@ -2,11 +2,14 @@
     <nav class="games-navbar">
         <button *ngFor="let game of games" (click)="selectGame(game.id)" [class.active]="game.id === selectedGameId">{{ game.name }}</button>
     </nav>
+
     <div class="sorting" *ngIf="games.length > 0">
         <button (click)="changeSort('score')" [class.active]="sortBy === 'score'">Ordenar por Puntuación</button>
         <button (click)="changeSort('date')" [class.active]="sortBy === 'date'">Ordenar por Fecha</button>
     </div>
+
     <div *ngIf="loading" class="loading">Cargando...</div>
+
     <table *ngIf="!loading && leaderboard.length > 0">
         <thead>
             <tr>
@@ -25,5 +28,6 @@
             </tr>
         </tbody>
     </table>
+
     <div *ngIf="!loading && leaderboard.length === 0">No hay datos</div>
 </div>
