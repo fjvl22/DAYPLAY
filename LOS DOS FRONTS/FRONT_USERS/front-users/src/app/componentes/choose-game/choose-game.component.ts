@@ -2,11 +2,13 @@ import { Component, OnInit } from "@angular/core";
 import { Game } from "../../interfaces/game";
 import { RequestsService } from "../../services/requests.service";
 import { Router } from "@angular/router";
+import { CommonModule } from "@angular/common";
+import { AuthService } from "../../services/auth.service";
 
 @Component({
   selector: 'app-choose-game',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './choose-game.component.html',
   styleUrl: './choose-game.component.css'
 })
@@ -19,7 +21,7 @@ export class ChooseGameComponent implements OnInit {
 
   hoveredGame: Game | null = null;
 
-  constructor(private requests: RequestsService, private router: Router) {}
+  constructor(public authService: AuthService, public requests: RequestsService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadGames();
@@ -35,7 +37,7 @@ export class ChooseGameComponent implements OnInit {
           [games[2] || null, games[3] || null]
         ];
       },
-      (err: any) => console.error(err)
+      (err: unknown) => console.error(err)
     );
   }
 
@@ -74,7 +76,13 @@ export class ChooseGameComponent implements OnInit {
     this.hoveredGame = null;
   }
 
-  goToRakning(): void {
+  goToRanking(): void {
+    if (this.authService.isPending()) return;
     this.router.navigate(['/ranking']);
+  }
+  
+  goToStory(): void {
+    if (this.authService.isPending()) return;
+    this.router.navigate(['/story']);
   }
 }

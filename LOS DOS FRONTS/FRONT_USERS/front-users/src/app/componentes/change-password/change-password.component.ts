@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-change-password',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './change-password.component.html',
   styleUrl: './change-password.component.css'
 })
@@ -14,7 +15,7 @@ export class ChangePasswordComponent {
   form!: FormGroup;
   message: string | null = null;
 
-  constructor(private fb: FormBuilder, private auth: AuthService) {
+  constructor(private fb: FormBuilder, public auth: AuthService) {
     this.form = this.fb.group({
       currentPassword: ['', Validators.required],
       newPassword: ['', Validators.required]

@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { MessageResponse } from '../../interfaces/message-response';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
 })
@@ -19,7 +20,7 @@ export class RegisterComponent implements OnInit {
 
   planTypes: string[] = [];
 
-  constructor(private router: Router, private fb: FormBuilder, private auth: AuthService) {}
+  constructor(private router: Router, private fb: FormBuilder, public auth: AuthService) {}
 
   ngOnInit(): void {
     this.registerForm = this.fb.group({

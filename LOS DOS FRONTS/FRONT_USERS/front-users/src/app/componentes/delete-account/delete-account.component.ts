@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-delete-account',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './delete-account.component.html',
   styleUrl: './delete-account.component.css'
 })
@@ -15,7 +16,7 @@ export class DeleteAccountComponent {
   form!: FormGroup;
   message: string | null = null;
 
-  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
+  constructor(private fb: FormBuilder, public auth: AuthService, private router: Router) {
     this.form = this.fb.group({
       password: ['', Validators.required]
     });

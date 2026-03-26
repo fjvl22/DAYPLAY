@@ -2,11 +2,7 @@
     <div class="logo"><img src="assets/LOGO.png" alt="LOGO"></div>
     <div class="welcome">Welcome, {{ nickname }}</div>
     <div class="user-icon">
-        <select (change)="
-            $event.target.value === 'logout' ? logout() :
-            $event.target.value === 'delete' ? openDeleteAccount(deleteAccount) :
-            $event.target.value === 'change' ? openChangePassword(changePassword) : null
-        ">
+        <select (change)="onSelect($event)">
             <option value="" selected><img src="assets/perfildonutmordido.jpg" alt="Perfil"></option>
             <option value="logout">Cerrar Sesión</option>
             <option value="delete">Eliminar Cuenta</option>

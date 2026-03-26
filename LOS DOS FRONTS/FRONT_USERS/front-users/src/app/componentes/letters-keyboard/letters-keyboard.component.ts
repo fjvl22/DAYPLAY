@@ -1,9 +1,10 @@
+import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-letters-keyboard',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './letters-keyboard.component.html',
   styleUrl: './letters-keyboard.component.css'
 })

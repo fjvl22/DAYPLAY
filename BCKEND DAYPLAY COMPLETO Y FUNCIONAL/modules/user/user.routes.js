@@ -11,5 +11,7 @@ router.get('/games', authGuard(), controller.getGames);
 router.get('/hangman/words', authGuard(), controller.getHangmanWords);
 router.get('/wordle/words', authGuard(), controller.getWordleWords);
 router.get('/operations', authGuard(), controller.getMathOperations);
+router.get('/chapters', authGuard(), controller.getChapters);
+router.get('/users', authGuard(), controller.getUsers);
 
 module.exports = router;

@@ -3,19 +3,22 @@ import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { DeleteAccountComponent } from '../delete-account/delete-account.component';
 import { ChangePasswordComponent } from '../change-password/change-password.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, DeleteAccountComponent, ChangePasswordComponent],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
 export class HeaderComponent {
   nickname = localStorage.getItem('nickname') || 'User';
   showDropdown = false;
+  deleteAccount!: DeleteAccountComponent;
+  changePassword!: ChangePasswordComponent;
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(public auth: AuthService, private router: Router) {}
 
   toggleDropdown() {
     this.showDropdown = !this.showDropdown;
@@ -36,5 +39,13 @@ export class HeaderComponent {
 
   openChangePassword(changePasswordComponent: ChangePasswordComponent) {
     changePasswordComponent.openModal();
+  }
+
+  onSelect(event: Event) {
+    const value = (event.target as HTMLSelectElement).value;
+  
+    if (value === 'logout') this.logout();
+    else if (value === 'delete') this.openDeleteAccount(this.deleteAccount);
+    else if (value === 'change') this.openChangePassword(this.changePassword);
   }
 }

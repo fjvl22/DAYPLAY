@@ -4,4 +4,4 @@
         <div class="cell" *ngFor="let cell of row; let colIndex = index" [ngClass]="cellStatus[rowIndex][colIndex]">{{ cell }}</div>
     </div>
 </div>
-<app-keyboard [usedLetters]="usedLetters" [keyClasses]="keyClasses" [gameMode]="'wordle'" (letterPressed)="onLetter($event)" (backpacePressed)="onBackspace()" (enterPressed)="onEnter()"></app-keyboard>
+<app-letters-keyboard [usedLetters]="usedLetters" [keyClasses]="keyClasses" [gameMode]="'wordle'" (letterPressed)="onLetter($event)" (backspacePressed)="onBackspace()" (enterPressed)="onEnter()"></app-letters-keyboard>

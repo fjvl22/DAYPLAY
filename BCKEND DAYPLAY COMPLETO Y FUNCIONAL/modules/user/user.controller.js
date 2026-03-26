@@ -94,6 +94,27 @@ async function getMathOperations(req, res) {
     }
 }
 
+async function getChapters(req, res) {
+    try {
+        const userId = req.user.personId;
+        const chapters = await service.getavailableChapters(userId);
+        res.json({ success: true, chapters });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Error fetching chapters' });
+    }
+}
+
+async function getUsers(req, res) {
+    try {
+        const users = await service.getUsers();
+        res.json(users);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Error fetching users' });
+    }
+}
+
 module.exports = {
     getLeaderboard,
     registerMatch,
@@ -103,5 +124,7 @@ module.exports = {
     getGames,
     getHangmanWords,
     getWordleWords,
-    getMathOperations
+    getMathOperations,
+    getChapters,
+    getUsers
 };

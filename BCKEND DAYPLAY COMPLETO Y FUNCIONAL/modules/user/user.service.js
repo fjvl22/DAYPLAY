@@ -13,6 +13,9 @@ const Streak = require('../../models/streak');
 const { Op } = require('sequelize');
 const Game = require('../../models/game');
 const SystemEvent = require('../../models/systemEvent');
+const Story = require('../../models/story');
+const Chapter = require('../../models/chapter');
+const StoryAccess = require('../../models/storyAccess');
 
 function getToday() {
     const today = new Date();
@@ -98,8 +101,26 @@ async function updateLeaderboard(userId, gameId, score) {
 // ======================= MATCH =======================
 
 async function createMatch(userId, gameId) {
-    const match = await GameMatch.create({ userId, gameId, score: 0, extraData: '' });
-    return match;
+    const today = getToday();
+    const possibleTodayMatch = await GameMatch.findOne({ where: { userId, gameId, date: today } });
+    if (possibleTodayMatch) {
+        const now = new Date();
+        const tomorrow = new Date(now);
+        tomorrow.setHours(24, 0, 0, 0);
+        const diffMs = tomorrow - now;
+        const hours = Math.floor(diffMs / (1000 * 60 * 60));
+        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+        throw new Error(`You can not play a game twice a day. You can play again in ${hours} hours, ${minutes} minutes and ${seconds} seconds.`);
+    }
+    const todayMatch = await GameMatch.create({
+        userId,
+        gameId,
+        date: today,
+        score: 0,
+        data: {}
+    });
+    return todayMatch;
 }
 
 async function finishMatch(matchId, score, extraData) {
@@ -107,13 +128,10 @@ async function finishMatch(matchId, score, extraData) {
     try {
         const match = await GameMatch.findByPk(matchId, { transaction });
         if (!match) throw new Error('Match not found');
-
         match.score = score;
         match.extraData = extraData;
         await match.save({ transaction });
-
         const game = await Game.findByPk(match.gameId, { transaction });
-
         await SystemEvent.create({
             userId: match.userId,
             eventType: 'GAME_PLAYED',
@@ -121,38 +139,63 @@ async function finishMatch(matchId, score, extraData) {
             category: 'USER',
             transaction
         });
-
         await UserGame.update(
             { active: 0 },
             { where: { userId: match.userId, gameId: match.gameId }, transaction }
         );
-
         const matchesToday = await GameMatch.findAll({
             where: { userId: match.userId, date: { [Op.gte]: getToday(), [Op.lt]: getTomorrow() } },
             transaction
         });
-
         const uniqueGamesToday = [...new Set(matchesToday.map(m => m.gameId))];
-
-        if (uniqueGamesToday.length === 4) {
-            const matchesYesterday = await GameMatch.findAll({
-                where: { userId: match.userId, date: { [Op.gte]: getYesterday(), [Op.lt]: getToday() } },
+        const matchesYesterday = await GameMatch.findAll({
+            where: { userId: match.userId, date: { [Op.gte]: getYesterday(), [Op.lt]: getToday() } },
+            transaction
+        });
+        const uniqueGamesYesterday = [...new Set(matchesYesterday.map(m => m.gameId))];
+        const isFirstDay = matchesYesterday.length === 0;
+        const isLastDayOfMonth = (() => {
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            return tomorrow.getDate() === 1;
+        })();
+        if (uniqueGamesToday.length === 4 && (uniqueGamesYesterday.length === 4 || isFirstDay || isLastDayOfMonth)) {
+            const [reward, created] = await DailyGameReward.findOrCreate({
+                where: { userId: match.userId, rewardDate: getToday() },
+                defaults: { totalScore: matchesToday.reduce((sum, m) => sum + m.score, 0) },
                 transaction
             });
-            const uniqueGamesYesterday = [...new Set(matchesYesterday.map(m => m.gameId))];
-            if (uniqueGamesYesterday.length === 4) {
-                await DailyGameReward.findOrCreate({
-                    where: { userId: match.userId, rewardDate: getToday() },
-                    defaults: { totalScore: score },
-                    transaction
-                });
+            if (created) {
+                let description = 'Capítulo diario desbloqueado';
+                if (isFirstDay) description = 'Inicio de la historia desbloqueado';
+                if (isLastDayOfMonth) description = 'Último día: todos los capítulos restantes desbloqueados';
                 await SystemEvent.create({
                     userId: match.userId,
                     eventType: 'DAILY_REWARD_UNLOCKED',
-                    description: 'Usuario desbloqueó recompensa diaria',
+                    description,
                     category: 'USER',
                     transaction
                 });
+                if (isLastDayOfMonth) {
+                    const currentMonth = new Date().toLocaleString('default', { month: 'long' });
+                    const story = await Story.findOne({ where: { monthYear: currentMonth } });
+                    if (story) {
+                        const chapters = await Chapter.findAll({ where: { storyId: story.id } });
+                        for (const chapter of chapters) {
+                            await StoryAccess.findOrCreate({
+                                where: { storyId: story.id, userId, accessGranted: true },
+                                defaults: {
+                                    grantedBy: 0,
+                                    accessGranted: true,
+                                    grantDate: new Date(),
+                                    notes: 'Desbloqueado último día del mes'
+                                },
+                                transaction
+                            });
+                        }
+                    }
+                }
             }
         }
 
@@ -232,6 +275,47 @@ async function getMathOperations(page = 1) {
     });
 }
 
+async function getAvailableChapters(userId) {
+    const accessRecords = await StoryAccess.findAll({
+        where: { userId, accessGranted: true },
+        include: [
+            {
+                model: Story,
+                include: [
+                    {
+                        model: Chapter,
+                        attributes: ['id', 'dayNumber', 'title', 'unlockCondition'],
+                        order: [['dayNumber', 'ASC']]
+                    }
+                ]
+            }
+        ]
+    });
+    const chapters = [];
+    for(const access of accessRecords) {
+        if (access.Story && access.Story.Chapters) {
+            for (const chapter of access.Story.Chapters) {
+                chapters.push({
+                    storyId: access.storyId,
+                    storyTitle: access.Story.title,
+                    chapterId: chapter.id,
+                    chapterTitle: chapter.title,
+                    dayNumber: chapter.dayNumber,
+                    unlockCondition: chapter.unlockCondition,
+                    grantedBy: access.grantedBy,
+                    grantDate: access.grantDate
+                });
+            }
+        }
+    }
+    chapters.sort((a,b) => a.storyId - b.storyId || a.dayNumber - b.dayNumber);
+    return chapters;
+}
+
+async function getUsers() {
+    return AppUser.findAll();
+}
+
 module.exports = {
     getLeaderboard,
     createMatch,
@@ -241,5 +325,7 @@ module.exports = {
     getGames,
     getHangmanWords,
     getWordleWords,
-    getMathOperations
+    getMathOperations,
+    getAvailableChapters,
+    getUsers
 };

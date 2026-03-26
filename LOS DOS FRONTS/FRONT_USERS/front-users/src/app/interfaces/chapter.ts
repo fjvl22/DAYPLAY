@@ -1,8 +1,10 @@
 export interface Chapter {
-    id: number;
-    storyId: number;
-    dayNumber: number;
-    title: string;
-    content: string;
-    unlockCondition?: string;
-  }
+  storyId: number;
+  storyTitle: string;
+  chapterId: number;
+  chapterTitle: string;
+  dayNumber: number;
+  unlockCondition: string;
+  grantedBy: number;
+  grantDate: string;
+}

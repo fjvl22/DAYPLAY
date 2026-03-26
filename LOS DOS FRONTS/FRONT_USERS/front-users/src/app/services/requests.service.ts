@@ -8,6 +8,8 @@ import { GameWord } from "../interfaces/game-word";
 import { MessageResponse } from "../interfaces/message-response";
 import { MatchResponse } from "../interfaces/match-response";
 import { StreakResponse } from "../interfaces/streak-response";
+import { Chapter } from "../interfaces/chapter";
+import { AppUser } from "../interfaces/app-user";
 
 @Injectable({
   providedIn: 'root'
@@ -50,7 +52,7 @@ export class RequestsService {
     );
   }
 
-  finishMatch(matchId: number, score: number, extraData: string): Observable<MessageResponse> {
+  finishMatch(matchId: number, score: number, extraData: object): Observable<MessageResponse> {
     const headers = this.getAuthHeaders();
     return this.http.post<MessageResponse>(
       `${this.API_URL}/match/finish`,
@@ -96,6 +98,22 @@ export class RequestsService {
     const headers = this.getAuthHeaders();
     return this.http.get<MathOperation[]>(
       `${this.API_URL}/operations?page=${page}`,
+      { headers }
+    );
+  }
+
+  getAvailableChapters(): Observable<Chapter[]> {
+    const headers = this.getAuthHeaders();
+    return this.http.get<Chapter[]>(
+      `${this.API_URL}/chapters`,
+      { headers }
+    );
+  }
+
+  getUsers(): Observable<AppUser[]> {
+    const headers = this.getAuthHeaders();
+    return this.http.get<AppUser[]>(
+      `${this.API_URL}/users`,
       { headers }
     );
   }

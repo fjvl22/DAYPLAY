@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { LoginResponse } from '../../interfaces/login-response';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -16,7 +17,7 @@ export class LoginComponent implements OnInit {
   loading = false;
   errorMessage = '';
 
-  constructor(private router: Router, private fb: FormBuilder, private auth: AuthService) {}
+  constructor(private router: Router, private fb: FormBuilder, public auth: AuthService) {}
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({

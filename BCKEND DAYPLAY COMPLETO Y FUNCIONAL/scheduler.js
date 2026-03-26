@@ -1,6 +1,6 @@
 const cron = require('node-cron');
-const adminService = require('./src/modules/admin/admin.service');
-const DailyGameReward = require('./src/models/dailyGameReward');
+const adminService = require('./modules/admin/admin.service');
+const DailyGameReward = require('./models/dailyGameReward');
 cron.schedule('0 0 * * *', async () => {
     console.log('Running automated daily review of DailyGameReward...');
     const rewards = await DailyGameReward.findAll();

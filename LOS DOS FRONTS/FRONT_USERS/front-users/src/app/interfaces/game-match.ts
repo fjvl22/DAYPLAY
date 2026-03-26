@@ -4,5 +4,5 @@ export interface GameMatch {
     gameId: number;
     date: string;
     score: number;
-    extraData?: any;
+    extraData?: object;
   }

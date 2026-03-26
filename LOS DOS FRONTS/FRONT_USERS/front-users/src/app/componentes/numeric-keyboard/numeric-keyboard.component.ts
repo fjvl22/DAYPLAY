@@ -1,9 +1,10 @@
+import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-numeric-keyboard',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './numeric-keyboard.component.html',
   styleUrl: './numeric-keyboard.component.css'
 })

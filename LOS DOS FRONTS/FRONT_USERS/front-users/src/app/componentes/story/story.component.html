@@ -1,0 +1,12 @@
+<div *ngIf="getCurrentChapter() as currentChapter" class="story-container">
+    <h2>{{ currentChapter.storyTitle }}</h2>
+    <h3>{{ currentChapter.chapterTitle }}</h3>
+    <p>{{ currentChapter.unlockCondition }}</p>
+
+    <div class="navigation">
+        <button (click)="prevChapter()" [disabled]="currentIndex === 0">⬅</button>
+        <button (click)="nextChapter()" [disabled]="currentIndex === chapters.length - 1">➡</button>
+    </div>
+</div>
+
+<div *ngIf="chapters.length === 0"><p>No hay capítulos disponibles.</p></div>

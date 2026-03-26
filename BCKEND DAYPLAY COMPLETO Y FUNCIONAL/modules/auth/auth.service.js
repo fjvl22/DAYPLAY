@@ -24,15 +24,22 @@ exports.login = async (nickname, password) => {
     if (!person) throw new Error('User not found');
     const validPassword = await bcrypt.compare(password, person.passwordHash);
     if (!validPassword) {
-        throw new Error('Incorrect credentials');
         await SystemEvent.create({
             userId: person?.id || null,
             eventType: 'LOGIN_FAILED',
             description: `Intento de login fallido`,
             category: 'SYSTEM'
         });
+        throw new Error('Incorrect credentials');
     }
     if (person.personType === 'ADMIN') {
+        await SystemEvent.create({
+            adminId: person.personType === 'ADMIN' ? person.id : null,
+            userId: person.personType === 'USER' ? person.id : null,
+            eventType: 'LOGIN_SUCCESS',
+            description: `Login correcto (${person.personType})`,
+            category: person.personType === 'ADMIN' ? 'ADMIN' : 'USER'
+        });
         return generateToken({
             id: person.id,
             role: 'ADMIN',
@@ -41,6 +48,8 @@ exports.login = async (nickname, password) => {
             permissions: person.Admin?.permissions,
             status: 'ACTIVE'
         });
+    }
+    if (person.AppUser) {
         await SystemEvent.create({
             adminId: person.personType === 'ADMIN' ? person.id : null,
             userId: person.personType === 'USER' ? person.id : null,
@@ -48,16 +57,16 @@ exports.login = async (nickname, password) => {
             description: `Login correcto (${person.personType})`,
             category: person.personType === 'ADMIN' ? 'ADMIN' : 'USER'
         });
-    }
-    if (person.AppUser) {
         return generateToken({
             id: person.id,
             role: 'USER',
             planId: person.AppUser.planId,
             subscriptionDate: person.AppUser.subscriptionDate,
-            status: 'ACTIVE'
+            status: 'ACTIVE',
+            nickname: person.nickname
         });
-        localStorage.setItem('nickname', person.nickname);
+    }
+    if (person.UserPending) {
         await SystemEvent.create({
             adminId: person.personType === 'ADMIN' ? person.id : null,
             userId: person.personType === 'USER' ? person.id : null,
@@ -65,28 +74,19 @@ exports.login = async (nickname, password) => {
             description: `Login correcto (${person.personType})`,
             category: person.personType === 'ADMIN' ? 'ADMIN' : 'USER'
         });
-    }
-    if (person.UserPending) {
         return generateToken({
             id: person.id,
             role: 'USER',
             status: 'PENDING'
         });
-        await SystemEvent.create({
-            adminId: person.personType === 'ADMIN' ? person.id : null,
-            userId: person.personType === 'USER' ? person.id : null,
-            eventType: 'LOGIN_SUCCESS',
-            description: `Login correcto (${person.personType})`,
-            category: person.personType === 'ADMIN' ? 'ADMIN' : 'USER'
-        });
     }
-    throw new Error('User state invalid');
     await SystemEvent.create({
         userId: person?.id || null,
         eventType: 'LOGIN_FAILED',
         description: `Intento de login fallido`,
         category: 'SYSTEM'
     });
+    throw new Error('User state invalid');
 };
 
 exports.adminRegistration = async (data) => {
@@ -168,17 +168,21 @@ exports.userRegistration = async (data) => {
 };
 
 exports.logout = async (token) => {
-    const decoded = jwt.decode(token);
-    await TokenBlackList.create({
-        token, expiresAt: new Date(decoded.exp * 1000)
-    });
-    await SystemEvent.create({
-        userId: decoded.id,
-        eventType: 'LOGOUT',
-        description: 'Usuario cerró sesión',
-        category: 'USER'
-    });
-    return { message: 'Logged out successfully' };
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        await TokenBlackList.create({
+            token, expiresAt: new Date(decoded.exp * 1000)
+        });
+        await SystemEvent.create({
+            userId: decoded.id,
+            eventType: 'LOGOUT',
+            description: 'Usuario cerró sesión',
+            category: 'USER'
+        });
+        return { message: 'Logged out successfully' };
+    } catch (error) {
+        throw new Error('Invalid token');
+    }
 };
 
 exports.deleteAccount = async (userId, password) => {
