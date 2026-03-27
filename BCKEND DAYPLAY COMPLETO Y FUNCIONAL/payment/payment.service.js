@@ -1,7 +1,3 @@
-const Payment = require('../models/payment');
-const BankCard = require('../models/bankCard');
-const PaymentTrace = require('../models/paymentTrace');
-
 // payment.service.js
 module.exports = function(stripeKey) {
     const Stripe = require('stripe');

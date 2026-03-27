@@ -1,26 +1,13 @@
-require('dotenv').config();
-require('./scheduler'); // si usas cron
+const config = require('./config');
+
+require('./scheduler');
 require('./cronJobs/dailyRewardCron');
 require('./cronJobs/storyAccessExpiration');
 
 const express = require('express');
 const cors = require('cors');
 const sequelize = require('./config/database');
-const config = require('./config');
 const paymentService = require('./payment/payment.service')(config.STRIPE_SECRET_KEY);
-
-console.log(`🚀 Entorno: ${config.ENV}`);
-console.log('📌 Variables de entorno cargadas:');
-console.log('PORT:', config.PORT);
-console.log('DB_NAME:', config.DB_NAME);
-console.log('DB_USER:', config.DB_USER);
-console.log('DB_PASS:', config.DB_PASS);
-console.log('DB_HOST:', config.DB_HOST);
-console.log('JWT_SECRET:', config.JWT_SECRET);
-console.log('EMAIL_USER:', config.EMAIL_USER);
-console.log('EMAIL_PASS:', config.EMAIL_PASS);
-
-// Aquí arrancaría tu servidor usando config.PORT
 
 const adminRoutes = require('./modules/admin/admin.routes');
 const authRoutes = require('./modules/auth/auth.routes');
@@ -70,7 +57,7 @@ async function startServer() {
         await sequelize.authenticate();
         console.log('Database connected ✅');
 
-        await sequelize.sync(); // en producción usa migrations
+        await sequelize.sync();
 
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT} 🚀`);
