@@ -1,34 +1,45 @@
-import { Component } from "@angular/core";
-import { Router } from "@angular/router";
+import { Component, ElementRef, HostListener, ViewChild } from "@angular/core";
 import { AuthService } from "../../core/services/auth.service";
+import { Router } from "@angular/router";
+import { DeleteAccountComponent } from "../../pages/delete-account/delete-account.component";
+import { ChangePasswordComponent } from "../../pages/change-password/change-password.component";
 import { CommonModule } from "@angular/common";
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DeleteAccountComponent, ChangePasswordComponent],
   templateUrl: './topbar.component.html',
   styleUrl: './topbar.component.css'
 })
 export class TopbarComponent {
-  menuOpen = false;
-  constructor(private auth: AuthService, private router: Router) {}
-  getAdminType(): string {
-    return this.auth.getAdminType();
-  }
-  toggleMenu(): void {
-    this.menuOpen = !this.menuOpen;
-  }
-  logout(): void {
-    this.auth.logout();
+  showDropdown = false;
+  @ViewChild(DeleteAccountComponent) deleteAccount!: DeleteAccountComponent;
+  @ViewChild(ChangePasswordComponent) changePassword!: ChangePasswordComponent;
+  constructor(public auth: AuthService, private router: Router, private eRef: ElementRef) {}
+  get nickname(): string {return this.auth.getNickname();}
+  toggleDropdown() {this.showDropdown = !this.showDropdown;}
+  logout() {
+    this.showDropdown = false;
+    this.auth.logout().subscribe({
+      next: () => {
+        localStorage.clear();
+      }
+    });
     this.router.navigate(['/login']);
   }
-  goToChangePassword(): void {
-    this.menuOpen = false;
-    this.router.navigate(['/change-password']);
+  openDeleteAccount() {
+    this.showDropdown = false;
+    this.deleteAccount?.openModal();
   }
-  goToDeleteAccount(): void {
-    this.menuOpen = false;
-    this.router.navigate(['/delete-account']);
+  openChangePassword() {
+    this.showDropdown = false;
+    this.changePassword?.openModal();
+  }
+  @HostListener('document:click', ['$event'])
+  clickOutside(event: Event) {
+    if (!this.eRef.nativeElement.contains(event.target)) {
+      this.showDropdown = false;
+    }
   }
 }

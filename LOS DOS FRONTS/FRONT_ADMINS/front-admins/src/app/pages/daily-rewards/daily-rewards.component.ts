@@ -14,7 +14,7 @@ export class DailyRewardsComponent {
   rewards: DailyGameReward[] = [];
   constructor(private admin: AdminService) {this.load();}
   load() {
-    this.admin.getDailyRewards().subscribe((res: DailyGameReward[]) => {this.rewards = res;});
+    this.admin.getDailyRewardRequests().subscribe((res: DailyGameReward[]) => {this.rewards = res;});
   }
   approve(id: number) {
     this.admin.approveDailyReward(id).subscribe(() => {this.load();});

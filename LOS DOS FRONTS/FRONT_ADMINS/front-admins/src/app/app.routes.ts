@@ -13,17 +13,21 @@ import { NotificationsComponent } from './pages/notifications/notifications.comp
 import { EventsComponent } from './pages/events/events.component';
 import { ChangePasswordComponent } from './pages/change-password/change-password.component';
 import { DeleteAccountComponent } from './pages/delete-account/delete-account.component';
+import { RegisterComponent } from './pages/register/register.component';
 
 export const routes: Routes = [
 
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+
   { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
 
   {
     path: '',
     component: LayoutComponent,
     canActivate: [roleGuard],
+    canActivateChild: [roleGuard],
     children: [
-
       { path: 'users', component: UsersComponent },
       { path: 'pending-users', component: PendingUsersComponent },
       { path: 'games', component: GamesComponent },
@@ -31,16 +35,12 @@ export const routes: Routes = [
       { path: 'payments/:id', component: PaymentDetailComponent },
       { path: 'daily-rewards', component: DailyRewardsComponent },
       { path: 'notifications', component: NotificationsComponent },
-
       { path: 'events', component: EventsComponent, data: { roles: ['SUPER_ADMIN', 'ADMIN'] } },
-
       { path: 'change-password', component: ChangePasswordComponent },
       { path: 'delete-account', component: DeleteAccountComponent },
-
       { path: '', redirectTo: 'users', pathMatch: 'full' }
     ]
   },
 
-  { path: '**', redirectTo: '' }
-
+  { path: '**', redirectTo: 'login' }
 ];

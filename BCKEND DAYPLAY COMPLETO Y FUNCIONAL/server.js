@@ -1,13 +1,12 @@
 const config = require('./config');
 
-require('./scheduler');
 require('./cronJobs/dailyRewardCron');
 require('./cronJobs/storyAccessExpiration');
 
 const express = require('express');
 const cors = require('cors');
 const sequelize = require('./config/database');
-const paymentService = require('./payment/payment.service')(config.STRIPE_SECRET_KEY);
+const paymentService = require('./services/payment.service');
 
 const adminRoutes = require('./modules/admin/admin.routes');
 const authRoutes = require('./modules/auth/auth.routes');
@@ -31,9 +30,9 @@ app.get('/', (req, res) => {
     res.json({ message: 'API running 🚀' });
 });
 
-app.use('/api/auth', authRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/user', userRoutes);
+app.use('/auth', authRoutes);
+app.use('/admin', adminRoutes);
+app.use('/user', userRoutes);
 
 /* ================================
    GLOBAL ERROR HANDLER
@@ -57,7 +56,7 @@ async function startServer() {
         await sequelize.authenticate();
         console.log('Database connected ✅');
 
-        await sequelize.sync();
+        await sequelize.sync({ force: true });
 
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT} 🚀`);

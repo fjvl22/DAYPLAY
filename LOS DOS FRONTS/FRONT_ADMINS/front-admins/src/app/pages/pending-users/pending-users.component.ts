@@ -13,19 +13,20 @@ import { UserPendingView } from '../../core/interfaces/user-pending-view';
 })
 export class PendingUsersComponent {
   pending: UserPendingView[] = [];
+  planFromStorage: string = '';
   constructor(private admin: AdminService) {this.load();}
   load() {
     this.admin.getPendingUsers().subscribe((res: UserPending[]) => {
-      const planFromStorage = localStorage.getItem('planType') || "";
+      this.planFromStorage = localStorage.getItem('planType') || "";
       this.pending = res.map(user => ({
-        ...user, planType: planFromStorage
+        ...user, planType: this.planFromStorage
       }));
     });
   }
   approve(id: number) {
-    this.admin.approvePendingUser(id).subscribe(() => {this.load()});
+    this.admin.approveUserPending(id, this.planFromStorage).subscribe(() => {this.load()});
   }
   reject(id: number) {
-    this.admin.rejectPendingUser(id).subscribe(() => {this.load()});
+    this.admin.rejectUserPending(id).subscribe(() => {this.load()});
   }
 }

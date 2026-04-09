@@ -14,12 +14,14 @@
             <td>{{ g.id }}</td>
             <td>{{ g.name }}</td>
             <td>{{ g.description }}</td>
-            <td>{{ g.url }}</td>
+            <td><img [src]="g.url"></td>
         </tr>
     </tbody>
 </table>
 
-<button (click)="showManager = !showManager">AdministrarDatos de Juegos</button>
+<br><br>
+
+<button (click)="showManager = !showManager">Administrar Datos de Juegos</button>
 
 <div *ngIf="showManager" class="manager">
 
@@ -88,10 +90,10 @@
         <div *ngIf="activeTab==='math'">
             <input placeholder="Operación" [(ngModel)]="newOperation.operation">
 
-            <input placeholder="Opción 1" [(ngModel)]="newOperation.options[0]">
-            <input placeholder="Opción 2" [(ngModel)]="newOperation.options[1]">
-            <input placeholder="Opción 3" [(ngModel)]="newOperation.options[2]">
-            <input placeholder="Opción 4" [(ngModel)]="newOperation.options[3]">
+            <input placeholder="Opción 1" [(ngModel)]="newOperation.MathOptions[0].optionValue">
+            <input placeholder="Opción 2" [(ngModel)]="newOperation.MathOptions[1].optionValue">
+            <input placeholder="Opción 3" [(ngModel)]="newOperation.MathOptions[2].optionValue">
+            <input placeholder="Opción 4" [(ngModel)]="newOperation.MathOptions[3].optionValue">
 
             <input type="number" placeholder="Resultado correcto" [(ngModel)]="newOperation.result">
 

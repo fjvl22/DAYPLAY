@@ -6,9 +6,9 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'USER_PENDING',
       timestamps: false
     });
-  
+
     UserPending.associate = (models) => {
-      UserPending.belongsTo(models.AppUser, { foreignKey: 'personId', onDelete: 'CASCADE' });
+      UserPending.belongsTo(models.Person, { foreignKey: 'PERSON_ID' });
     };
   
     return UserPending;

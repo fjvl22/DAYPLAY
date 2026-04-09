@@ -1,21 +1,21 @@
-const Leaderboard = require('../../models/leaderboard');
-const Person = require('../../models/person');
-const AppUser = require('../../models/appUser');
-const UserPlan = require('../../models/userPlan');
-const GameMatch = require('../../models/gameMatch');
-const UserGame = require('../../models/userGame');
-const DailyGameReward = require('../../models/dailyGameReward');
-const GameWord = require('../../models/gameWord');
-const MathOperation = require('../../models/mathOperation');
-const MathOption = require('../../models/mathOption');
 const sequelize = require('../../config/database');
-const Streak = require('../../models/streak');
 const { Op } = require('sequelize');
-const Game = require('../../models/game');
-const SystemEvent = require('../../models/systemEvent');
-const Story = require('../../models/story');
-const Chapter = require('../../models/chapter');
-const StoryAccess = require('../../models/storyAccess');
+const { Leaderboard } = require('../../models');
+const { Person } = require('../../models');
+const { AppUser } = require('../../models');
+const { UserPlan } = require('../../models');
+const { GameMatch } = require('../../models');
+const { UserGame } = require('../../models');
+const { DailyGameReward } = require('../../models');
+const { GameWord } = require('../../models');
+const { MathOperation } = require('../../models');
+const { MathOption } = require('../../models');
+const { Streak } = require('../../models');
+const { Game } = require('../../models');
+const { SystemEvent } = require('../../models');
+const { Story } = require('../../models');
+const { Chapter } = require('../../models');
+const { StoryAccess } = require('../../models');
 
 function getToday() {
     const today = new Date();

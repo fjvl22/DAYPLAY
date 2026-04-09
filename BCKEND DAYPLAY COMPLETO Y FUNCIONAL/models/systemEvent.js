@@ -13,10 +13,10 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'SYSTEM_EVENT',
       timestamps: false
     });
-  
+
     SystemEvent.associate = (models) => {
-      SystemEvent.belongsTo(models.Admin, { foreignKey: 'adminId' });
-      SystemEvent.belongsTo(models.AppUser, { foreignKey: 'userId' });
+      SystemEvent.belongsTo(models.Admin, { foreignKey: 'ADMIN_ID' });
+      SystemEvent.belongsTo(models.AppUser, { foreignKey: 'USER_ID' });
     };
   
     return SystemEvent;

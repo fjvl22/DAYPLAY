@@ -9,8 +9,10 @@
         <td>{{ r.id }}</td>
         <td>{{ r.userId }}</td>
         <td>
-            <button (click)="approve(r.id)">Aprobar</button>
-            <button (click)="reject(r.id)">Rechazar</button>
+            <div *ngIf="r.id!==null">
+                <button class="btn btn-success" (click)="approve(r.id!)">Aprobar</button>
+                <button class="btn btn-danger" (click)="reject(r.id!)">Rechazar</button>
+            </div>
         </td>
     </tr>
 </table>

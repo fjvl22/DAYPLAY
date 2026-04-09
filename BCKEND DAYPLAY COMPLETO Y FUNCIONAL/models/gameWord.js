@@ -12,9 +12,9 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: false,
       indexes: [{ unique: true, fields: ['gameId', 'word'] }]
     });
-  
+
     GameWord.associate = (models) => {
-      GameWord.belongsTo(models.Game, { foreignKey: 'gameId' });
+      GameWord.belongsTo(models.Game, { foreignKey: 'GAME_ID' });
     };
   
     return GameWord;

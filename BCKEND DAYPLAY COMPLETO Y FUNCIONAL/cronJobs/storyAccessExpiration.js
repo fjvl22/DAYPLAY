@@ -1,9 +1,9 @@
 const cron = require('node-cron');
-const { StoryAccess } = require('../models/storyAccess');
-const { Person } = require('../models/person');
-const { AppUser } = require('../models/appUser');
-const { UserPlan } = require('../models/userPlan');
-const { SystemEvent } = require('../models/systemEvent');
+const { StoryAccess } = require('../models');
+const { Person } = require('../models');
+const { AppUser } = require('../models');
+const { UserPlan } = require('../models');
+const { SystemEvent } = require('../models');
 const { Op } = require('sequelize');
 const { createNotification } = require('../services/notification.service');
 const { sendEmail } = require('../services/email.service');
@@ -50,7 +50,7 @@ const expireStoryAccess = async () => {
                 userId: user.personId,
                 eventType: 'DAILY_REWARD_EXPIRED',
                 description: 'Acceso expirado automáticamente por plan BASIC',
-                categoty: 'SYSTEM',
+                category: 'SYSTEM',
                 ipAddress: null
             });
         }

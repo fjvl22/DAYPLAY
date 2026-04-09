@@ -9,11 +9,13 @@
     </tr>
     <tr *ngFor="let u of users">
         <td>{{ u.personId }}</td>
-        <td>{{ u.person?.nickname }}</td>
-        <td>{{ u.person?.email }}</td>
-        <td>{{ u.person?.active }}</td>
+        <td>{{ u.person.nickname }}</td>
+        <td>{{ u.person.email }}</td>
+        <td>{{ u.person.active }}</td>
         <td>
-            <button (click)="delete(u.personId)">Eliminar</button>
+            <div *ngIf="u.personId !== null">
+                <button class="btn btn-danger" (click)="delete(u.personId!)">Eliminar</button>
+            </div>
         </td>
     </tr>
 </table>

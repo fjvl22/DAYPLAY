@@ -11,10 +11,10 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'PAYMENT_TRACE',
       timestamps: false
     });
-  
+
     PaymentTrace.associate = (models) => {
-      PaymentTrace.belongsTo(models.Payment, { foreignKey: 'paymentId', onDelete: 'CASCADE' });
-      PaymentTrace.belongsTo(models.Admin, { foreignKey: 'updatedBy' });
+      PaymentTrace.belongsTo(models.Payment, { foreignKey: 'PAYMENT_ID' });
+      PaymentTrace.belongsTo(models.Admin, { foreignKey: 'UPDATED_BY' });
     };
   
     return PaymentTrace;

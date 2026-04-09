@@ -9,10 +9,10 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'MATH_OPERATION',
       timestamps: false
     });
-  
+
     MathOperation.associate = (models) => {
-      MathOperation.belongsTo(models.Game, { foreignKey: 'gameId' });
-      MathOperation.hasMany(models.MathOption, { foreignKey: 'operationId' });
+      MathOperation.belongsTo(models.Game, { foreignKey: 'GAME_ID' });
+      MathOperation.hasMany(models.MathOption, { foreignKey: 'OPERATION_ID' });
     };
   
     return MathOperation;

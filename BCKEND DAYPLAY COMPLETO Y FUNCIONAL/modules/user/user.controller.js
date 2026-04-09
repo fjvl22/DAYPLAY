@@ -97,7 +97,7 @@ async function getMathOperations(req, res) {
 async function getChapters(req, res) {
     try {
         const userId = req.user.personId;
-        const chapters = await service.getavailableChapters(userId);
+        const chapters = await service.getAvailableChapters(userId);
         res.json({ success: true, chapters });
     } catch (err) {
         console.error(err);

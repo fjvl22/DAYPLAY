@@ -12,6 +12,12 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'PERSON',
       timestamps: false
     });
+
+    Person.associate = (models) => {
+      Person.hasOne(models.AppUser, { foreignKey: 'PERSON_ID' });
+      Person.hasOne(models.Admin, { foreignKey: 'PERSON_ID' });
+      Person.hasOne(models.UserPending, { foreignKey: 'PERSON_ID' });
+    };
   
     return Person;
   };

@@ -8,10 +8,13 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'USER_PLAN',
     timestamps: false
   });
-
-  // ✅ Método estático para obtener los valores del ENUM
+  
   UserPlan.getPlanTypes = function () {
     return this.rawAttributes.planType.values;
+  };
+
+  UserPlan.associate = (models) => {
+    UserPlan.hasMany(models.AppUser, { foreignKey: 'PLAN_ID' });
   };
 
   return UserPlan;

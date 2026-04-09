@@ -11,6 +11,10 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'BANK_ENTITY',
       timestamps: false
     });
+
+    BankEntity.associate = (models) => {
+      BankEntity.hasMany(models.BankCard, { foreignKey: 'BANK_ENTITY_ID' });
+    };
   
     return BankEntity;
   };

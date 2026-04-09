@@ -44,14 +44,8 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Payment.associate = (models) => {
-    Payment.belongsTo(models.AppUser, {
-      foreignKey: 'userId',
-      targetKey: 'personId' // APP_USER(PERSON_ID)
-    });
-
-    Payment.hasMany(models.PaymentTrace, {
-      foreignKey: 'paymentId'
-    });
+    Payment.belongsTo(models.AppUser, { foreignKey: 'USER_ID' });
+    Payment.hasMany(models.PaymentTrace, { foreignKey: 'PAYMENT_ID' });
   };
 
   return Payment;

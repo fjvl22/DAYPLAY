@@ -9,14 +9,18 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'GAME',
       timestamps: false
     });
-  
+
     Game.associate = (models) => {
-      Game.hasMany(models.GameWord, { foreignKey: 'gameId' });
-      Game.hasMany(models.MathOperation, { foreignKey: 'gameId' });
-      Game.hasMany(models.GameMatch, { foreignKey: 'gameId' });
-      Game.hasMany(models.Streak, { foreignKey: 'gameId' });
-      Game.hasMany(models.Leaderboard, { foreignKey: 'gameId' });
-      Game.hasMany(models.UserGame, { foreignKey: 'gameId' });
+      Game.hasMany(models.GameWord, { foreignKey: 'GAME_ID' });
+      Game.hasMany(models.MathOperation, { foreignKey: 'GAME_ID' });
+      Game.hasMany(models.GameMatch, { foreignKey: 'GAME_ID' });
+      Game.hasMany(models.Streak, { foreignKey: 'GAME_ID' });
+      Game.hasMany(models.Leaderboard, { foreignKey: 'GAME_ID' });
+  
+      Game.belongsToMany(models.AppUser, {
+          through: models.UserGame,
+          foreignKey: 'GAME_ID'
+      });
     };
   
     return Game;

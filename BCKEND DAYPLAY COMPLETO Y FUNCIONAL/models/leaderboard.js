@@ -15,5 +15,9 @@ module.exports = (sequelize, DataTypes) => {
       }
     ]
   });
+  Leaderboard.associate = (models) => {
+    Leaderboard.belongsTo(models.AppUser, { foreignKey: 'USER_ID' });
+    Leaderboard.belongsTo(models.Game, { foreignKey: 'GAME_ID' });
+  };
   return Leaderboard;
 };

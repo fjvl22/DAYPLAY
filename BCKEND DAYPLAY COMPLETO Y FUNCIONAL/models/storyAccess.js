@@ -14,11 +14,11 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: false,
       indexes: [{ unique: true, fields: ['userId','storyId'] }]
     });
-  
+
     StoryAccess.associate = (models) => {
-      StoryAccess.belongsTo(models.Story, { foreignKey: 'storyId' });
-      StoryAccess.belongsTo(models.AppUser, { foreignKey: 'userId' });
-      StoryAccess.belongsTo(models.Admin, { foreignKey: 'grantedBy' });
+      StoryAccess.belongsTo(models.Story, { foreignKey: 'STORY_ID' });
+      StoryAccess.belongsTo(models.AppUser, { foreignKey: 'USER_ID' });
+      StoryAccess.belongsTo(models.Admin, { foreignKey: 'GRANTED_BY' });
     };
   
     return StoryAccess;

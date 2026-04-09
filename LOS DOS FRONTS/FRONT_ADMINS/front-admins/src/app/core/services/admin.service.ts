@@ -12,11 +12,15 @@ import { Payment } from '../interfaces/payment';
 import { Notification } from '../interfaces/notification';
 import { SystemEvent } from '../interfaces/system-event';
 import { Admin } from '../interfaces/admin';
+import { AuthService } from './auth.service';
+import { PaymentDetailResponse } from '../interfaces/payment-detail-response';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
+
+  private authService = inject(AuthService);
 
   private http = inject(HttpClient);
 
@@ -28,7 +32,7 @@ export class AdminService {
     return this.http.get<AppUser[]>(`${this.apiUrl}/users`);
   }
 
-  getUserPendings(): Observable<UserPending[]> {
+  getPendingUsers(): Observable<UserPending[]> {
     return this.http.get<UserPending[]>(`${this.apiUrl}/users/pending`);
   }
 
@@ -126,14 +130,30 @@ export class AdminService {
     return this.http.get<Payment[]>(`${this.apiUrl}/payments`);
   }
 
-  getPaymentDetail(id: number): Observable<Payment> {
-    return this.http.get<Payment>(`${this.apiUrl}/payments/${id}`);
+  getPaymentDetail(id: number): Observable<PaymentDetailResponse> {
+    return this.http.get<PaymentDetailResponse>(`${this.apiUrl}/payments/${id}`);
   }
 
   // ================= NOTIFICATIONS =================
 
   getNotifications(): Observable<Notification[]> {
     return this.http.get<Notification[]>(`${this.apiUrl}/notifications`);
+  }
+
+  createNotification(data: any) {
+    return this.http.post(`${this.apiUrl}/notification`, data, {
+      headers: {
+        Authorization: `Bearer ${this.authService.getToken()}`
+      }
+    });
+  }
+
+  createNotifications(data: any) {
+    return this.http.post(`${this.apiUrl}/notifications`, data, {
+      headers: {
+        Authorization: `Bearer ${this.authService.getToken()}`
+      }
+    });
   }
 
   // ================= EVENTS =================

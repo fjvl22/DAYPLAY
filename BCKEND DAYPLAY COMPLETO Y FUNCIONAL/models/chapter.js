@@ -12,9 +12,9 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: false,
       indexes: [{ unique: true, fields: ['storyId','dayNumber'] }]
     });
-  
+
     Chapter.associate = (models) => {
-      Chapter.belongsTo(models.Story, { foreignKey: 'storyId' });
+      Chapter.belongsTo(models.Story, { foreignKey: 'STORY_ID' });
     };
   
     return Chapter;

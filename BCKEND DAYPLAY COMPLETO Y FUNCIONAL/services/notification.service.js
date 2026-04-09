@@ -1,4 +1,4 @@
-const Notification = require('../models/notification');
+const { Notification } = require('../models');
 
 /**
  * Crea una notificación interna para un usuario
@@ -8,8 +8,13 @@ const Notification = require('../models/notification');
  * @param {string} options.message
  * @param {string} options.type
 */
-exports.createNotification = async ({ userId, title, message, type }) => {
+exports.createNotification = async ({ userId, type, title, message, createdBy }) => {
     return await Notification.create({
-        userId, title, message, type, read: false
+        userId: userId,
+        type: type,
+        title: title,
+        message: message,
+        sentDate: Date.now(),
+        createdBy: createdBy
     });
 };

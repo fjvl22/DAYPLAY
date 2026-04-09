@@ -12,10 +12,10 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'NOTIFICATION',
       timestamps: false
     });
-  
+
     Notification.associate = (models) => {
-      Notification.belongsTo(models.AppUser, { foreignKey: 'userId', onDelete: 'CASCADE' });
-      Notification.belongsTo(models.Admin, { foreignKey: 'createdBy' });
+      Notification.belongsTo(models.AppUser, { foreignKey: 'USER_ID' });
+      Notification.belongsTo(models.Admin, { foreignKey: 'CREATED_BY' });
     };
   
     return Notification;

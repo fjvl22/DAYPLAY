@@ -8,11 +8,13 @@
     </tr>
     <tr *ngFor="let u of pending">
         <td>{{ u.personId }}</td>
-        <td>{{ u.person?.nickname }}</td>
+        <td>{{ u.person.nickname }}</td>
         <td>{{ u.planType }}</td>
         <td>
-            <button (click)="approve(u.personId)">Aprobar</button>
-            <button (click)="reject(u.personId)">Rechazar</button>
+            <div *ngIf="u.personId">
+                <button (click)="approve(u.personId!)">Aprobar</button>
+                <button (click)="reject(u.personId!)">Rechazar</button>
+            </div>
         </td>
     </tr>
 </table>

@@ -11,10 +11,10 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'GAME_MATCH',
       timestamps: false
     });
-  
+
     GameMatch.associate = (models) => {
-      GameMatch.belongsTo(models.AppUser, { foreignKey: 'userId' });
-      GameMatch.belongsTo(models.Game, { foreignKey: 'gameId' });
+      GameMatch.belongsTo(models.AppUser, { foreignKey: 'USER_ID' });
+      GameMatch.belongsTo(models.Game, { foreignKey: 'GAME_ID' });
     };
   
     return GameMatch;

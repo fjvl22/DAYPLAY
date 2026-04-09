@@ -1,16 +1,15 @@
 const bcrypt = require('bcryptjs');
-const { sequelize } = require('sequelize');
-const { Person } = require('../../models/person');
-const { Admin } = require('../../models/admin');
-const { AppUser } = require('../../models/appUser');
-const { UserPending } = require('../../models/userPending');
-const { SystemEvent } = require('../../models/systemEvent');
-const { UserPlan } = require('../../models/userPlan');
-const { TokenBlackList } = require('../../models/tokenBlacklist');
+const sequelize = require('../../config/database');
+const { Person } = require('../../models');
+const { Admin } = require('../../models');
+const { AppUser } = require('../../models');
+const { UserPending } = require('../../models');
+const { SystemEvent } = require('../../models');
+const { UserPlan } = require('../../models');
+const { TokenBlackList } = require('../../models');
 const { generateToken } = require('../../utils/jwt');
 const { getPermissionsByDepartment } = require('../admin/admin.service');
 const jwt = require('jsonwebtoken');
-const systemEvent = require('../../models/systemEvent');
 
 exports.login = async (nickname, password) => {
     const person = await Person.findOne({
@@ -42,6 +41,7 @@ exports.login = async (nickname, password) => {
         });
         return generateToken({
             id: person.id,
+            nickname: person.nickname,
             role: 'ADMIN',
             adminType: person.Admin?.adminType,
             department: person.Admin?.department,
@@ -76,6 +76,7 @@ exports.login = async (nickname, password) => {
         });
         return generateToken({
             id: person.id,
+            nickname: person.nickname,
             role: 'USER',
             status: 'PENDING'
         });
@@ -118,13 +119,13 @@ exports.adminRegistration = async (data) => {
             adminType,
             permissions
         }, { transaction });
-        await transaction.commit();
-        await systemEvent.create({
+        await SystemEvent.create({
             adminId: person.id,
             eventType: 'ADMIN_CREATED',
             description: `Nuevo admin creado (${adminType})`,
-            category: 'ADMIM'
-        });
+            category: 'ADMIN'
+        }, { transaction });
+        await transaction.commit();
         return {
             message: 'Admin registrado correctamente.',
             personId: person.id,
@@ -133,7 +134,8 @@ exports.adminRegistration = async (data) => {
             permissions
         };
     } catch (error) {
-        await transaction.rollback();
+        if (transaction && !transaction.finished) await transaction.rollback();
+        console.error("ERROR REGISTRO:", error);
         throw error;
     }
 };

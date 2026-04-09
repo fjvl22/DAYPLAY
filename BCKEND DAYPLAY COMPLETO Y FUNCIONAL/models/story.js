@@ -11,10 +11,10 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'STORY',
       timestamps: false
     });
-  
+
     Story.associate = (models) => {
-      Story.hasMany(models.Chapter, { foreignKey: 'storyId' });
-      Story.hasMany(models.StoryAccess, { foreignKey: 'storyId' });
+      Story.hasMany(models.Chapter, { foreignKey: 'STORY_ID' });
+      Story.hasMany(models.StoryAccess, { foreignKey: 'STORY_ID' });
     };
   
     return Story;

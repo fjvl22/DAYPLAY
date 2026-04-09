@@ -44,11 +44,13 @@ export class RegisterComponent {
     if (!nickname || !email || !password) return;
     this.authService.register({ nickname, email, password }).subscribe({
       next: (res) => {
+        console.log(res);
         this.loading = false;
         alert('Registro correcto. Será redirigido al login.');
         this.router.navigate(['/login']);
       },
       error: (err) => {
+        console.log(err);
         this.loading = false;
         this.errorMessage = err.error?.message || 'Error en el registro';
       }

@@ -2,7 +2,7 @@ const router = require('express').Router();
 const admin = require('./admin.controller');
 const auth = require('../../middlewares/checkRole');
 
-router.use(auth);
+router.use(auth(['GAME_ADMIN', 'PAYMENT_ADMIN', 'NOTIF_ADMIN', 'EVENT_ADMIN']));
 
 router.get('/users',admin.getUsers);
 router.get('/users/pending',admin.getPendingUsers);
@@ -35,5 +35,9 @@ router.get('/events',admin.getEvents);
 router.get('/admins',admin.getAdmins);
 
 router.get('/permissions/:department',admin.getPermissionsByDepartment);
+
+router.post('/notification',admin.sendNotification);
+
+router.post('/notifications',admin.sendNotifications);
 
 module.exports = router;

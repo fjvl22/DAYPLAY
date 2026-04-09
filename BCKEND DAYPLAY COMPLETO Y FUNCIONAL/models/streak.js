@@ -12,10 +12,10 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: false,
       indexes: [{ unique: true, fields: ['userId','gameId'] }]
     });
-  
+
     Streak.associate = (models) => {
-      Streak.belongsTo(models.AppUser, { foreignKey: 'userId' });
-      Streak.belongsTo(models.Game, { foreignKey: 'gameId' });
+      Streak.belongsTo(models.AppUser, { foreignKey: 'USER_ID' });
+      Streak.belongsTo(models.Game, { foreignKey: 'GAME_ID' });
     };
   
     return Streak;

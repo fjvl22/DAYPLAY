@@ -33,7 +33,7 @@ export class TraceDetailDialogComponent implements OnInit {
     this.errorMessage = '';
     this.adminService.getAdmins().subscribe({
       next: (admins) => {
-        admins.forEach(a => this.userMap.set(a.personId, a.person.nickname));
+        admins.forEach(a => {if (a.personId) {this.userMap.set(a.personId, a.person.nickname);}});
         this.adminService.getPaymentDetail(this.paymentId).subscribe({
           next: (data) => {
             this.traces = data.traces;

@@ -1,8 +1,18 @@
-<div class="login">
+<div class="login-container">
     <h2>Admin Login</h2>
-    <input [(ngModel)]="nickname" placeholder="Nombre de Usuario">
-    <input [(ngModel)]="password" type="password" placeholder="Contraseña">
-    <button (click)="login()">Login</button>
-    <p>¿Aún no tienes cuenta en DAYPLAY?</p>
-    <p>¿Y a qué estás esperando?<a (click)="goToRegister()" style="cursor: pointer;">¡REGÍSTRATE YA!</a></p>
-</div>
+  
+    <label>Nombre de usuario</label>
+    <input [(ngModel)]="nickname" placeholder="Introduce tu usuario">
+  
+    <label>Contraseña</label>
+    <input [(ngModel)]="password" type="password" placeholder="Introduce tu contraseña">
+  
+    <button (click)="login()">Iniciar Sesión</button>
+  
+    <p class="info">¿Aún no tienes cuenta en DAYPLAY?</p>
+  
+    <p class="register">
+      ¿Y a qué estás esperando?
+      <span (click)="goToRegister()">¡REGÍSTRATE YA!</span>
+    </p>
+  </div>

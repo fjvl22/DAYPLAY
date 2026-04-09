@@ -30,15 +30,20 @@ export class AuthService {
     return !!this.getToken();
   }
 
-  getAdminType(): string {
+  getPayload(): any {
     const token = this.getToken();
-    if (!token) return '';
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.adminType || '';
-    } catch {
-      return '';
-    }
+    if (!token) return null;
+    try {return JSON.parse(atob(token.split('.')[1]))} catch {return null;}
+  }
+
+  getNickname(): string {
+    const payload = this.getPayload();
+    return payload?.nickname || 'User';
+  }
+
+  getAdminType(): string {
+    const payload = this.getPayload();
+    return payload?.adminType || '';
   }
 
   logout() {

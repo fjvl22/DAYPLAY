@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { TokenBlacklist } = require('../models/tokenBlacklist');
+const { TokenBlacklist } = require('../models');
 
 exports.authGuard = () => {
     return async (req, res, next) => {

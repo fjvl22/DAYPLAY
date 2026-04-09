@@ -11,9 +11,9 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: false,
       indexes: [{ unique: true, fields: ['userId','rewardDate'] }]
     });
-  
+
     DailyGameReward.associate = (models) => {
-      DailyGameReward.belongsTo(models.AppUser, { foreignKey: 'userId', onDelete: 'CASCADE' });
+      DailyGameReward.belongsTo(models.AppUser, { foreignKey: 'USER_ID' });
     };
   
     return DailyGameReward;

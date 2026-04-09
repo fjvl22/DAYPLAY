@@ -17,10 +17,10 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'BANK_CARD',
       timestamps: false
     });
-  
+
     BankCard.associate = (models) => {
-      BankCard.belongsTo(models.BankEntity, { foreignKey: 'bankEntityId' });
-      BankCard.belongsTo(models.AppUser, { foreignKey: 'userId', onDelete: 'CASCADE' });
+      BankCard.belongsTo(models.BankEntity, { foreignKey: 'BANK_ENTITY_ID' });
+      BankCard.belongsTo(models.AppUser, { foreignKey: 'USER_ID' });
     };
   
     return BankCard;

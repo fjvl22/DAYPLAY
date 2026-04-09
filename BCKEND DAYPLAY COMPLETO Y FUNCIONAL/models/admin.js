@@ -9,9 +9,14 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'ADMIN',
       timestamps: false
     });
-  
+
     Admin.associate = (models) => {
-      Admin.belongsTo(models.Person, { foreignKey: 'personId', onDelete: 'CASCADE' });
+      Admin.belongsTo(models.Person, { foreignKey: 'PERSON_ID' });
+  
+      Admin.hasMany(models.PaymentTrace, { foreignKey: 'UPDATED_BY' });
+      Admin.hasMany(models.Notification, { foreignKey: 'CREATED_BY' });
+      Admin.hasMany(models.StoryAccess, { foreignKey: 'GRANTED_BY' });
+      Admin.hasMany(models.SystemEvent, { foreignKey: 'ADMIN_ID' });
     };
   
     return Admin;

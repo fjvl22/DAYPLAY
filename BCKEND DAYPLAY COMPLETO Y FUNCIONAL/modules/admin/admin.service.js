@@ -1,26 +1,26 @@
 const { Op } = require('sequelize');
 const sequelize = require('../../config/database');
 
-const Person = require('../../models/person');
-const Admin = require('../../models/admin');
-const AppUser = require('../../models/appUser');
-const UserPending = require('../../models/userPending');
-const Game = require('../../models/game');
-const GameWord = require('../../models/gameWord');
-const MathOperation = require('../../models/mathOperation');
-const MathOption = require('../../models/mathOption');
-const GameMatch = require('../../models/gameMatch');
-const DailyGameReward = require('../../models/dailyGameReward');
-const Story = require('../../models/story');
-const StoryAccess = require('../../models/storyAccess');
-const Chapter = require('../../models/chapter');
-const Payment = require('../../models/payment');
-const PaymentTrace = require('../../models/paymentTrace');
-const Notification = require('../../models/notification');
-const SystemEvent = require('../../models/systemEvent');
-const UserPlan = require('../../models/userPlan');
+const { Person } = require('../../models');
+const { Admin } = require('../../models');
+const { AppUser } = require('../../models');
+const { UserPending } = require('../../models');
+const { Game } = require('../../models');
+const { GameWord } = require('../../models');
+const { MathOperation } = require('../../models');
+const { MathOption } = require('../../models');
+const { GameMatch } = require('../../models');
+const { DailyGameReward } = require('../../models');
+const { Story } = require('../../models');
+const { StoryAccess } = require('../../models');
+const { Chapter } = require('../../models');
+const { Payment } = require('../../models');
+const { PaymentTrace } = require('../../models');
+const { Notification } = require('../../models');
+const { SystemEvent } = require('../../models');
+const { UserPlan } = require('../../models');
 
-const { chargeUser } = require('../../payment/payment.service');
+const { chargeUser } = require('../../services/payment.service');
 const { sendEmail } = require('../../services/email.service');
 const { createNotification } = require('../../services/notification.service');
 
@@ -417,3 +417,43 @@ exports.getPermissionsByDepartment = async (department) => {
     };
     return permissionsMap[department] || {};
 };
+
+exports.sendNotification = async (userId, title, message, type, createdBy) => {
+    let admin = await Admin.findByPk(createdBy);
+    if (admin.adminType !== 'NOTIF_ADMIN')
+        throw new Error('Permission denied');
+    await sendEmail({
+        to: userId,
+        subject: title,
+        html: `<p>${message}</p>`
+    });
+    await createNotification({
+        userId: userId,
+        type: type,
+        title: title,
+        message: message,
+        createdBy: createdBy
+    });
+    return { message: 'Notifications and emails sent.' }
+}
+
+exports.sendNotifications = async (title, message, type, createdBy) => {
+    let admin = await Admin.findByPk(createdBy);
+    if (admin.adminType !== 'NOTIF_ADMIN')
+        throw new Error('Permission denied');
+    let users = await AppUser.findAll();
+    users.forEach( async (user) => {
+        await sendEmail({
+            to: user.personId,
+            subject: title,
+            html: `<p>${message}</p>`
+        });
+        await createNotification({
+            userId: user.personId,
+            type: type,
+            title: title,
+            message: message,
+            createdBy: createdBy
+        });
+    });
+}

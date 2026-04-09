@@ -8,11 +8,25 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'APP_USER',
       timestamps: false
     });
-  
+
     AppUser.associate = (models) => {
-      AppUser.belongsTo(models.Person, { foreignKey: 'personId', onDelete: 'CASCADE' });
-      AppUser.belongsTo(models.UserPlan, { foreignKey: 'planId', onDelete: 'CASCADE' });
-      AppUser.hasMany(models.Leaderboard, {foreignKey: 'personId'});
+      AppUser.belongsTo(models.Person, { foreignKey: 'PERSON_ID' });
+      AppUser.belongsTo(models.UserPlan, { foreignKey: 'PLAN_ID' });
+  
+      AppUser.hasMany(models.BankCard, { foreignKey: 'USER_ID' });
+      AppUser.hasMany(models.GameMatch, { foreignKey: 'USER_ID' });
+      AppUser.hasMany(models.DailyGameReward, { foreignKey: 'USER_ID' });
+      AppUser.hasMany(models.Streak, { foreignKey: 'USER_ID' });
+      AppUser.hasMany(models.Leaderboard, { foreignKey: 'USER_ID' });
+      AppUser.hasMany(models.Payment, { foreignKey: 'USER_ID' });
+      AppUser.hasMany(models.Notification, { foreignKey: 'USER_ID' });
+      AppUser.hasMany(models.SystemEvent, { foreignKey: 'USER_ID' });
+      AppUser.hasMany(models.StoryAccess, { foreignKey: 'USER_ID' });
+  
+      AppUser.belongsToMany(models.Game, {
+          through: models.UserGame,
+          foreignKey: 'USER_ID'
+      });
     };
   
     return AppUser;

@@ -1,0 +1,64 @@
+body {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+/* Centrar la tarjeta en pantalla */
+.register-card {
+    width: 400px;
+    margin: 80px auto;
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+}
+  
+/* Título */
+.register-card h2 {
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+  
+/* Formulario en columna */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+  
+/* Campos ocupan todo el ancho */
+mat-form-field {
+    width: 100%;
+}
+  
+/* Botón */
+button {
+    margin-top: 10px;
+    height: 45px;
+    font-weight: bold;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+  
+/* Hover botón */
+button:hover {
+    transform: translateY(-2px);
+}
+  
+/* Mensaje de error general */
+.error {
+    color: #d32f2f;
+    background: #fdecea;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: left;
+}
+  
+/* Responsive (móvil) */
+@media (max-width: 500px) {
+    .register-card {
+        width: 90%;
+        margin: 40px auto;
+        padding: 20px;
+    }
+}

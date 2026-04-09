@@ -207,3 +207,15 @@ exports.getPermissionsByDepartment = async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 };
+
+exports.sendNotification = async (req, res) => {
+    const { userId, title, message, type, createdBy } = req.body;
+    const notification = await adminService.sendNotification(userId, title, message, type, createdBy);
+    res.json(notification);
+};
+
+exports.sendNotifications = async (req, res) => {
+    const { title, message, type, createdBy } = req.body;
+    const notifications = await adminService.sendNotifications(title, message, type, createdBy);
+    res.json(notifications);
+};
