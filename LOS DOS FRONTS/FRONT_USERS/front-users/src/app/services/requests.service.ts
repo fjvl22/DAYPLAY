@@ -16,7 +16,7 @@ import { AppUser } from "../interfaces/app-user";
 })
 export class RequestsService {
 
-  private API_URL = 'http://localhost:3000/api/user';
+  private API_URL = '/user';
 
   constructor(private http: HttpClient) {}
 

@@ -24,7 +24,7 @@ export class AdminService {
 
   private http = inject(HttpClient);
 
-  private apiUrl = 'http://localhost:3000/admin';
+  private apiUrl = '/admin';
 
   // ================= USERS =================
 

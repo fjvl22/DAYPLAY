@@ -11,7 +11,7 @@ import { JwtPayload } from "../interfaces/jwt-payload";
 })
 export class AuthService {
 
-  private API_URL = 'http://localhost:3000/api/auth';
+  private API_URL = '/auth';
 
   constructor(private http: HttpClient) {}
 

@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+
+  frontend-user:
+    build: ./frontend-user
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+
+  frontend-admin:
+    build: ./frontend-admin
+    ports:
+      - "4300:80"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    env_file:
+      - .env
+
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: dayplay
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
