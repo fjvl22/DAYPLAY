@@ -1,10 +1,13 @@
 <div class="layout">
     <app-topbar></app-topbar>
+
     <div class="body">
-        <app-sidebar [open]="sidebarOpen"></app-sidebar>
-        <div class="content">
-            <button class="toggle-btn" [style.left.px]="sidebarOpen ? 220 : 10" (click)="toggleSidebar()">{{ sidebarOpen ? '◀' : '▶' }}</button>
-            <router-outlet></router-outlet>
-        </div>
+
+        <div class="sidebar-trigger" (mouseenter)="openSidebar()"></div>
+
+        <div class="sidebar-wrapper" (mouseenter)="openSidebar()" (mouseleave)="maybeClose()"><app-sidebar [open]="sidebarOpen"></app-sidebar></div>
+
+        <div class="content" [class.shifted]="sidebarOpen"><router-outlet></router-outlet></div>
+    
     </div>
 </div>

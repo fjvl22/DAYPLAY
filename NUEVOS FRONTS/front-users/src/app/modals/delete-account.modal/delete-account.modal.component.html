@@ -1,0 +1,61 @@
+<ion-modal [isOpen]="showModal">
+  <ng-template>
+
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Eliminar cuenta</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeModal()">✖</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="modal-content">
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="form">
+
+        <ion-item>
+          <ion-label position="stacked">
+            Confirma tu contraseña
+          </ion-label>
+
+          <ion-input
+            type="password"
+            formControlName="password">
+          </ion-input>
+        </ion-item>
+
+        <div class="buttons">
+
+          <ion-button
+            expand="block"
+            color="danger"
+            type="submit">
+
+            Eliminar
+
+          </ion-button>
+
+          <ion-button
+            expand="block"
+            fill="outline"
+            color="medium"
+            type="button"
+            (click)="closeModal()">
+
+            Cancelar
+
+          </ion-button>
+
+        </div>
+
+        <p class="message" *ngIf="message">
+          {{ message }}
+        </p>
+
+      </form>
+
+    </ion-content>
+
+  </ng-template>
+</ion-modal>

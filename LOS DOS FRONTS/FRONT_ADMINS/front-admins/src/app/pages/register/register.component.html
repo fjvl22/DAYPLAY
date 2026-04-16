@@ -35,6 +35,8 @@
       </mat-form-field>
   
       <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+      <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
   
       <button mat-raised-button color="primary" type="submit" [disabled]="loading">
         {{ loading ? 'Registrando...' : 'Registrarse' }}

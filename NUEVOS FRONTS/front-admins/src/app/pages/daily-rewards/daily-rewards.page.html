@@ -1,0 +1,20 @@
+<ion-content class="ion-padding">
+
+  <h2>Solicitudes Capítulo Diario</h2>
+
+  <ion-list>
+    <ion-item *ngFor="let r of rewards">
+
+      <ion-label>
+        <h2>ID: {{ r.id }}</h2>
+        <p>Usuario: {{ r.userId }}</p>
+      </ion-label>
+
+      <ion-button color="success" (click)="approve(r.id!)">Aprobar</ion-button>
+
+      <ion-button color="danger" (click)="reject(r.id!)">Rechazar</ion-button>
+
+    </ion-item>
+  </ion-list>
+
+</ion-content>

@@ -1,0 +1,29 @@
+.modal-content {
+    --background: #0f172a;
+    color: white;
+  }
+  
+  .form {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  ion-item {
+    --background: rgba(255,255,255,0.05);
+    --border-radius: 10px;
+    color: white;
+  }
+  
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .message {
+    text-align: center;
+    font-size: 14px;
+    color: #f87171;
+  }

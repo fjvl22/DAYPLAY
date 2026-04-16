@@ -1,0 +1,96 @@
+<ion-content class="ion-padding">
+
+  <h2>Juegos</h2>
+
+  <ion-card *ngFor="let g of games">
+    <ion-item>
+      <ion-label>
+        <h2>{{ g.name }}</h2>
+        <p>{{ g.description }}</p>
+      </ion-label>
+    </ion-item>
+
+    <img [src]="g.url" style="width: 100%; max-height: 200px; object-fit: cover;">
+  </ion-card>
+
+  <ion-button expand="full" (click)="showManager = !showManager">Administrar Juegos</ion-button>
+
+  <div *ngIf="showManager">
+
+    <ion-segment [(ngModel)]="activeTab" (ionChange)="onTabChange()">
+      <ion-segment-button value="hangman">Ahorcado</ion-segment-button>
+      <ion-segment-button value="wordle">Wordle</ion-segment-button>
+      <ion-segment-button value="math">Math Rush</ion-segment-button>
+    </ion-segment>
+
+    <ion-button expand="full" (click)="showForm = !showForm">Añadir</ion-button>
+
+    <ion-list *ngIf="activeTab === 'hangman'">
+      <ion-item *ngFor="let w of hangmanWords">
+        <ion-label>
+          <h2>{{ w.word }}</h2>
+          <p>{{ w.language }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-list *ngIf="activeTab === 'wordle'">
+      <ion-item *ngFor="let w of wordleWords">
+        <ion-label>
+          <h2>{{ w.word }}</h2>
+          <p>{{ w.language }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-list *ngIf="activeTab === 'math'">
+      <ion-item *ngFor="let op of mathOperations">
+        <ion-label>
+          <h2>{{ op.operation }}</h2>
+          <p><span *ngFor="let opt of op.MathOptions" [style.color]="opt.optionValue == op.result ? 'green' : 'red'">{{ opt.optionValue }}</span></p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <div *ngIf="showForm">
+
+      <div *ngIf="activeTab !== 'math'">
+
+        <ion-item>
+          <ion-input [(ngModel)]="newWord.word" placeholder="Palabra"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-select [(ngModel)]="newWord.language">
+            <ion-select-option value="es">Español</ion-select-option>
+            <ion-select-option value="en">Inglés</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-button expand="full" (click)="addWord()">Guardar</ion-button>
+
+      </div>
+
+      <div *ngIf="activeTab === 'math'">
+
+        <ion-item>
+          <ion-input [(ngModel)]="newOperation.operation" placeholder="Operación"></ion-input>
+        </ion-item>
+
+        <ion-item *ngFor="let opt of newOperation.MathOptions; let i = index">
+          <ion-input [(ngModel)]="newOperation.MathOptions[i].optionValue" placeholder="Opción {{i+1}}"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input [(ngModel)]="newOperation.result" placeholder="Resultado"></ion-input>
+        </ion-item>
+
+        <ion-button expand="full" (click)="addOperation()">Guardar</ion-button>
+
+      </div>
+
+    </div>
+    
+  </div>
+
+</ion-content>

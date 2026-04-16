@@ -30,6 +30,7 @@ export class RegisterComponent {
     confirmPassword: ['', [Validators.required]]
   });
   errorMessage = '';
+  successMessage = '';
   loading = false;
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {}
   register() {
@@ -46,7 +47,7 @@ export class RegisterComponent {
       next: (res) => {
         console.log(res);
         this.loading = false;
-        alert('Registro correcto. Será redirigido al login.');
+        this.successMessage = 'Registro correcto. Será redirigido al login.';
         this.router.navigate(['/login']);
       },
       error: (err) => {

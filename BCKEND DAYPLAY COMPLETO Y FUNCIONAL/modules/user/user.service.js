@@ -300,6 +300,7 @@ async function getAvailableChapters(userId) {
                     storyTitle: access.Story.title,
                     chapterId: chapter.id,
                     chapterTitle: chapter.title,
+                    chapterContent: chapter.content,
                     dayNumber: chapter.dayNumber,
                     unlockCondition: chapter.unlockCondition,
                     grantedBy: access.grantedBy,

@@ -396,28 +396,6 @@ exports.getNotifications = async (adminId) => {
     });
 };
 
-exports.getEvents = async (adminId) => {
-    let admin = await Admin.findByPk(adminId);
-    if (admin.adminType !== 'EVENT_ADMIN') throw new Error('Permission denied');
-    return await SystemEvent.findAll();
-};
-
-exports.getAdmins = async (adminId) => {
-    let admin = await Admin.findByPk(adminId);
-    if (!admin) throw new Error('Permission denied');
-    return await Admin.findAll();
-};
-
-exports.getPermissionsByDepartment = async (department) => {
-    const permissionsMap = {
-        GAME: { canManageGames: true, canApproveRewards: true },
-        PAYMENT: { canChargeUsers: true, canManagePlans: true },
-        EVENT: { canCreateEvents: true, canManageEvents: true },
-        NOTIF: { canSendNotifications: true, canManageNotifications: true }
-    };
-    return permissionsMap[department] || {};
-};
-
 exports.sendNotification = async (userId, title, message, type, createdBy) => {
     let admin = await Admin.findByPk(createdBy);
     if (admin.adminType !== 'NOTIF_ADMIN')
@@ -457,3 +435,25 @@ exports.sendNotifications = async (title, message, type, createdBy) => {
         });
     });
 }
+
+exports.getEvents = async (adminId) => {
+    let admin = await Admin.findByPk(adminId);
+    if (admin.adminType !== 'EVENT_ADMIN') throw new Error('Permission denied');
+    return await SystemEvent.findAll();
+};
+
+exports.getAdmins = async (adminId) => {
+    let admin = await Admin.findByPk(adminId);
+    if (!admin) throw new Error('Permission denied');
+    return await Admin.findAll();
+};
+
+exports.getPermissionsByDepartment = async (department) => {
+    const permissionsMap = {
+        GAME: { canManageGames: true, canApproveRewards: true },
+        PAYMENT: { canChargeUsers: true, canManagePlans: true },
+        EVENT: { canCreateEvents: true, canManageEvents: true },
+        NOTIF: { canSendNotifications: true, canManageNotifications: true }
+    };
+    return permissionsMap[department] || {};
+};

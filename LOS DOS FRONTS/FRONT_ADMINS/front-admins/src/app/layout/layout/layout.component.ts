@@ -11,8 +11,14 @@ import { RouterOutlet } from "@angular/router";
   styleUrl: './layout.component.css'
 })
 export class LayoutComponent {
+
   sidebarOpen = false;
-  toggleSidebar() {
-    this.sidebarOpen = !this.sidebarOpen;
-  }
+
+  hoverSidebar = false;
+
+  openSidebar() {this.sidebarOpen = true;}
+
+  closeSidebar() {this.sidebarOpen = false;}
+
+  maybeClose() {if (!this.hoverSidebar) this.closeSidebar();}
 }

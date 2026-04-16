@@ -1,0 +1,78 @@
+.game-content {
+    --background: linear-gradient(180deg, #0f172a, #111827);
+  }
+  
+  .center-area {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+  }
+  
+  .title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    margin-top: 10px;
+    color: white;
+  }
+  
+  .egg {
+    background: linear-gradient(135deg, #ffcc70, #ff8c42);
+    border-radius: 50% / 35%;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  .large-egg {
+    width: 280px;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .egg-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+  }
+  
+  .small-egg {
+    width: 140px;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  
+  .small-egg:active {
+    transform: scale(0.95);
+  }
+  
+  .correct {
+    background: #4caf50 !important;
+    color: white;
+  }
+  
+  .wrong {
+    background: #ee3935 !important;
+    color: white;
+  }
+  
+  .final-screen {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+  }

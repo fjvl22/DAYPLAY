@@ -1,0 +1,7 @@
+{
+  "name": "front-users",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

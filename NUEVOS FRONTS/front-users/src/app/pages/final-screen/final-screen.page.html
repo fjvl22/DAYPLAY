@@ -1,0 +1,40 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Fin de la partida</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="final-content">
+
+  <div class="container">
+
+    <h1 class="title">🏁 FIN DE LA PARTIDA</h1>
+
+    <h2 class="subtitle">¿Deseas guardar tu partida?</h2>
+
+    <div class="buttons">
+
+      <ion-button
+        expand="block"
+        color="success"
+        (click)="saveGame()">
+
+        Guardar Partida
+
+      </ion-button>
+
+      <ion-button
+        expand="block"
+        color="medium"
+        fill="outline"
+        (click)="goToChooseGame()">
+
+        No Guardar
+
+      </ion-button>
+
+    </div>
+
+  </div>
+
+</ion-content>

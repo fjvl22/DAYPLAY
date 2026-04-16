@@ -53,6 +53,16 @@ button:hover {
     font-size: 14px;
     text-align: left;
 }
+
+/* Mensaje de éxito general */
+.success {
+    color: lightgreen;
+    background: #fdecea;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: left;
+}
   
 /* Responsive (móvil) */
 @media (max-width: 500px) {

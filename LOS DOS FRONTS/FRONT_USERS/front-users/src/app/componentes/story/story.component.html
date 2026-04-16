@@ -1,7 +1,7 @@
 <div *ngIf="getCurrentChapter() as currentChapter" class="story-container">
     <h2>{{ currentChapter.storyTitle }}</h2>
     <h3>{{ currentChapter.chapterTitle }}</h3>
-    <p>{{ currentChapter.unlockCondition }}</p>
+    <p>{{ currentChapter.chapterContent }}</p>
 
     <div class="navigation">
         <button (click)="prevChapter()" [disabled]="currentIndex === 0">⬅</button>

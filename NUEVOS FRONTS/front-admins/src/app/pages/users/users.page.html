@@ -1,0 +1,20 @@
+<ion-content class="ion-padding">
+
+  <h2>Usuarios Activos</h2>
+
+  <ion-list>
+    <ion-item *ngFor="let u of users">
+
+      <ion-label>
+        <h2>{{ u.person.nickname }}</h2>
+        <p>ID: {{ u.personId }}</p>
+        <p>Email: {{ u.person.email }}</p>
+        <p>Activo: {{ u.person.active }}</p>
+      </ion-label>
+
+      <ion-button color="danger" slot="end" (click)="delete(u.personId!)">Eliminar</ion-button>
+
+    </ion-item>
+  </ion-list>
+
+</ion-content>

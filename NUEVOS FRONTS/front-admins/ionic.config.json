@@ -1,0 +1,7 @@
+{
+  "name": "front-admins",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

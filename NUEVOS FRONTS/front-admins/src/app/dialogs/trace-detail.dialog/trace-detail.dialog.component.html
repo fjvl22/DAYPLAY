@@ -1,0 +1,42 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>Detalle de la traza</ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="close()">Cerrar</ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+    <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+
+    <ion-text color="danger" *ngIf="errorMessage">{{ errorMessage }}</ion-text>
+
+    <ng-container *ngIf="!loading && !errorMessage">
+
+        <ion-searchbar placeholder="Filtrar por acción o nombre de usuario" (ionInput)="applyFilter($event)"></ion-searchbar>
+
+        <ion-list>
+
+            <ion-item *ngFor="let t of filteredTraces">
+
+                <ion-label class="ion-text-wrap">
+
+                    <h2>{{ t.action }}</h2>
+
+                    <p>📅 {{ t.traceDate | date:'medium' }}</p>
+
+                    <p>📝 {{ t.notes || '-' }}</p>
+
+                    <p>👤 {{ getNickname(t.updatedBy) }}</p>
+
+                </ion-label>
+
+            </ion-item>
+
+        </ion-list>
+
+    </ng-container>
+
+</ion-content>

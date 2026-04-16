@@ -1,19 +1,43 @@
-.toggle-btn {
-    position: absolute;
-    top: 15px;
-    padding: 5px 10px;
-    background: #2c3e50;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
+.layout {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-.app-topbar {
+.body {
+    flex: 1;
     position: relative;
+}
+
+.sidebar-trigger {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 12px;
+    height: 100vh;
     z-index: 1000;
 }
 
-.sidebar {
-    z-index: 500;
+.sidebar-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 900;
+}
+
+.content {
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    transition: transform 0.3s ease;
+}
+
+.content.shifted {
+    transform: translateX(220px);
+}
+
+app-topbar {
+    position: relative;
+    z-index: 1100; 
 }

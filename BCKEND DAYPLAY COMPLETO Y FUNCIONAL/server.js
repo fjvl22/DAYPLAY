@@ -30,9 +30,9 @@ app.get('/', (req, res) => {
     res.json({ message: 'API running 🚀' });
 });
 
-app.use('/auth', authRoutes);
-app.use('/admin', adminRoutes);
-app.use('/user', userRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/user', userRoutes);
 
 /* ================================
    GLOBAL ERROR HANDLER
@@ -56,7 +56,7 @@ async function startServer() {
         await sequelize.authenticate();
         console.log('Database connected ✅');
 
-        await sequelize.sync({ force: true });
+        await sequelize.sync();
 
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT} 🚀`);

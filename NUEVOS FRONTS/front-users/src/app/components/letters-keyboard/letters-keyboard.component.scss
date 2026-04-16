@@ -1,0 +1,46 @@
+.keyboard {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 10px auto;
+  }
+  
+  .row {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+  }
+  
+  .key-btn {
+    min-width: 32px;
+    height: 45px;
+    font-size: 14px;
+    font-weight: bold;
+    --border-radius: 6px;
+  }
+  
+  .special-btn {
+    width: 80px;
+    height: 45px;
+    font-size: 18px;
+    --border-radius: 6px;
+  }
+  
+  .correct {
+    --background: #6aaa64 !important;
+    color: white;
+  }
+  
+  .present {
+    --background: #c9b458 !important;
+    color: white;
+  }
+  
+  .absent {
+    --background: #787c7e !important;
+    color: white;
+  }
+  
+  ion-button[disabled] {
+    opacity: 0.5;
+  }

@@ -1,9 +1,8 @@
 <div class="sidebar" [class.closed]="!open">
-    <a routerLink="/users">Usuarios</a>
-    <a routerLink="/pending-users">Pendientes</a>
-    <a routerLink="/games">Juegos</a>
-    <a routerLink="/daily-rewards">Capítulos</a>
-    <a routerLink="/payments">Pagos</a>
-    <a routerLink="/notifications">Notificaciones</a>
-    <a routerLink="/events">Eventos</a>
+    <a *ngIf="canSee('users')" routerLink="/users">Usuarios</a>
+    <a *ngIf="canSee('pending-users')" routerLink="/pending-users">Pendientes</a>
+    <a *ngIf="canSee('games')" routerLink="/games">Juegos</a>
+    <a *ngIf="canSee('payments')" routerLink="/payments">Pagos</a>
+    <a *ngIf="canSee('notifications')" routerLink="/notifications">Notificaciones</a>
+    <a *ngIf="canSee('events')" routerLink="/events">Eventos</a>
 </div>

@@ -1,0 +1,35 @@
+<ion-content class="ion-padding">
+
+  <h2>Crear Notificación</h2>
+
+  <ion-segment [(ngModel)]="mode">
+    <ion-segment-button value="one">
+      <ion-label>Un Usuario</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="all">
+      <ion-label>Todos</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <ion-item *ngIf="mode === 'one'">
+    <ion-label>Usuario</ion-label>
+    <ion-select [(ngModel)]="selectedUserId">
+      <ion-select-option *ngFor="let user of users" [value]="user.personId">{{ user.person.nickname }}</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-input [(ngModel)]="data.type" placeholder="Tipo"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-input [(ngModel)]="data.title" placeholder="Título"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-textarea [(ngModel)]="data.message" placeholder="Mensaje"></ion-textarea>
+  </ion-item>
+
+  <ion-button expand="full" (click)="send()">Enviar</ion-button>
+
+</ion-content>

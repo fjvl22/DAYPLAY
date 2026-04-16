@@ -1,0 +1,41 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Ahorcado</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="hangman-content">
+
+  <div class="game-wrapper">
+
+    <h2 class="title">AHORCADO</h2>
+
+    <img
+      class="hangman-img"
+      [src]="getImageByErrors()"
+      [alt]="errorsCounter" />
+
+    <div class="word">
+      <label>{{ hangmanService.getMaskedWord() }}</label>
+    </div>
+
+    <app-letters-keyboard
+      [usedLetters]="usedLetters"
+      [keyClasses]="keyClasses"
+      [gameMode]="'hangman'"
+      (letterPressed)="onLetter($event)">
+    </app-letters-keyboard>
+
+    <div *ngIf="hangmanService.isGameOver() && hangmanService.isWin()" class="win">
+      <p>🎉 ¡Felicidades!</p>
+      <p>Has ganado</p>
+    </div>
+
+    <div *ngIf="hangmanService.isGameOver() && !hangmanService.isWin()" class="lose">
+      <p>💀 ¡Ohhhh, has perdido!</p>
+      <p>La palabra era {{ hangmanService.getMaskedWord() }}</p>
+    </div>
+
+  </div>
+
+</ion-content>

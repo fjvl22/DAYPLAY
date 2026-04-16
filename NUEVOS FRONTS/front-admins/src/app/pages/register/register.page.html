@@ -1,0 +1,51 @@
+<ion-content class="ion-padding">
+
+  <ion-card class="register-card">
+
+    <ion-card-header>
+      <ion-card-title>Registro de Administrador</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+
+      <form [formGroup]="registerForm" (ngSubmit)="register()">
+
+        <ion-item>
+          <ion-input label="Nombre de Usuario" lbelPlacement="stacked" formControlName="nickname"></ion-input>
+        </ion-item>
+
+        <ion-text color="danger" *ngIf="registerForm.get('nickname')?.invalid && registerForm.get('nickname')?.touched">Nombre de usuario obligatorio (mínimo 3 caracteres)</ion-text>
+
+        <ion-item>
+          <ion-input label="Email" type="email" labelPlacement="stacked" formControlName="email"></ion-input>
+        </ion-item>
+
+        <ion-text color="danger" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">Email inválido</ion-text>
+
+        <ion-item>
+          <ion-input label="Contraseña" type="password" labelPlacement="stacked" formControlName="password"></ion-input>
+        </ion-item>
+
+        <ion-text color="danger" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">Mínimo 6 caracteres</ion-text>
+
+        <ion-item>
+          <ion-input label="Confirmar contraseña" type="password" labelPlacement="stacked" formControlName="confirmPassword"></ion-input>
+        </ion-item>
+
+        <ion-text color="danger" *ngIf="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched">Confirma la contraseña</ion-text>
+
+        <ion-text color="danger" *ngIf="errorMessage">{{ errorMessage }}</ion-text>
+
+        <ion-text color="success" *ngIf="successMessage">{{ successMessage }}</ion-text>
+
+        <ion-button expand="full" type="submit" [disabled]="loading">
+          {{ loading ? 'Registrando...' : 'Registrarse' }}
+        </ion-button>
+
+      </form>
+
+    </ion-card-content>
+
+  </ion-card>
+
+</ion-content>

@@ -1,0 +1,18 @@
+<ion-content class="ion-padding">
+
+  <h2>Pagos</h2>
+
+  <ion-list>
+    <ion-item *ngFor="let p of payments">
+
+      <ion-label>
+        <h2>ID: {{ p.id }}</h2>
+        <p>Usuario: {{ p.userId }}</p>
+        <p>Cantidad: {{ p.amount }}</p>
+        <p>Fecha: {{ p.date }}</p>
+      </ion-label>
+
+    </ion-item>
+  </ion-list>
+
+</ion-content>

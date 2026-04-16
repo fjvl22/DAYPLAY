@@ -1,0 +1,41 @@
+<div class="keyboard">
+
+  <div class="row" *ngFor="let row of keys">
+
+    <ion-button
+      *ngFor="let key of row"
+      class="key-btn"
+      [disabled]="usedLetters.includes(key.toLowerCase())"
+      [ngClass]="keyClasses[key.toLowerCase()]"
+      (click)="pressKey(key.toLowerCase())"
+      size="small">
+
+      {{ key }}
+
+    </ion-button>
+
+  </div>
+
+  <div *ngIf="gameMode === 'wordle'" class="row">
+
+    <ion-button
+      class="special-btn"
+      color="medium"
+      (click)="enterPressed.emit()">
+
+      ⏎
+
+    </ion-button>
+
+    <ion-button
+      class="special-btn"
+      color="danger"
+      (click)="backspacePressed.emit()">
+
+      ⌫
+
+    </ion-button>
+
+  </div>
+
+</div>

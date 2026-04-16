@@ -1,0 +1,50 @@
+.leaderboard-content {
+    --background: #0f172a;
+    padding: 10px;
+  }
+  
+  .games-navbar,
+  .sorting {
+    margin: 10px 0;
+  }
+  
+  .player-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .position {
+    font-size: 22px;
+    width: 40px;
+    text-align: center;
+  }
+  
+  .info h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+  }
+  
+  .info p {
+    margin: 0;
+    font-size: 12px;
+    color: #aaa;
+  }
+  
+  .score {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .current-user {
+    --background: #ffeb3b !important;
+    color: black;
+  }
+  
+  .empty {
+    text-align: center;
+    margin-top: 40px;
+    color: #aaa;
+  }

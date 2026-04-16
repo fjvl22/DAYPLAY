@@ -1,0 +1,49 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Math Rush</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="game-content">
+
+  <ng-container *ngIf="!mathRushService.isFinished(); else finalScreen">
+
+    <div class="center-area">
+
+      <div class="egg large-egg">
+        {{ currentOperation?.operation }}
+      </div>
+
+      <div class="egg-grid">
+
+        <div
+          class="egg small-egg"
+          *ngFor="let option of options"
+          (click)="selectedAnswer = option; selectAnswer(option)"
+          [ngClass]="{
+            'correct': showResult && isCorrect(option),
+            'wrong': showResult && !isCorrect(option)
+          }">
+
+          {{ option }}
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </ng-container>
+
+  <ng-template #finalScreen>
+    <div class="final-screen">
+      <h2>Juego terminado</h2>
+      <p>
+        Puntuación:
+        {{ mathRushService.getScore() }} /
+        {{ mathRushService.getTotalOperations() }}
+      </p>
+    </div>
+  </ng-template>
+
+</ion-content>

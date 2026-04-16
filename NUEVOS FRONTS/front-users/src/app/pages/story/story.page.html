@@ -1,0 +1,46 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Historia</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="story-content">
+
+  <ng-container *ngIf="getCurrentChapter() as currentChapter; else noChapters">
+
+    <ion-card class="story-card">
+      <ion-card-header>
+        <ion-card-title>{{ currentChapter.storyTitle }}</ion-card-title>
+        <ion-card-subtitle>{{ currentChapter.chapterTitle }}</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <p>{{ currentChapter.chapterContent }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <div class="navigation">
+      <ion-button
+        fill="outline"
+        (click)="prevChapter()"
+        [disabled]="currentIndex === 0">
+        ⬅
+      </ion-button>
+
+      <ion-button
+        fill="outline"
+        (click)="nextChapter()"
+        [disabled]="currentIndex === chapters.length - 1">
+        ➡
+      </ion-button>
+    </div>
+
+  </ng-container>
+
+  <ng-template #noChapters>
+    <div class="empty">
+      <p>No hay capítulos disponibles.</p>
+    </div>
+  </ng-template>
+
+</ion-content>

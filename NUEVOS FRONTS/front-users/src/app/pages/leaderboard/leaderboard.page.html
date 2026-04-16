@@ -1,0 +1,54 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Ranking</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="leaderboard-content">
+
+  <div class="games-navbar">
+    <ion-segment [(ngModel)]="selectedGameId" (ionChange)="onGameChange($event)">
+
+      <ion-segment-button *ngFor="let g of games" [value]="g.id">{{ g.name }}</ion-segment-button>
+
+    </ion-segment>
+  </div>
+
+  <div class="sorting" *ngIf="games.length > 0">
+
+    <ion-segment [(ngModel)]="sortBy" (ionChange)="onSortChange($event)">
+
+      <ion-segment-button value="score">Puntuación</ion-segment-button>
+
+      <ion-segment-button value="date">Fecha</ion-segment-button>
+
+    </ion-segment>
+
+  </div>
+
+  <ion-spinner *ngIf="loading"></ion-spinner>
+
+  <ng-container *ngIf="!loading && leaderboard.length > 0">
+
+    <ion-card *ngFor="let player of leaderboardWithNicknames; let i = index" [ngClass]="{ 'current-user': isCurrentUser(player.nickname) }">
+
+      <ion-card-content class="player-row">
+
+        <div class="position">{{ getMedal(i) || (i + 1) }}</div>
+
+        <div class="info">
+          <h3>{{ player.nickname }}</h3>
+          <p>{{ player.lastUpdate | date: 'dd/MM/yyyy' }}</p>
+        </div>
+
+        <div class="score">{{ player.totalPoints }}</div>
+
+      </ion-card-content>
+
+    </ion-card>
+
+  </ng-container>
+
+  <div class="empty" *ngIf="!loading && leaderboard.length === 0">No hay datos</div>
+
+</ion-content>

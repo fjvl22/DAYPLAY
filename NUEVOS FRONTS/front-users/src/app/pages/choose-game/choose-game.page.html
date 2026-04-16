@@ -1,0 +1,55 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Selecciona un juego</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="game-content">
+
+  <div class="top-buttons" *ngIf="!authService.isPending()">
+
+    <ion-button fill="clear" (click)="goToStory()">
+      <ion-icon name="book-outline"></ion-icon>
+    </ion-button>
+
+    <ion-button fill="clear" (click)="goToRanking()">
+      <ion-icon name="trophy-outline"></ion-icon>
+    </ion-button>
+
+  </div>
+
+  <h2 class="title">{{ title }}</h2>
+
+  <ion-grid>
+
+    <ion-row *ngFor="let row of grid">
+
+      <ion-col size="6" *ngFor="let game of row">
+
+        <ion-card
+          class="game-card"
+          *ngIf="game"
+          (click)="onCellClick(game)">
+
+          <ion-card-content>
+
+            <div class="game-url">
+              {{ game.url || '---' }}
+            </div>
+
+            <div class="overlay">
+              <h4>{{ game.name }}</h4>
+              <p>{{ game.description }}</p>
+            </div>
+
+          </ion-card-content>
+
+        </ion-card>
+
+      </ion-col>
+
+    </ion-row>
+
+  </ion-grid>
+
+</ion-content>

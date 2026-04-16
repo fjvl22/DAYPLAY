@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-toolbar>
+
+    <ion-title class="logo">
+      <img src="assets/LOGO.png" alt="LOGO" />
+    </ion-title>
+
+    <div class="welcome">
+      Welcome, {{ nickname }}
+    </div>
+
+    <ion-buttons slot="end">
+
+      <ion-button (click)="openMenu($event)">
+        <ion-icon name="person-circle-outline"></ion-icon>
+      </ion-button>
+
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<app-delete-account #deleteAccount></app-delete-account>
+<app-change-password #changePassword></app-change-password>
