@@ -11,6 +11,7 @@ const paymentService = require('./services/payment.service');
 const adminRoutes = require('./modules/admin/admin.routes');
 const authRoutes = require('./modules/auth/auth.routes');
 const userRoutes = require('./modules/user/user.routes');
+const jwtRoutes = require('./modules/jwt/jwt.routes');
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/jwt', jwtRoutes);
 
 /* ================================
    GLOBAL ERROR HANDLER

@@ -1,45 +1,32 @@
 const bcrypt = require('bcryptjs');
 const sequelize = require('../../config/database');
-const { Person } = require('../../models');
+const { Person, TokenBlacklist } = require('../../models');
 const { Admin } = require('../../models');
 const { AppUser } = require('../../models');
 const { UserPending } = require('../../models');
 const { SystemEvent } = require('../../models');
 const { UserPlan } = require('../../models');
-const { TokenBlackList } = require('../../models');
-const { generateToken } = require('../../utils/jwt');
+const jwtService = require('../jwt/jwt.service');
 const { getPermissionsByDepartment } = require('../admin/admin.service');
 const jwt = require('jsonwebtoken');
+const tokenBlacklist = require('../../models/tokenBlacklist');
 
 exports.login = async (nickname, password) => {
+
     const person = await Person.findOne({
         where: { nickname, active: true },
-        include: [
-            { model: Admin },
-            { model: AppUser },
-            { model: UserPending }
-        ]
+        include: [Admin, AppUser, UserPending]
     });
+
     if (!person) throw new Error('User not found');
+
     const validPassword = await bcrypt.compare(password, person.passwordHash);
-    if (!validPassword) {
-        await SystemEvent.create({
-            userId: person?.id || null,
-            eventType: 'LOGIN_FAILED',
-            description: `Intento de login fallido`,
-            category: 'SYSTEM'
-        });
-        throw new Error('Incorrect credentials');
-    }
+    if (!validPassword) throw new Error('Incorrect credentials');
+
+    let payload;
+
     if (person.personType === 'ADMIN') {
-        await SystemEvent.create({
-            adminId: person.personType === 'ADMIN' ? person.id : null,
-            userId: person.personType === 'USER' ? person.id : null,
-            eventType: 'LOGIN_SUCCESS',
-            description: `Login correcto (${person.personType})`,
-            category: person.personType === 'ADMIN' ? 'ADMIN' : 'USER'
-        });
-        return generateToken({
+        payload = {
             id: person.id,
             nickname: person.nickname,
             role: 'ADMIN',
@@ -47,47 +34,67 @@ exports.login = async (nickname, password) => {
             department: person.Admin?.department,
             permissions: person.Admin?.permissions,
             status: 'ACTIVE'
-        });
-    }
-    if (person.AppUser) {
-        await SystemEvent.create({
-            adminId: person.personType === 'ADMIN' ? person.id : null,
-            userId: person.personType === 'USER' ? person.id : null,
-            eventType: 'LOGIN_SUCCESS',
-            description: `Login correcto (${person.personType})`,
-            category: person.personType === 'ADMIN' ? 'ADMIN' : 'USER'
-        });
-        return generateToken({
+        };
+    } else if (person.AppUser) {
+        payload = {
             id: person.id,
+            nickname: person.nickname,
             role: 'USER',
             planId: person.AppUser.planId,
             subscriptionDate: person.AppUser.subscriptionDate,
-            status: 'ACTIVE',
-            nickname: person.nickname
-        });
-    }
-    if (person.UserPending) {
-        await SystemEvent.create({
-            adminId: person.personType === 'ADMIN' ? person.id : null,
-            userId: person.personType === 'USER' ? person.id : null,
-            eventType: 'LOGIN_SUCCESS',
-            description: `Login correcto (${person.personType})`,
-            category: person.personType === 'ADMIN' ? 'ADMIN' : 'USER'
-        });
-        return generateToken({
+            status: 'ACTIVE'
+        };
+    } else if (person.UserPending) {
+        payload = {
             id: person.id,
             nickname: person.nickname,
             role: 'USER',
             status: 'PENDING'
-        });
-    }
-    await SystemEvent.create({
-        userId: person?.id || null,
-        eventType: 'LOGIN_FAILED',
-        description: `Intento de login fallido`,
-        category: 'SYSTEM'
+        };
+    } else { throw new Error('User state invalid'); }
+
+    const tokens = jwtService.generateTokens(payload);
+
+    await tokenBlacklist.create({
+        token: tokens.refreshToken,
+        expiresAt: new Date(Date.now()+7*24*60*60*1000)
     });
-    throw new Error('User state invalid');
+
+    await SystemEvent.create({
+        userId: person.id,
+        eventType: 'LOGIN_SUCCESS',
+        description: `Login correcto (${person.personType})`,
+        category: person.personType === 'ADMIN' ? 'ADMIN' : 'USER'
+    });
+
+    return tokens;
+};
+
+exports.logout = async (accessToken, refreshToken) => {
+    try {
+        const decoded = jwtService.verifyAccessToken(accessToken);
+
+        await TokenBlacklist.create({
+            token: accessToken,
+            expiresAt: new Date(decoded.exp * 100)
+        });
+
+        if (refreshToken) {
+            await tokenBlacklist.destroy({ where: { token: refreshToken } });
+        }
+
+        await SystemEvent.create({
+            userId: decoded.id,
+            eventType: 'LOGOUT',
+            description: 'Usuario cerró sesión',
+            category: 'USER'
+        });
+
+        return { message: 'Logged out successfully' };
+
+    } catch (error) {
+        throw new Error('Invalid token');
+    }
 };
 
 exports.adminRegistration = async (data) => {
@@ -166,24 +173,6 @@ exports.userRegistration = async (data) => {
     } catch (error) {
         await transaction.rollback();
         throw error;
-    }
-};
-
-exports.logout = async (token) => {
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        await TokenBlackList.create({
-            token, expiresAt: new Date(decoded.exp * 1000)
-        });
-        await SystemEvent.create({
-            userId: decoded.id,
-            eventType: 'LOGOUT',
-            description: 'Usuario cerró sesión',
-            category: 'USER'
-        });
-        return { message: 'Logged out successfully' };
-    } catch (error) {
-        throw new Error('Invalid token');
     }
 };
 

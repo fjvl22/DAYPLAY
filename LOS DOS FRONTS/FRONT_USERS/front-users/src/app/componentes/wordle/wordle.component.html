@@ -1,7 +1,0 @@
-<h2>WORDLE</h2>
-<div class="board">
-    <div class="row" *ngFor="let row of grid; let rowIndex = index">
-        <div class="cell" *ngFor="let cell of row; let colIndex = index" [ngClass]="cellStatus[rowIndex][colIndex]">{{ cell }}</div>
-    </div>
-</div>
-<app-letters-keyboard [usedLetters]="usedLetters" [keyClasses]="keyClasses" [gameMode]="'wordle'" (letterPressed)="onLetter($event)" (backspacePressed)="onBackspace()" (enterPressed)="onEnter()"></app-letters-keyboard>
