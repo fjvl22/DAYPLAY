@@ -1,18 +1,24 @@
-import { CanActivateChildFn, Router, UrlTree } from "@angular/router";
-import { AuthService } from "../services/auth.service";
 import { inject } from "@angular/core";
+import { CanActivateFn, Router } from "@angular/router";
+import { AuthService } from "../services/auth.service";
 
-export const roleGuard: CanActivateChildFn = (route, state): boolean | UrlTree => {
+export const roleGuard: CanActivateFn = (route, state): boolean => {
 
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  if (!auth.isLogged()) return router.parseUrl('/login');
+  if (!auth.isLogged()) {
+    router.navigate(['/login']);
+    return false;
+  }
 
   const roles = route.data?.['roles'];
   const userRole = auth.getAdminType();
 
-  if (roles && !roles.includes(userRole)) return router.parseUrl('/users');
+  if (roles && userRole && !roles.includes(userRole)) {
+    router.navigate(['/users']);
+    return false;
+  }
 
   return true;
 };

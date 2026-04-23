@@ -1,30 +1,61 @@
 import { Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
-import { IonicModule, NavController } from "@ionic/angular";
+import { ReactiveFormsModule, FormBuilder, Validators } from "@angular/forms";
+import { IonicModule } from "@ionic/angular";
+import { Router } from "@angular/router";
 
 import { AuthService } from "src/app/core/services/auth.service";
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule],
+  imports: [CommonModule, ReactiveFormsModule, IonicModule],
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss']
 })
 export class LoginPage {
 
-  nickname = '';
-  password = '';
+  loginForm;
+  loading = false;
+  errorMessage = '';
 
   constructor(
+    private fb: FormBuilder,
     private auth: AuthService,
-    private navCtrl: NavController
-  ) {}
-
-  login() {
-    this.auth.login(this.nickname, this.password).subscribe(() => {
-      this.navCtrl.navigateRoot('/users');
+    private router: Router
+  ) {
+    this.loginForm = this.fb.group({
+      nickname: ['', Validators.required],
+      password: ['', Validators.required]
     });
+  }
+
+  onSubmit() {
+    if (this.loginForm.invalid) return;
+
+    this.loading = true;
+    this.errorMessage = '';
+
+    const { nickname, password } = this.loginForm.value;
+
+    if (!nickname || !password) {
+      this.loading = false;
+      return;
+    }
+
+    this.auth.login(nickname, password).subscribe({
+      next: () => {
+        this.loading = false;
+        this.router.navigate(['/users']);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage = err?.error?.message ? err?.error?.message : 'Error al iniciar sesión';
+      }
+    });
+  }
+
+  goToRegister() {
+    this.router.navigate(['/register']);
   }
 }

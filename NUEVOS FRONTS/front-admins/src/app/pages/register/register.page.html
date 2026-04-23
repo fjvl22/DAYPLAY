@@ -11,7 +11,7 @@
       <form [formGroup]="registerForm" (ngSubmit)="register()">
 
         <ion-item>
-          <ion-input label="Nombre de Usuario" lbelPlacement="stacked" formControlName="nickname"></ion-input>
+          <ion-input label="Nombre de Usuario" labelPlacement="stacked" formControlName="nickname"></ion-input>
         </ion-item>
 
         <ion-text color="danger" *ngIf="registerForm.get('nickname')?.invalid && registerForm.get('nickname')?.touched">Nombre de usuario obligatorio (mínimo 3 caracteres)</ion-text>

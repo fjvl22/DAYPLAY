@@ -10,7 +10,6 @@ import { IonicModule } from '@ionic/angular';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    importProvidersFrom(IonicModule.forRoot()),
     provideIonicAngular(),
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideHttpClient(),

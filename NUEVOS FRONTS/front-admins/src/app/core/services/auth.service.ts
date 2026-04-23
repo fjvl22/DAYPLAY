@@ -22,7 +22,8 @@ export class AuthService {
   login(nickname: string, password: string): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.api}/login`, { nickname, password }).pipe(
       tap(res => {
-        this.saveToken(res.token);
+        this.saveAccessToken(res.accessToken);
+        this.saveRefreshToken(res.refreshToken);
         this.updateAdminType();
       })
     );
@@ -46,12 +47,16 @@ export class AuthService {
     return this.http.put<MessageResponse>(`${this.api}/change-password`, data);
   }
 
-  saveToken(token: string) {
-    localStorage.setItem('token', token);
+  saveAccessToken(token: string) {
+    localStorage.setItem('accessToken', token);
   }
-
+  
+  saveRefreshToken(token: string) {
+    localStorage.setItem('refreshToken', token);
+  }
+  
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return localStorage.getItem('accessToken');
   }
 
   isLogged(): boolean {
