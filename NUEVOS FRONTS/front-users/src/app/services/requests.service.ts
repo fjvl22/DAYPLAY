@@ -7,7 +7,6 @@ import { MathOperation } from "../interfaces/math-operation";
 import { GameWord } from "../interfaces/game-word";
 import { MessageResponse } from "../interfaces/message-response";
 import { MatchResponse } from "../interfaces/match-response";
-import { StreakResponse } from "../interfaces/streak-response";
 import { Chapter } from "../interfaces/chapter";
 import { AppUser } from "../interfaces/app-user";
 
@@ -57,15 +56,6 @@ export class RequestsService {
     return this.http.post<MessageResponse>(
       `${this.API_URL}/match/finish`,
       { matchId, score, extraData },
-      { headers }
-    );
-  }
-
-  updateStreak(gameId: number): Observable<StreakResponse> {
-    const headers = this.getAuthHeaders();
-    return this.http.post<StreakResponse>(
-      `${this.API_URL}/streak`,
-      { gameId },
       { headers }
     );
   }

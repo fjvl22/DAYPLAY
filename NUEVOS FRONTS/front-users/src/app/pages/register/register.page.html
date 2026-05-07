@@ -4,25 +4,23 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="register-content">
+<ion-content class="ion-padding">
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
 
-  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="form">
-
-    <ion-card class="form-card">
-
+    <ion-card>
       <ion-card-header>
-        <ion-card-title>Crear cuenta</ion-card-title>
+        <ion-card-title>Registro</ion-card-title>
       </ion-card-header>
 
       <ion-card-content>
 
         <ion-item>
-          <ion-label position="stacked">Nickname</ion-label>
+          <ion-label position="stacked">Nombre de Usuario</ion-label>
           <ion-input type="text" formControlName="nickname"></ion-input>
         </ion-item>
 
         <ion-item>
-          <ion-label position="stacked">Email</ion-label>
+          <ion-label position="stacked">Correo Electrónico</ion-label>
           <ion-input type="email" formControlName="email"></ion-input>
         </ion-item>
 
@@ -32,38 +30,19 @@
         </ion-item>
 
         <ion-item>
-          <ion-label>Plan</ion-label>
-          <ion-select formControlName="plan" placeholder="Selecciona un plan">
-            <ion-select-option *ngFor="let plan of planTypes" [value]="plan">
-              {{ plan }}
-            </ion-select-option>
+          <ion-label position="stacked">Plan</ion-label>
+          <ion-select formControlName="plan">
+            <ion-select-option *ngFor="let plan of planTypes">{{ plan }}</ion-select-option>
           </ion-select>
         </ion-item>
 
-        <ion-button
-          expand="block"
-          type="submit"
-          [disabled]="loading || registerForm.invalid"
-          class="submit-btn">
-          Registrarse
-        </ion-button>
+        <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
+        <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
-        <ion-text color="medium" *ngIf="loading">
-          <p>Cargando...</p>
-        </ion-text>
-
-        <ion-text color="danger" *ngIf="errorMessage">
-          <p>{{ errorMessage }}</p>
-        </ion-text>
-
-        <ion-text color="success" *ngIf="successMessage">
-          <p>{{ successMessage }}</p>
-        </ion-text>
+        <ion-button expand="full" type="submit" [disabled]="loading">{{ loading ? 'Cargando...' : 'Registrarse' }}</ion-button>
 
       </ion-card-content>
-
     </ion-card>
 
   </form>
-
 </ion-content>

@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { TokenBlacklist } = require('../../models');
 
-exports.generateTokens = (payload) => {
+exports.generateTokens = (payload, rememberMe) => {
     const accessToken = jwt.sign(
         payload,
         process.env.JWT_ACCESS_SECRET,
@@ -11,7 +11,7 @@ exports.generateTokens = (payload) => {
     const refreshToken = jwt.sign(
         payload,
         process.env.JWT_REFRESH_SECRET,
-        { expiresIn: '7d' }
+        { expiresIn: rememberMe ? '7d' : '1d' }
     );
 
     return { accessToken, refreshToken };
@@ -24,26 +24,16 @@ exports.verifyRefreshToken = (token) => {return jwt.verify(token, process.env.JW
 exports.refreshAccessToken = async (refreshToken) => {
     if (!refreshToken) throw new Error('No refresh token');
 
-    try {
-        const decoded = exports.verifyRefreshToken(refreshToken);
+    const decoded = exports.verifyRefreshToken(refreshToken);
 
-        const exists = await TokenBlacklist.findOne({ where: { token: refreshToken } });
+    const exists = await TokenBlacklist.findOne({ where: { token: refreshToken } });
+    if (!exists) throw new Error('Invalid refresh token');
 
-        if (!exists) throw new Error('Invalid refresh token');
+    await TokenBlacklist.destroy({ where: { token: refreshToken } });
 
-        const newAccessToken = jwt.sign(
-            {
-                id: decoded.id,
-                role: decoded.role,
-                nickname: decoded.nickname
-            },
-            process.env.JWT_ACCESS_SECRET,
-            { expiresIn: '1h' }
-        );
+    const newTokens = exports.generateTokens({id: decoded.id, role: decoded.role, nickname: decoded.nickname}, true);
 
-        return { accessToken: newAccessToken };
+    await TokenBlacklist.create({ token: newTokens.refreshToken, expiresAt: new Date(Date.now()+7*24*60*60*1000) });
 
-    } catch (error) {
-        throw new Error('Invalid or expired refresh token');
-    }
+    return newTokens;
 };

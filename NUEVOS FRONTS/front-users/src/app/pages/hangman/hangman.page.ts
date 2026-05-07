@@ -38,6 +38,10 @@ export class HangmanPage implements OnInit {
 
   errorsCounter = 0;
 
+  currentStreak: number = 0;
+
+  showIntroStreak: boolean = true;
+
   constructor(
     public gameFinishService: GameFinishService,
     public hangmanService: HangmanService,
@@ -46,6 +50,14 @@ export class HangmanPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    const nav = this.router.getCurrentNavigation();
+    this.currentStreak =
+      nav?.extras?.state?.['streak'] ||
+      history.state?.streak ||
+      0;
+
+    setTimeout(() => this.showIntroStreak = false, 5000);
+
     this.hangmanService.fetchWord().subscribe(w => {
       this.word = w;
       this.hangmanService.startGame(w);

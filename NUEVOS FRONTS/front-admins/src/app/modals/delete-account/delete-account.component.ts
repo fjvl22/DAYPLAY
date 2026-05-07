@@ -2,8 +2,9 @@ import { Component } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { IonicModule, ModalController } from "@ionic/angular";
-import { AuthService } from "src/app/core/services/auth.service";
 import { Router } from "@angular/router";
+import { AdminService } from "src/app/core/services/admin.service";
+import { AuthService } from "src/app/core/services/auth.service";
 
 @Component({
   selector: 'app-delete-account',
@@ -13,16 +14,24 @@ import { Router } from "@angular/router";
 })
 export class DeleteAccountComponent {
 
-  form!: FormGroup;
+  form: FormGroup;
   message: string | null = null;
+  loading = false;
 
   constructor(
     private fb: FormBuilder,
+    private admin: AdminService,
     private auth: AuthService,
     private modalCtrl: ModalController,
     private router: Router
   ) {
-    this.form = this.fb.group({password: ['', Validators.required]});
+    this.form = this.fb.group({
+      password: ['', Validators.required]
+    });
+
+    this.form.valueChanges.subscribe(() => {
+      this.message = null;
+    });
   }
 
   close() {
@@ -32,13 +41,23 @@ export class DeleteAccountComponent {
   submit() {
     if (this.form.invalid) return;
 
+    this.loading = true;
+
     this.auth.deleteAccount(this.form.value.password).subscribe({
-      next: (res) => {
-        localStorage.clear();
+      next: () => {
+
+        this.loading = false;
+
+        this.admin.clearPermissions();
+        localStorage.removeItem('token');
+
         this.modalCtrl.dismiss(true);
         this.router.navigate(['/login']);
       },
-      error: err => this.message = err.error?.message || 'Error'
+      error: err => {
+        this.loading = false;
+        this.message = err.error?.message || 'Error';
+      }
     });
   }
 }

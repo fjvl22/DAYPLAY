@@ -1,49 +1,27 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Math Rush</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content class="game-content">
 
-  <ng-container *ngIf="!mathRushService.isFinished(); else finalScreen">
+  <div class="streak-intro" *ngIf="showIntroStreak">
+    <img src="https://cdn-icons-png.flaticon.com/512/742/742751.png">
+    <span>{{ currentStreak }}</span>
+  </div>
 
-    <div class="center-area">
-
-      <div class="egg large-egg">
-        {{ currentOperation?.operation }}
-      </div>
-
-      <div class="egg-grid">
-
-        <div
-          class="egg small-egg"
-          *ngFor="let option of options"
-          (click)="selectedAnswer = option; selectAnswer(option)"
-          [ngClass]="{
-            'correct': showResult && isCorrect(option),
-            'wrong': showResult && !isCorrect(option)
-          }">
-
-          {{ option }}
-
-        </div>
-
-      </div>
-
+  <div class="center-area">
+    <div class="egg large-egg">
+      {{ currentOperation?.operation }}
     </div>
 
-  </ng-container>
-
-  <ng-template #finalScreen>
-    <div class="final-screen">
-      <h2>Juego terminado</h2>
-      <p>
-        Puntuación:
-        {{ mathRushService.getScore() }} /
-        {{ mathRushService.getTotalOperations() }}
-      </p>
+    <div class="egg-grid">
+      <div class="egg small-egg"
+        *ngFor="let option of options"
+        (click)="selectAnswer(option)">
+        {{ option }}
+      </div>
     </div>
-  </ng-template>
+  </div>
+
+  <div class="streak-container" *ngIf="!showIntroStreak">
+    <img src="https://cdn-icons-png.flaticon.com/512/742/742751.png">
+    <span>{{ currentStreak }}</span>
+  </div>
 
 </ion-content>

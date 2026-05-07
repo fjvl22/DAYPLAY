@@ -35,6 +35,10 @@ export class GuessSecretNumberPage implements OnInit {
   currentInput: string = '';
   message: string = '';
 
+  currentStreak: number = 0;
+
+  showIntroStreak: boolean = true;
+
   constructor(
     public gameFinishService: GameFinishService,
     public service: GuessSecretNumberService,
@@ -42,7 +46,15 @@ export class GuessSecretNumberPage implements OnInit {
     private authService: AuthService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
+    const nav = this.router.getCurrentNavigation();
+    this.currentStreak =
+      nav?.extras?.state?.['streak'] ||
+      history.state?.streak ||
+      0;
+  
+    setTimeout(() => this.showIntroStreak = false, 5000);
+  
     this.service.startGame();
   }
 

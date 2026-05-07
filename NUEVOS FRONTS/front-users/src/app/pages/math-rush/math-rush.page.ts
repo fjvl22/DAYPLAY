@@ -36,6 +36,10 @@ export class MathRushPage implements OnInit {
 
   answer!: number;
 
+  currentStreak: number = 0;
+
+  showIntroStreak: boolean = true;
+
   constructor(
     public gameFinishService: GameFinishService,
     public mathRushService: MathRushService,
@@ -43,7 +47,15 @@ export class MathRushPage implements OnInit {
     private authService: AuthService
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
+    const nav = this.router.getCurrentNavigation();
+    this.currentStreak =
+      nav?.extras?.state?.['streak'] ||
+      history.state?.streak ||
+      0;
+  
+    setTimeout(() => this.showIntroStreak = false, 5000);
+  
     this.mathRushService.fetchDailyOperations().subscribe(ops => {
       this.mathRushService.startGame(ops);
       this.loadNextOperation();

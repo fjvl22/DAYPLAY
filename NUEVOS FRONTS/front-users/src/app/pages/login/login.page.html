@@ -1,51 +1,27 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Iniciar Sesión</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="login-wrapper" *ngIf="loginForm">
+  <div class="login-container">
+    <h1>Inicio de Sesión</h1>
 
-<ion-content class="login-content">
+    <form [formGroup]="loginForm" (ngSubmit)="login()">
 
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form">
+      <ion-input class="custom-input" placeholder="Nombre de Usuario" type="text" formControlName="nickname"></ion-input>
 
-    <ion-card class="login-card">
+      <ion-text color="danger" *ngIf="f['nickname'].touched && f['nickname'].invalid"><small>El usuario es obligatorio.</small></ion-text>
 
-      <ion-card-header>
-        <ion-card-title>Bienvenido</ion-card-title>
-      </ion-card-header>
+      <ion-input class="custom-input" placeholder="Contraseña" type="password" formControlName="password"></ion-input>
 
-      <ion-card-content>
+      <ion-text color="danger" *ngIf="f['password'].touched && f['password'].invalid"><small>La contraseña es obligatoria.</small></ion-text>
 
-        <ion-item>
-          <ion-label position="stacked">Nombre de usuario</ion-label>
-          <ion-input type="text" formControlName="nickname"></ion-input>
-        </ion-item>
+      <ion-item lines="none" class="remember-me">
+        <ion-checkbox slot="start" (ionChange)="onCheckBoxChange($event)"></ion-checkbox>
+        <ion-label>Recuérdame</ion-label>
+      </ion-item>
 
-        <ion-item>
-          <ion-label position="stacked">Contraseña</ion-label>
-          <ion-input type="password" formControlName="password"></ion-input>
-        </ion-item>
+      <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
+      <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
-        <ion-button
-          expand="block"
-          type="submit"
-          [disabled]="loading || loginForm.invalid"
-          class="login-btn">
-          Entrar
-        </ion-button>
+      <ion-button expand="block" class="login-button" type="submit" [disabled]="loading">{{ loading ? 'Cargando...' : 'Iniciar Sesión' }}</ion-button>
 
-        <ion-text color="medium" *ngIf="loading">
-          <p>Cargando...</p>
-        </ion-text>
-
-        <ion-text color="danger" *ngIf="errorMessage">
-          <p>{{ errorMessage }}</p>
-        </ion-text>
-
-      </ion-card-content>
-
-    </ion-card>
-
-  </form>
-
-</ion-content>
+    </form>
+  </div>
+</div>

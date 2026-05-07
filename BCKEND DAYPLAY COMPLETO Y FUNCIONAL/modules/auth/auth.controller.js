@@ -1,8 +1,8 @@
 const authService = require('./auth.service');
 exports.login = async (req, res, next) => {
     try {
-        const { nickname, password } = req.body;
-        const token = await authService.login(nickname, password);
+        const { nickname, password, rememberMe } = req.body;
+        const token = await authService.login(nickname, password, rememberMe);
         res.json({ token });
     } catch (error) {
         next(error);

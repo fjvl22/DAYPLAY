@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 import { AppUser } from '../interfaces/app-user';
 import { UserPending } from '../interfaces/user-pending';
@@ -14,6 +14,8 @@ import { SystemEvent } from '../interfaces/system-event';
 import { Admin } from '../interfaces/admin';
 import { AuthService } from './auth.service';
 import { PaymentDetailResponse } from '../interfaces/payment-detail-response';
+import { ApproveResponse } from '../interfaces/approve-response';
+import { Permissions } from '../interfaces/permissions';
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +28,8 @@ export class AdminService {
 
   private apiUrl = '/api/admin';
 
+  private storageKeyPermissions: string = 'permissions';
+
   // ================= USERS =================
 
   getUsers(): Observable<AppUser[]> {
@@ -36,17 +40,19 @@ export class AdminService {
     return this.http.get<UserPending[]>(`${this.apiUrl}/users/pending`);
   }
 
-  approveUserPending(UserPendingId: number, plan: string): Observable<AppUser> {
-    return this.http.post<AppUser>(`${this.apiUrl}/users/approve`, {
-      UserPendingId,
+  approveUserPending(adminId: number, userPendingId: number, plan: string): Observable<ApproveResponse> {
+    return this.http.post<ApproveResponse>(`${this.apiUrl}/users/approve`, {
+      adminId,
+      userPendingId,
       plan
     });
   }
 
-  rejectUserPending(id: number): Observable<{ message: string }> {
-    return this.http.delete<{ message: string }>(
-      `${this.apiUrl}/users/reject/${id}`
-    );
+  rejectUserPending(pendingUserId: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/users/reject`, {
+      adminId: Number(localStorage.getItem('adminId')),
+      pendingUserId
+    });
   }
 
   updateUser(id: number, user: Partial<AppUser>): Observable<AppUser> {
@@ -143,7 +149,7 @@ export class AdminService {
   createNotification(data: any) {
     return this.http.post(`${this.apiUrl}/notification`, data, {
       headers: {
-        Authorization: `Bearer ${this.authService.getToken()}`
+        Authorization: `Bearer ${this.authService.getAccessToken()}`
       }
     });
   }
@@ -151,7 +157,7 @@ export class AdminService {
   createNotifications(data: any) {
     return this.http.post(`${this.apiUrl}/notifications`, data, {
       headers: {
-        Authorization: `Bearer ${this.authService.getToken()}`
+        Authorization: `Bearer ${this.authService.getAccessToken()}`
       }
     });
   }
@@ -168,4 +174,27 @@ export class AdminService {
     return this.http.get<Admin[]>(`${this.apiUrl}/admins`);
   }
 
+  // ================= PERMISSIONS =================
+
+  getPermissionsByDepartment(department: string) {
+    return this.http
+      .get<Permissions>(`${this.apiUrl}/permissions/${department}`)
+      .pipe(tap(perms => this.setPermissions(perms)));
+  }
+
+  getPermissions(): Permissions {
+    const data = localStorage.getItem(this.storageKeyPermissions);
+
+    if (!data) return {};
+
+    try {return JSON.parse(data) as Permissions} catch (e) {return {}};
+  }
+
+  setPermissions(perms: Permissions) {
+    localStorage.setItem(this.storageKeyPermissions, JSON.stringify(perms));
+  }
+
+  clearPermissions(): void {
+    localStorage.removeItem(this.storageKeyPermissions);
+  }
 }

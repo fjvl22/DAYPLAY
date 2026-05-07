@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     }, {
       tableName: 'STREAK',
       timestamps: false,
-      indexes: [{ unique: true, fields: ['userId','gameId'] }]
+      indexes: [{ unique: true, fields: ['USER_ID','GAME_ID'] }]
     });
 
     Streak.associate = (models) => {

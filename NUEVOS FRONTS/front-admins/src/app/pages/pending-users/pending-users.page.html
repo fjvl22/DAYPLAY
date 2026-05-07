@@ -3,6 +3,7 @@
   <h2>Usuarios Pendientes</h2>
 
   <ion-list>
+
     <ion-item *ngFor="let u of pending">
 
       <ion-label>
@@ -11,11 +12,24 @@
         <p>Plan: {{ u.planType }}</p>
       </ion-label>
 
-      <ion-button color="success" (click)="approve(u.personId!)">Aprobar</ion-button>
+      <ion-button color="success" (click)="approve(u.personId!, u.planType)">Aprobar</ion-button>
 
       <ion-button color="danger" (click)="reject(u.personId!)">Rechazar</ion-button>
 
     </ion-item>
+
   </ion-list>
+
+  <hr>
+
+  <div class="stripe-div">
+
+    <h3>Pago Stripe</h3>
+
+    <div id="card-element"></div>
+
+    <ion-button expand="block" color="primary" (click)="confirmPayment()">Confirmar Pago</ion-button>
+
+  </div>
 
 </ion-content>

@@ -16,7 +16,7 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
+    const token = this.getAccessToken();
     return new HttpHeaders({ Authorization: `Bearer ${token}` });
   }
 
@@ -24,17 +24,27 @@ export class AuthService {
     return this.http.post<MessageResponse>(`${this.API_URL}/register/user`, { nickname, password, email });
   }
 
-  login(nickname: string, password: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.API_URL}/login`, { nickname, password })
+  login(nickname: string, password: string, rememberMe: boolean): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.API_URL}/login`, { nickname, password, rememberMe })
       .pipe(
         tap((res: LoginResponse) => {
-          localStorage.setItem('token', res.token);
-          const payload = jwtDecode<JwtPayload>(res.token);
+
+          sessionStorage.setItem('accessToken', res.accessToken);
+
+          const payload = jwtDecode<JwtPayload>(res.accessToken);
+
           localStorage.setItem('userId', payload.id.toString());
           localStorage.setItem('role', payload.role);
           localStorage.setItem('status', payload.status);
+
           if (payload.nickname) {
             localStorage.setItem('nickname', payload.nickname);
+          }
+
+          if (rememberMe) {
+            localStorage.setItem('refreshToken', res.refreshToken);
+          } else {
+            sessionStorage.setItem('refreshToken', res.refreshToken);
           }
         })
       );
@@ -50,14 +60,19 @@ export class AuthService {
 
   clearSession(): void {
     localStorage.clear();
+    sessionStorage.clear();
   }
 
-  getToken(): string | null {
-    return localStorage.getItem('token');
+  getAccessToken(): string | null {
+    return sessionStorage.getItem('accessToken');
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken');
   }
 
   getUser(): JwtPayload | null {
-    const token = this.getToken();
+    const token = this.getAccessToken();
     if (!token) return null;
     try { return jwtDecode<JwtPayload>(token); } catch { return null; }
   }
@@ -88,7 +103,7 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    return !!this.getRefreshToken();
   }
 
   getNickname(): string | null {
@@ -105,12 +120,20 @@ export class AuthService {
   }
 
   deleteAccount(password: string): Observable<MessageResponse> {
-    const headers = this.getAuthHeaders();
-    return this.http.request<MessageResponse>('delete', `${this.API_URL}/delete-account`, {body: { password }});
+    return this.http.request<MessageResponse>('delete', `${this.API_URL}/delete-account`, {
+      body: { password },
+      headers: this.getAuthHeaders()
+    });
   }
 
   getPlanTypes(): Observable<string[]> {
-    const headers = this.getAuthHeaders();
-    return this.http.get<string[]>(`${this.API_URL}/plan-types`, { headers });
+    return this.http.get<string[]>(`${this.API_URL}/plan-types`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  refreshToken(): Observable<any> {
+    const refreshToken = this.getRefreshToken();
+    return this.http.post(`${this.API_URL}/refresh`, { refreshToken });
   }
 }

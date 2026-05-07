@@ -49,7 +49,9 @@ export class LoginPage implements OnInit {
 
   loginForm!: FormGroup;
   loading = false;
+  successMessage = '';
   errorMessage = '';
+  rememberMe = false;
 
   constructor(
     private router: Router,
@@ -64,6 +66,10 @@ export class LoginPage implements OnInit {
     });
   }
 
+  onCheckboxChange(event: any) {
+    this.rememberMe = event.detail.checked;
+  }
+
   onSubmit() {
     if (this.loginForm.invalid) return;
 
@@ -72,12 +78,14 @@ export class LoginPage implements OnInit {
 
     const { nickname, password } = this.loginForm.value;
 
-    this.auth.login(nickname, password).subscribe({
+    this.auth.login(nickname, password, this.rememberMe).subscribe({
       next: (res: LoginResponse) => {
-        localStorage.setItem('token', res.token);
+        localStorage.setItem('access-token', res.accessToken);
+        localStorage.setItem('refresh-token', res.refreshToken);
         localStorage.setItem('nickname', nickname);
 
         this.loading = false;
+        setTimeout(() => {this.successMessage = 'Redirigiendo a la página principal...';}, 3000);
         this.router.navigate(['/choose-game']);
       },
       error: (err) => {

@@ -6,6 +6,11 @@
 
 <ion-content class="wordle-content">
 
+  <div class="streak-intro" *ngIf="showIntroStreak">
+    <img src="https://cdn-icons-png.flaticon.com/512/742/742751.png">
+    <span>{{ currentStreak }}</span>
+  </div>
+
   <div class="board">
     <div class="row" *ngFor="let row of grid; let rowIndex = index">
       <div
@@ -25,5 +30,10 @@
     (backspacePressed)="onBackspace()"
     (enterPressed)="onEnter()">
   </app-letters-keyboard>
+
+  <div class="streak-container" *ngIf="!showIntroStreak">
+    <img src="https://cdn-icons-png.flaticon.com/512/742/742751.png">
+    <span>{{ currentStreak }}</span>
+  </div>
 
 </ion-content>

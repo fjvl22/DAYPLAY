@@ -79,20 +79,22 @@ export class ChooseGamePage implements OnInit {
     if (!game) return;
 
     this.requests.createMatch(game.id).subscribe({
-      next: () => {
+      next: (res) => {
+
+        const streak = res.streak.currentStreak;
 
         switch (game.id) {
           case 1:
-            this.router.navigate(['/hangman']);
+            this.router.navigate(['/hangman'], { state: { streak } });
             break;
           case 2:
-            this.router.navigate(['/guesssecretnumber']);
+            this.router.navigate(['/guesssecretnumber'], { state: { streak } });
             break;
           case 3:
-            this.router.navigate(['/mathrush']);
+            this.router.navigate(['/mathrush'], { state: { streak } });
             break;
           case 4:
-            this.router.navigate(['/wordle']);
+            this.router.navigate(['/wordle'], { state: { streak } });
             break;
         }
       },

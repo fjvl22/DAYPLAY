@@ -16,10 +16,17 @@
       <ion-input type="password" formControlName="password"></ion-input>
     </ion-item>
 
-    <ion-button color="danger" expand="full" type="submit">Eliminar</ion-button>
+    <ion-button color="danger" expand="full" type="submit" [disabled]="form.invalid || loading">
+
+      <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+      <span *ngIf="!loading">Eliminar</span>
+
+    </ion-button>
 
   </form>
 
-  <ion-text color="danger" *ngIf="message">{{ message }}</ion-text>
+  <ion-text color="danger" *ngIf="message">
+    {{ message }}
+  </ion-text>
 
 </ion-content>

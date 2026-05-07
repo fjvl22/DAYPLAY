@@ -39,6 +39,10 @@ export class WordlePage implements OnInit {
 
   gameOver = false;
 
+  currentStreak: number = 0;
+
+  showIntroStreak: boolean = true;
+
   constructor(
     public gameFinishService: GameFinishService,
     public wordleService: WordleService,
@@ -47,8 +51,15 @@ export class WordlePage implements OnInit {
   ) {}
 
   ngOnInit() {
+    const nav = this.router.getCurrentNavigation();
+    this.currentStreak =
+      nav?.extras?.state?.['streak'] ||
+      history.state?.streak ||
+      0;
+  
+    setTimeout(() => this.showIntroStreak = false, 5000);
+  
     this.initBoard();
-
     this.wordleService.fetchWord().subscribe(w => {
       this.secretWord = w;
       this.wordleService.startGame(w);

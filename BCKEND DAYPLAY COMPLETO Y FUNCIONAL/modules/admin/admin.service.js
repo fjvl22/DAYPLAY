@@ -20,7 +20,7 @@ const { Notification } = require('../../models');
 const { SystemEvent } = require('../../models');
 const { UserPlan } = require('../../models');
 
-const { chargeUser } = require('../../services/payment.service');
+const { chargeUser } = require('../payment/payment.service');
 const { sendEmail } = require('../../services/email.service');
 const { createNotification } = require('../../services/notification.service');
 
@@ -37,26 +37,40 @@ exports.getPendingUsers = async (adminId) => {
 };
 
 exports.approvePendingUser = async (adminId, pendingUserId, plan) => {
-    let admin = await Admin.findByPk(adminId);
-    if (admin.adminType !== 'PAYMENT_ADMIN') throw new Error('Permission denied');
+
+    const admin = await Admin.findByPk(adminId);
+    if (!admin || admin.adminType !== 'PAYMENT_ADMIN') {
+        throw new Error('Permission denied');
+    }
+
     const transaction = await sequelize.transaction();
+
     try {
         const pending = await UserPending.findByPk(pendingUserId, { transaction });
         if (!pending) throw new Error('Pending user not found');
+
         const userPlan = await UserPlan.findOne({
             where: { planType: plan, active: true },
             transaction
         });
+
         if (!userPlan) throw new Error('Plan not found');
-        const amount = userPlan.planType === 'BASIC' ? 10 : 15;
-        await chargeUser(pending.personId, admin.personId, amount);
+
+        const amount = userPlan.planType = 'BASIC' ? 10 : 15;
+
+        const paymentResult = await chargeUser(pending.personId, admin.personId, amount);
+
         const appUser = await AppUser.create({
             personId: pending.personId,
             subscriptionDate: new Date(),
-            planId: userPlan.id
+            planId: userPlan.id,
+            status: 'PENDING_PAYMENT'
         }, { transaction });
+
         await pending.destroy({ transaction });
+
         await transaction.commit();
+
         await SystemEvent.create({
             adminId: admin.personId,
             userId: pending.personId,
@@ -64,7 +78,13 @@ exports.approvePendingUser = async (adminId, pendingUserId, plan) => {
             description: `Usuario aprobado con plan ${userPlan.planType}`,
             category: 'ADMIN'
         });
-        return appUser;
+
+        return {
+            clientSecret: paymentResult.clientSecret,
+            paymentId: paymentResult.paymentId,
+            appUserId: appUser.personId,
+            amount
+        };
     } catch (error) {
         await transaction.rollback();
         throw error;

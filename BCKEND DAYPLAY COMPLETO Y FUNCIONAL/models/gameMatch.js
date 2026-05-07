@@ -9,7 +9,13 @@ module.exports = (sequelize, DataTypes) => {
       extraData: { type: DataTypes.JSON }
     }, {
       tableName: 'GAME_MATCH',
-      timestamps: false
+      timestamps: false,
+      indexes: [
+        {
+          unique: true,
+          fields: ['USER_ID', 'GAME_ID', 'DATE']
+        }
+      ]
     });
 
     GameMatch.associate = (models) => {

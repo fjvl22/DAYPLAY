@@ -113,14 +113,25 @@ async function createMatch(userId, gameId) {
         const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
         throw new Error(`You can not play a game twice a day. You can play again in ${hours} hours, ${minutes} minutes and ${seconds} seconds.`);
     }
-    const todayMatch = await GameMatch.create({
-        userId,
-        gameId,
-        date: today,
-        score: 0,
-        data: {}
-    });
-    return todayMatch;
+    const transaction = await sequelize.transaction();
+    try {
+        const streak = await updateStreak(userId, gameId);
+        const todayMatch = await GameMatch.create({
+            userId,
+            gameId,
+            date: today,
+            score: 0,
+            data: {}
+        });
+        await transaction.commit();
+        return { match: todayMatch, streak: streak };
+    } catch (error) {
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            throw new Error('You can not play a game twice a day.');
+        }
+        await transaction.rollback();
+        throw error;
+    }
 }
 
 async function finishMatch(matchId, score, extraData) {

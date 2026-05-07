@@ -11,7 +11,7 @@ const { getPermissionsByDepartment } = require('../admin/admin.service');
 const jwt = require('jsonwebtoken');
 const tokenBlacklist = require('../../models/tokenBlacklist');
 
-exports.login = async (nickname, password) => {
+exports.login = async (nickname, password, rememberMe) => {
 
     const person = await Person.findOne({
         where: { nickname, active: true },
@@ -53,11 +53,11 @@ exports.login = async (nickname, password) => {
         };
     } else { throw new Error('User state invalid'); }
 
-    const tokens = jwtService.generateTokens(payload);
+    const tokens = jwtService.generateTokens(payload, rememberMe);
 
     await tokenBlacklist.create({
         token: tokens.refreshToken,
-        expiresAt: new Date(Date.now()+7*24*60*60*1000)
+        expiresAt: new Date(Date.now()+(rememberMe?7:1)*24*60*60*1000)
     });
 
     await SystemEvent.create({

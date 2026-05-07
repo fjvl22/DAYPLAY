@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const admin = require('./admin.controller');
 const auth = require('../../middlewares/checkRole');
+const stripeWebhook = require('../payment/webhook');
 
 router.use(auth(['GAME_ADMIN', 'PAYMENT_ADMIN', 'NOTIF_ADMIN', 'EVENT_ADMIN']));
 
@@ -39,5 +40,7 @@ router.get('/permissions/:department',admin.getPermissionsByDepartment);
 router.post('/notification',admin.sendNotification);
 
 router.post('/notifications',admin.sendNotifications);
+
+router.post('/stripe', require('express').json(), stripeWebhook);
 
 module.exports = router;

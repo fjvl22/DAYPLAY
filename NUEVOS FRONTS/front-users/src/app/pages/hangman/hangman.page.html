@@ -10,6 +10,11 @@
 
     <h2 class="title">AHORCADO</h2>
 
+    <div class="streak-intro" *ngIf="showIntroStreak">
+      <img src="https://cdn-icons-png.flaticon.com/512/742/742751.png">
+      <span>{{ currentStreak }}</span>
+    </div>
+
     <img
       class="hangman-img"
       [src]="getImageByErrors()"
@@ -34,6 +39,11 @@
     <div *ngIf="hangmanService.isGameOver() && !hangmanService.isWin()" class="lose">
       <p>💀 ¡Ohhhh, has perdido!</p>
       <p>La palabra era {{ hangmanService.getMaskedWord() }}</p>
+    </div>
+
+    <div class="streak-container" *ngIf="!showIntroStreak">
+      <img src="https://cdn-icons-png.flaticon.com/512/742/742751.png" />
+      <span>{{ currentStreak }}</span>
     </div>
 
   </div>

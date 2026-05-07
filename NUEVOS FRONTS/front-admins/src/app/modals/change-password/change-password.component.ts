@@ -13,8 +13,9 @@ import { ChangePasswordPayload } from "src/app/core/interfaces/change-password-p
 })
 export class ChangePasswordComponent {
 
-  form!: FormGroup;
+  form: FormGroup;
   message: string | null = null;
+  loading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -23,7 +24,17 @@ export class ChangePasswordComponent {
   ) {
     this.form = this.fb.group({
       currentPassword: ['', Validators.required],
-      newPassword: ['', Validators.required]
+      newPassword: ['', [Validators.required, Validators.minLength(6)]]
+    }, {
+      validators: (form) => {
+        const current = form.get('currentPassword')?.value;
+        const next = form.get('newPassword')?.value;
+        return current === next ? { samePassword: true } : null;
+      }
+    });
+
+    this.form.valueChanges.subscribe(() => {
+      this.message = null;
     });
   }
 
@@ -34,11 +45,19 @@ export class ChangePasswordComponent {
   submit() {
     if (this.form.invalid) return;
 
+    this.loading = true;
+
     const payload: ChangePasswordPayload = this.form.value;
 
     this.auth.changePassword(payload).subscribe({
-      next: () => this.modalCtrl.dismiss(true),
-      error: err => this.message = err.error?.message || 'Error'
+      next: () => {
+        this.loading = false;
+        this.modalCtrl.dismiss(true);
+      },
+      error: err => {
+        this.loading = false;
+        this.message = err.error?.message || 'Error';
+      }
     });
   }
 }

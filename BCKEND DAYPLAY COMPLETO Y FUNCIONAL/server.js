@@ -6,12 +6,12 @@ require('./cronJobs/storyAccessExpiration');
 const express = require('express');
 const cors = require('cors');
 const sequelize = require('./config/database');
-const paymentService = require('./services/payment.service');
 
 const adminRoutes = require('./modules/admin/admin.routes');
 const authRoutes = require('./modules/auth/auth.routes');
 const userRoutes = require('./modules/user/user.routes');
 const jwtRoutes = require('./modules/jwt/jwt.routes');
+const paymentRoutes = require('./modules/payment/payment.routes');
 
 const app = express();
 
@@ -35,6 +35,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/jwt', jwtRoutes);
+app.use('/api/payments', paymentRoutes);
 
 /* ================================
    GLOBAL ERROR HANDLER

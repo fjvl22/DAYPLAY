@@ -34,7 +34,7 @@ if (result.error) {
     DB_NAME: process.env.DB_NAME,
     DB_USER: process.env.DB_USER,
     DB_HOST: process.env.DB_HOST,
-    JWT_SECRET: process.env.JWT_SECRET,
+    JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY ? 'LOADED ✅' : 'MISSING ❌'
   });
   console.log('🔎 process.env completo:', process.env);
@@ -47,7 +47,7 @@ module.exports = {
   DB_USER: process.env.DB_USER,
   DB_PASS: process.env.DB_PASS,
   DB_HOST: process.env.DB_HOST,
-  JWT_SECRET: process.env.JWT_SECRET,
+  JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET,
   EMAIL_USER: process.env.EMAIL_USER,
   EMAIL_PASS: process.env.EMAIL_PASS,
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,

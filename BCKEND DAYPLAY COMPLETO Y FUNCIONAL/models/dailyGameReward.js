@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
     }, {
       tableName: 'DAILY_GAME_REWARD',
       timestamps: false,
-      indexes: [{ unique: true, fields: ['userId','rewardDate'] }]
+      indexes: [{ unique: true, name: 'uniq_user_reward_date', fields: ['USER_ID','REWARD_DATE'] }]
     });
 
     DailyGameReward.associate = (models) => {

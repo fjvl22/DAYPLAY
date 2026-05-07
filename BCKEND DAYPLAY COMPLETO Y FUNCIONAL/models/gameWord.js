@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     }, {
       tableName: 'GAME_WORD',
       timestamps: false,
-      indexes: [{ unique: true, fields: ['gameId', 'word'] }]
+      indexes: [{ unique: true, fields: ['GAME_ID', 'WORD'] }]
     });
 
     GameWord.associate = (models) => {

@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     }, {
       tableName: 'STORY_ACCESS',
       timestamps: false,
-      indexes: [{ unique: true, fields: ['userId','storyId'] }]
+      indexes: [{ unique: true, fields: ['USER_ID','STORY_ID'] }]
     });
 
     StoryAccess.associate = (models) => {

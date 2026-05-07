@@ -17,23 +17,31 @@ export class LoginPage {
 
   loginForm;
   loading = false;
+  successMessage = '';
   errorMessage = '';
+  rememberMe = false;
 
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
     private router: Router
   ) {
+    console.log('l');
     this.loginForm = this.fb.group({
       nickname: ['', Validators.required],
       password: ['', Validators.required]
     });
   }
 
-  onSubmit() {
+  onCheckboxChange(event: any) {
+    this.rememberMe = event.detail.checked;
+  }
+
+  login() {
     if (this.loginForm.invalid) return;
 
     this.loading = true;
+    this.successMessage = '';
     this.errorMessage = '';
 
     const { nickname, password } = this.loginForm.value;
@@ -43,10 +51,11 @@ export class LoginPage {
       return;
     }
 
-    this.auth.login(nickname, password).subscribe({
+    this.auth.login(nickname, password, this.rememberMe).subscribe({
       next: () => {
         this.loading = false;
-        this.router.navigate(['/users']);
+        setTimeout(() => {this.successMessage = 'Redirigiendo a la página principal...';}, 3000);
+        this.router.navigateByUrl('/users');
       },
       error: (err) => {
         this.loading = false;
@@ -56,6 +65,14 @@ export class LoginPage {
   }
 
   goToRegister() {
-    this.router.navigate(['/register']);
+    this.router.navigateByUrl('/register');
+  }
+
+  get nickname() {
+    return this.loginForm.get('nickname');
+  }
+  
+  get password() {
+    return this.loginForm.get('password');
   }
 }
