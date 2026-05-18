@@ -1,0 +1,17 @@
+<ion-list>
+
+  <ion-item *ngIf="canSee('users')" routerLink="/layout/users">Usuarios</ion-item>
+
+  <ion-item *ngIf="canSee('pending-users')" routerLink="/layout/pending-users">Usuarios Pendientes</ion-item>
+
+  <ion-item *ngIf="canSee('games')" routerLink="/layout/games">Juegos</ion-item>
+
+  <ion-item *ngIf="canSee('daily-rewards')" routerLink="/layout/daily-rewards">Capítulos</ion-item>
+  
+  <ion-item *ngIf="canSee('payments')" routerLink="/layout/payments">Pagos</ion-item>
+
+  <ion-item *ngIf="canSee('notifications')" routerLink="/layout/notifications">Notificaciones</ion-item>
+
+  <ion-item *ngIf="canSee('events')" routerLink="/layout/events">Eventos</ion-item>
+
+</ion-list>
