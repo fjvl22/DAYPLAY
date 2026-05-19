@@ -50,3 +50,24 @@ h1 {
   margin-top: 10px;
   font-size: 14px;
 }
+
+.redirect-link {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.redirect-link p {
+  font-size: 14px;
+  color: #666;
+}
+
+.redirect-link span {
+  color: #3880ff;
+  cursor: pointer;
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+.redirect-link span:hover {
+  text-decoration: underline;
+}

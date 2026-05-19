@@ -1,48 +1,101 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Registro</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="register-wrapper" *ngIf="registerForm">
 
-<ion-content class="ion-padding">
-  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+  <div class="register-container">
 
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Registro</ion-card-title>
-      </ion-card-header>
+    <h1>Registro</h1>
 
-      <ion-card-content>
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
 
-        <ion-item>
-          <ion-label position="stacked">Nombre de Usuario</ion-label>
-          <ion-input type="text" formControlName="nickname"></ion-input>
-        </ion-item>
+      <ion-input
+        class="custom-input"
+        placeholder="Nombre de Usuario"
+        type="text"
+        formControlName="nickname">
+      </ion-input>
 
-        <ion-item>
-          <ion-label position="stacked">Correo Electrónico</ion-label>
-          <ion-input type="email" formControlName="email"></ion-input>
-        </ion-item>
+      <ion-text color="danger"
+        *ngIf="registerForm.get('nickname')?.touched &&
+               registerForm.get('nickname')?.invalid">
 
-        <ion-item>
-          <ion-label position="stacked">Contraseña</ion-label>
-          <ion-input type="password" formControlName="password"></ion-input>
-        </ion-item>
+        <small>El usuario es obligatorio.</small>
 
-        <ion-item>
-          <ion-label position="stacked">Plan</ion-label>
-          <ion-select formControlName="plan">
-            <ion-select-option *ngFor="let plan of planTypes">{{ plan }}</ion-select-option>
-          </ion-select>
-        </ion-item>
+      </ion-text>
 
-        <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
-        <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+      <ion-input
+        class="custom-input"
+        placeholder="Correo Electrónico"
+        type="email"
+        formControlName="email">
+      </ion-input>
 
-        <ion-button expand="full" type="submit" [disabled]="loading">{{ loading ? 'Cargando...' : 'Registrarse' }}</ion-button>
+      <ion-text color="danger"
+        *ngIf="registerForm.get('email')?.touched &&
+               registerForm.get('email')?.invalid">
 
-      </ion-card-content>
-    </ion-card>
+        <small>Email inválido.</small>
 
-  </form>
-</ion-content>
+      </ion-text>
+
+      <ion-input
+        class="custom-input"
+        placeholder="Contraseña"
+        type="password"
+        formControlName="password">
+      </ion-input>
+
+      <ion-text color="danger"
+        *ngIf="registerForm.get('password')?.touched &&
+               registerForm.get('password')?.invalid">
+
+        <small>Contraseña inválida.</small>
+
+      </ion-text>
+
+      <ion-item lines="none" class="custom-select">
+
+        <ion-label>Plan</ion-label>
+
+        <ion-select formControlName="plan">
+
+          <ion-select-option
+            *ngFor="let plan of planTypes"
+            [value]="plan">
+
+            {{ plan }}
+
+          </ion-select-option>
+
+        </ion-select>
+
+      </ion-item>
+
+      <p class="success-message" *ngIf="successMessage">
+        {{ successMessage }}
+      </p>
+
+      <p class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </p>
+
+      <ion-button
+        expand="block"
+        class="register-button"
+        type="submit"
+        [disabled]="loading">
+
+        {{ loading ? 'Cargando...' : 'Registrarse' }}
+
+      </ion-button>
+
+      <div class="redirect-link">
+        <p>
+          ¿Ya tienes cuenta?
+          <span (click)="goToLogin()">Inicia sesión</span>
+        </p>
+      </div>
+
+    </form>
+
+  </div>
+
+</div>

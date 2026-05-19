@@ -1,4 +1,4 @@
-<div class="login-wrapper">
+<div class="login-wrapper" *ngIf="loginForm">
   <div class="login-container">
     <h1>Inicio de Sesión</h1>
 
@@ -6,15 +6,11 @@
 
       <ion-input class="custom-input" placeholder="Nombre de Usuario" type="text" formControlName="nickname"></ion-input>
 
-      <small *ngIf="nickname?.touched && nickname?.invalid">
-        El usuario es obligatorio
-      </small>
+      <ion-text color="danger" *ngIf="f['nickname'].touched && f['nickname'].invalid"><small>El usuario es obligatorio.</small></ion-text>
 
       <ion-input class="custom-input" placeholder="Contraseña" type="password" formControlName="password"></ion-input>
 
-      <small *ngIf="password?.touched && password?.invalid">
-        La contraseña es obligatoria
-      </small>
+      <ion-text color="danger" *ngIf="f['password'].touched && f['password'].invalid"><small>La contraseña es obligatoria.</small></ion-text>
 
       <ion-item lines="none" class="remember-me">
         <ion-checkbox slot="start" (ionChange)="onCheckboxChange($event)"></ion-checkbox>
@@ -24,18 +20,15 @@
       <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
       <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
-      <ion-button expand="block" class="login-button" type="submit" [disabled]="loading">
-        {{ loading ? 'Cargando...' : 'Iniciar Sesión' }}
-      </ion-button>
+      <ion-button expand="block" class="login-button" type="submit" [disabled]="loading">{{ loading ? 'Cargando...' : 'Iniciar Sesión' }}</ion-button>
+
+      <div class="redirect-link">
+        <p>
+          ¿Aún no tienes cuenta?
+          <span (click)="goToRegister()">Regístrate aquí</span>
+        </p>
+      </div>
 
     </form>
-    
-    <div class="register-link">
-      <p>
-        ¿Aún no tienes cuenta?
-        <span (click)="goToRegister()">Regístrate aquí</span>
-      </p>
-    </div>
-
   </div>
 </div>

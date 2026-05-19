@@ -6,14 +6,6 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
   IonItem,
   IonLabel,
   IonInput,
@@ -30,14 +22,6 @@ import {
     CommonModule,
     ReactiveFormsModule,
 
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
     IonItem,
     IonLabel,
     IonInput,
@@ -106,5 +90,9 @@ export class RegisterPage implements OnInit {
         this.errorMessage = err.error?.message || 'Error en registro';
       }
     });
+  }
+
+  goToLogin() {
+    this.router.navigate(['/login']);
   }
 }

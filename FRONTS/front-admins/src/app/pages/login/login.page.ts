@@ -1,35 +1,54 @@
-import { Component } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { ReactiveFormsModule, FormBuilder, Validators } from "@angular/forms";
-import { IonicModule } from "@ionic/angular";
-import { Router } from "@angular/router";
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { LoginResponse } from 'src/app/core/interfaces/login-response';
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
-import { AuthService } from "src/app/core/services/auth.service";
+import {
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonButton,
+  IonText,
+  IonCheckbox
+} from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, IonicModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+
+    IonItem,
+    IonLabel,
+    IonInput,
+    IonButton,
+    IonText,
+    IonCheckbox
+  ],
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss']
 })
-export class LoginPage {
+export class LoginPage implements OnInit {
 
-  loginForm;
+  loginForm!: FormGroup;
   loading = false;
   successMessage = '';
   errorMessage = '';
   rememberMe = false;
 
   constructor(
+    private router: Router,
     private fb: FormBuilder,
-    private auth: AuthService,
-    private router: Router
-  ) {
-    console.log('l');
+    public auth: AuthService
+  ) {}
+
+  ngOnInit(): void {
     this.loginForm = this.fb.group({
       nickname: ['', Validators.required],
-      password: ['', Validators.required]
+      password: ['', [Validators.required, Validators.minLength(4)]]
     });
   }
 
@@ -41,38 +60,30 @@ export class LoginPage {
     if (this.loginForm.invalid) return;
 
     this.loading = true;
-    this.successMessage = '';
     this.errorMessage = '';
 
     const { nickname, password } = this.loginForm.value;
 
-    if (!nickname || !password) {
-      this.loading = false;
-      return;
-    }
-
     this.auth.login(nickname, password, this.rememberMe).subscribe({
-      next: () => {
+      next: (res: LoginResponse) => {
+        localStorage.setItem('access-token', res.accessToken);
+        localStorage.setItem('refresh-token', res.refreshToken);
+        localStorage.setItem('nickname', nickname);
+
         this.loading = false;
         setTimeout(() => {this.successMessage = 'Redirigiendo a la página principal...';}, 3000);
-        this.router.navigateByUrl('/layout/users');
+        this.router.navigate(['/layout/users']);
       },
       error: (err) => {
         this.loading = false;
-        this.errorMessage = err?.error?.message ? err?.error?.message : 'Error al iniciar sesión';
+        this.errorMessage = err.error?.message || 'Error en login';
       }
     });
   }
 
-  goToRegister() {
-    this.router.navigateByUrl('/register');
-  }
+  get f() {return this.loginForm.controls;}
 
-  get nickname() {
-    return this.loginForm.get('nickname');
-  }
-  
-  get password() {
-    return this.loginForm.get('password');
+  goToRegister() {
+    this.router.navigate(['/register']);
   }
 }

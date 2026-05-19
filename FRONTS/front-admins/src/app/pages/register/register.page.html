@@ -1,48 +1,32 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Registro</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="register-wrapper">
+  <div class="register-container">
 
-<ion-content class="ion-padding">
-  <form [formGroup]="registerForm" (ngSubmit)="register()">
+    <h1>Registro</h1>
 
-    <ion-card>
-      <ion-card-header>
-        <ion-card-title>Crea tu cuenta</ion-card-title>
-      </ion-card-header>
+    <form [formGroup]="registerForm" (ngSubmit)="register()">
 
-      <ion-card-content>
+      <ion-input class="custom-input" placeholder="Nombre de Usuario" type="text" formControlName="nickname"></ion-input>
 
-        <ion-item>
-          <ion-label position="stacked">Nombre de Usuario</ion-label>
-          <ion-input type="text" formControlName="nickname"></ion-input>
-        </ion-item>
+      <ion-input class="custom-input" placeholder="Correo Electrónico" type="email" formControlName="email"></ion-input>
 
-        <ion-item>
-          <ion-label position="stacked">Correo Electrónico</ion-label>
-          <ion-input type="email" formControlName="email"></ion-input>
-        </ion-item>
+      <ion-input class="custom-input" placeholder="Contraseña" type="password" formControlName="password"></ion-input>
 
-        <ion-item>
-          <ion-label position="stacked">Contraseña</ion-label>
-          <ion-input type="password" formControlName="password"></ion-input>
-        </ion-item>
+      <ion-input class="custom-input" placeholder="Confirmar Contraseña" type="password" formControlName="confirmPassword"></ion-input>
 
-        <ion-item>
-          <ion-label position="stacked">Confirmación de Contraseña</ion-label>
-          <ion-input type="password" formControlName="confirmPassword"></ion-input>
-        </ion-item>
+      <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
 
-        <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
-        <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+      <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
-        <ion-button expand="full" type="submit" [disabled]="loading">
-          {{ loading ? 'Cargando...' : 'Registrarse' }}
-        </ion-button>
+      <ion-button expand="block" class="register-button" type="submit" [disabled]="loading">{{ loading ? 'Cargando...' : 'Registrarse' }}</ion-button>
 
-      </ion-card-content>
-    </ion-card>
+    </form>
 
-  </form>
-</ion-content>
+    <div class="login-link">
+      <p>
+        ¿Ya tienes cuenta?
+        <span (click)="goToLogin()">Inicia sesión</span>
+      </p>
+    </div>
+
+  </div>
+</div>

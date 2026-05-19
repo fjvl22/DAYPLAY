@@ -22,6 +22,13 @@
 
       <ion-button expand="block" class="login-button" type="submit" [disabled]="loading">{{ loading ? 'Cargando...' : 'Iniciar Sesión' }}</ion-button>
 
+      <div class="redirect-link">
+        <p>
+          ¿Aún no tienes cuenta?
+          <span (click)="goToRegister()">Regístrate aquí</span>
+        </p>
+      </div>
+
     </form>
   </div>
 </div>
