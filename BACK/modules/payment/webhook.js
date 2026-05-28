@@ -1,3 +1,4 @@
+/*
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const Payment = require('../../models/payment');
@@ -8,7 +9,21 @@ const SystemEvent = require('../../models/systemEvent');
 
 async function stripeWebhook(req, res) {
 
-    const event = req.body;
+    const sig = req.headers['stripe-signature'];
+
+    let event;
+
+    try {
+
+        event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET_KEY);
+
+    } catch (err) {
+
+        console.error(err.message);
+
+        return res.status(400).send(`Webhook Error: ${err.message}`);
+
+    }
 
     try {
 
@@ -21,16 +36,17 @@ async function stripeWebhook(req, res) {
             const payment = await Payment.findByPk(paymentId);
 
             if (payment) {
-                payment.status = 'CONFIRMED';
-                payment.transactionId = intent.id;
-                await payment.save();
+                if (payment.status !== 'CONFIRMED') {
+                    payment.status = 'CONFIRMED';
+                    payment.confirmedAt = new Date();
+                    await payment.save();
+                }
 
                 const user = await AppUser.findByPk(payment.userId);
 
                 if (user) {
-                    const person = await Person.findByPk(user.personId);
-                    person.active = true;
-                    await person.save();
+                    user.subscriptionStatus = 'ACTIVE';
+                    await user.save();
                 }
 
                 await PaymentTrace.create({
@@ -41,10 +57,13 @@ async function stripeWebhook(req, res) {
                 });
 
                 await SystemEvent.create({
-                    userId: payment.userId,
+                    actorType: 'SYSTEM',
+                    actorId: null,
+                    targetType: 'PAYMENT',
+                    targetId: payment.id,
                     eventType: 'PAYMENT_SUCCESS',
-                    description: `Pago ${payment.id} confirmado correctamente`,
-                    category: 'PAYMENT'
+                    category: 'PAYMENT',
+                    description: `Pago ${payment.id} confirmado correctamente`
                 });
             } else {
                 return res.json({ received: true });
@@ -60,7 +79,12 @@ async function stripeWebhook(req, res) {
             const payment = await Payment.findByPk(paymentId);
 
             if (payment) {
-                payment.status = 'FAILED';
+                if (payment.status !== 'FAILED') {
+                    payment.status = 'FAILED';
+                }
+
+                payment.failureReason = intent.last_payment_error?.message || 'Payment failed';
+
                 await payment.save();
 
                 await PaymentTrace.create({
@@ -71,10 +95,17 @@ async function stripeWebhook(req, res) {
                 });
 
                 await SystemEvent.create({
-                    userId: payment.userId,
+                    actorType: 'SYSTEM',
+                    actorId: null,
+
+                    targetType: 'PAYMENT',
+                    targetId: payment.id,
+
                     eventType: 'PAYMENT_FAILED',
-                    description: `Pago ${payment.id} fallido`,
-                    category: 'PAYMENT'
+
+                    category: 'PAYMENT',
+
+                    description: `Pago ${payment.id} erróneo`
                 });
             }
         }
@@ -88,3 +119,4 @@ async function stripeWebhook(req, res) {
 }
 
 module.exports = stripeWebhook;
+*/

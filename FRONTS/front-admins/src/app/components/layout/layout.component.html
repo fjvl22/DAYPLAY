@@ -1,23 +1,13 @@
-<ion-app>
+<app-topbar></app-topbar>
 
-  <ion-split-pane contentId="main">
+<div class="layout-container">
 
-    <ion-menu contentId="main" type="overlay">
+  <app-sidebar [pinned]="sidebarPinned" (pinnedChange)="sidebarPinned = $event"></app-sidebar>
+  
+  <main class="content" [class.shifted]="sidebarPinned">
 
-      <ion-content>
-        <app-sidebar></app-sidebar>
-      </ion-content>
+    <router-outlet></router-outlet>
 
-    </ion-menu>
-
-    <div class="ion-page" id="main">
-
-      <app-topbar></app-topbar>
-
-      <router-outlet></router-outlet>
-
-    </div>
-
-  </ion-split-pane>
-
-</ion-app>
+  </main>
+  
+</div>

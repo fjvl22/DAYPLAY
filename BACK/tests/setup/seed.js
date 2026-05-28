@@ -41,7 +41,6 @@ async function seedDatabase() {
 
   await Admin.create({
     personId: adminPerson.id,
-    adminType: 'GAME_ADMIN',
     department: 'GAME',
     permissions: {
       canManageGames: true

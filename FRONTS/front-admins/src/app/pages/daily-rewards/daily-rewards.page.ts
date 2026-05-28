@@ -16,9 +16,9 @@ export class DailyRewardsPage {
 
   constructor(private admin: AdminService) {this.load();}
 
-  load() {this.admin.getDailyRewardRequests().subscribe(res => this.rewards = res);}
+  load() {this.admin.getRewards().subscribe(res => this.rewards = res);}
 
-  approve(id: number) {this.admin.approveDailyReward(id).subscribe(() => this.load());}
+  approve(id: number) {this.admin.approveReward(id).subscribe(() => this.load());}
 
-  reject(id: number) {this.admin.rejectDailyReward(id).subscribe(() => this.load());}
+  reject(id: number) {this.admin.rejectReward(id).subscribe(() => this.load());}
 }

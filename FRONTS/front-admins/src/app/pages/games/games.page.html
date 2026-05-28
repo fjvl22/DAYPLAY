@@ -2,6 +2,11 @@
 
   <h2>Juegos</h2>
 
+  <div *ngIf="games.length === 0" class="empty-container">
+    <ion-icon name="document-outline"></ion-icon>
+    <p>No hay juegos disponibles</p>
+  </div>
+
   <ion-card *ngFor="let g of games">
     <ion-item>
       <ion-label>
@@ -13,7 +18,9 @@
     <img [src]="g.url" style="width: 100%; max-height: 200px; object-fit: cover;">
   </ion-card>
 
-  <ion-button expand="full" (click)="showManager = !showManager">Administrar Juegos</ion-button>
+  <ion-button expand="full" (click)="showManager = !showManager">
+    Administrar Juegos
+  </ion-button>
 
   <div *ngIf="showManager">
 
@@ -23,7 +30,9 @@
       <ion-segment-button value="math">Math Rush</ion-segment-button>
     </ion-segment>
 
-    <ion-button expand="full" (click)="showForm = !showForm">Añadir</ion-button>
+    <ion-button expand="full" (click)="showForm = !showForm">
+      Añadir
+    </ion-button>
 
     <ion-list *ngIf="activeTab === 'hangman'">
       <ion-item *ngFor="let w of hangmanWords">
@@ -47,7 +56,12 @@
       <ion-item *ngFor="let op of mathOperations">
         <ion-label>
           <h2>{{ op.operation }}</h2>
-          <p><span *ngFor="let opt of op.MathOptions" [style.color]="opt.optionValue == op.result ? 'green' : 'red'">{{ opt.optionValue }}</span></p>
+          <p>
+            <span *ngFor="let opt of op.MathOptions"
+                  [style.color]="opt.optionValue == op.result ? 'green' : 'red'">
+              {{ opt.optionValue }}
+            </span>
+          </p>
         </ion-label>
       </ion-item>
     </ion-list>
@@ -67,7 +81,9 @@
           </ion-select>
         </ion-item>
 
-        <ion-button expand="full" (click)="addWord()">Guardar</ion-button>
+        <ion-button expand="full" (click)="addWord()">
+          Guardar
+        </ion-button>
 
       </div>
 
@@ -78,19 +94,23 @@
         </ion-item>
 
         <ion-item *ngFor="let opt of newOperation.MathOptions; let i = index">
-          <ion-input [(ngModel)]="newOperation.MathOptions[i].optionValue" placeholder="Opción {{i+1}}"></ion-input>
+          <ion-input [(ngModel)]="newOperation.MathOptions[i].optionValue"
+                     placeholder="Opción {{i+1}}">
+          </ion-input>
         </ion-item>
 
         <ion-item>
           <ion-input [(ngModel)]="newOperation.result" placeholder="Resultado"></ion-input>
         </ion-item>
 
-        <ion-button expand="full" (click)="addOperation()">Guardar</ion-button>
+        <ion-button expand="full" (click)="addOperation()">
+          Guardar
+        </ion-button>
 
       </div>
 
     </div>
-    
+
   </div>
 
 </ion-content>

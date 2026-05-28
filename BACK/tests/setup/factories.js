@@ -18,7 +18,7 @@ module.exports = {
     });
   },
 
-  async createAdmin(type = 'GAME_ADMIN') {
+  async createAdmin() {
     const person = await Person.create({
       nickname: 'admin',
       email: 'admin@test.com',
@@ -29,7 +29,6 @@ module.exports = {
 
     return Admin.create({
       personId: person.id,
-      adminType: type,
       department: 'GAME',
       permissions: {}
     });

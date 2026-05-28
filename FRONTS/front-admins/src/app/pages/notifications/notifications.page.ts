@@ -51,7 +51,8 @@ export class NotificationsPage implements OnInit {
       this.showAlert('Tipo y mensaje son obligatorios.');
       return;
     }
-    const myNickname = this.authService.getNickname();
+    let myNickname: string;
+    this.authService.nickname$.subscribe(value => {myNickname = value;});
     this.adminService.getAdmins().subscribe({
       next: (data: Admin[]) => {
         let createdBy = 0;
@@ -72,7 +73,7 @@ export class NotificationsPage implements OnInit {
             sentDate: Date.now().toString(),
             createdBy: createdBy
           };
-          this.adminService.createNotification(payload).subscribe({
+          this.adminService.sendNotificationToUser(payload).subscribe({
             next: () => {
               this.showAlert('Notificación enviada');
               this.reset();
@@ -87,7 +88,7 @@ export class NotificationsPage implements OnInit {
             sentDate: Date.now().toString(),
             createdBy: createdBy
           };
-          this.adminService.createNotifications(payload).subscribe({
+          this.adminService.sendNotificationToAll(payload).subscribe({
             next: () => {
               this.showAlert('Notificaciones enviadas a todos');
               this.reset();

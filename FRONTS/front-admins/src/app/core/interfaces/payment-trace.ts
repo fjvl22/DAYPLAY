@@ -4,5 +4,10 @@ export interface PaymentTrace {
   traceDate: string;
   action: string;
   notes?: string;
-  updatedBy?: number;
+  updatedBy?: {
+    id: number;
+    person?: {
+      nickname: string;
+    }
+  }
 }

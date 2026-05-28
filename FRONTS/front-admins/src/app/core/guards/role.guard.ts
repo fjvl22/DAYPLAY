@@ -1,24 +1,28 @@
 import { inject } from "@angular/core";
 import { CanActivateFn, Router } from "@angular/router";
 import { AuthService } from "../services/auth.service";
+import { filter, map, take } from "rxjs/operators";
 
-export const roleGuard: CanActivateFn = (route, state): boolean => {
+export const roleGuard: CanActivateFn = (route) => {
 
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  if (!auth.isLogged()) {
-    router.navigate(['/layout/login']);
-    return false;
-  }
+  const departments = route.data?.['departments'] as string[] | undefined;
 
-  const roles = route.data?.['roles'];
-  const userRole = auth.getAdminType();
+  if (!auth.isLogged()) return router.parseUrl('/login');
 
-  if (roles && userRole && !roles.includes(userRole)) {
-    router.navigate(['/layout/users']);
-    return false;
-  }
+  return auth.department$.pipe(
 
-  return true;
+    filter((dep): dep is string => dep !== null && dep !== ''),
+
+    take(1),
+
+    map(dep => {
+
+      if (departments && !departments.includes(dep)) return router.parseUrl('/login');
+
+      return true;
+    })
+  );
 };

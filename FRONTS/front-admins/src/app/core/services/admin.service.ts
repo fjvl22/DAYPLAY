@@ -1,36 +1,26 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
-
-import { AppUser } from '../interfaces/app-user';
-import { UserPending } from '../interfaces/user-pending';
-import { Game } from '../interfaces/game';
-import { GameWord } from '../interfaces/game-word';
-import { MathOperation } from '../interfaces/math-operation';
-import { DailyGameReward } from '../interfaces/daily-game-reward';
-import { Payment } from '../interfaces/payment';
-import { Notification } from '../interfaces/notification';
-import { SystemEvent } from '../interfaces/system-event';
-import { Admin } from '../interfaces/admin';
-import { AuthService } from './auth.service';
-import { PaymentDetailResponse } from '../interfaces/payment-detail-response';
-import { ApproveResponse } from '../interfaces/approve-response';
-import { Permissions } from '../interfaces/permissions';
+import { Observable } from "rxjs";
+import { Notification } from "../interfaces/notification";
+import { PaymentTrace } from "../interfaces/payment-trace";
+import { Payment } from "../interfaces/payment";
+import { SystemEvent } from "../interfaces/system-event";
+import { DailyGameReward } from "../interfaces/daily-game-reward";
+import { MathOperation } from "../interfaces/math-operation";
+import { GameWord } from "../interfaces/game-word";
+import { UserPending } from "../interfaces/user-pending";
+import { AppUser } from "../interfaces/app-user";
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminService {
 
-  private authService = inject(AuthService);
+  private apiUrl = 'http://localhost:3000/api/admin';
 
-  private http = inject(HttpClient);
+  constructor(private http: HttpClient) {}
 
-  private apiUrl = '/api/admin';
-
-  private storageKeyPermissions: string = 'permissions';
-
-  // ================= USERS =================
+  // ===================== USERS =====================
 
   getUsers(): Observable<AppUser[]> {
     return this.http.get<AppUser[]>(`${this.apiUrl}/users`);
@@ -40,35 +30,26 @@ export class AdminService {
     return this.http.get<UserPending[]>(`${this.apiUrl}/users/pending`);
   }
 
-  approveUserPending(adminId: number, userPendingId: number, plan: string): Observable<ApproveResponse> {
-    return this.http.post<ApproveResponse>(`${this.apiUrl}/users/approve`, {
-      adminId,
-      userPendingId,
-      plan
-    });
+  approvePendingUser(body: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/users/approve`, body);
   }
 
-  rejectUserPending(pendingUserId: number): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/users/reject`, {
-      adminId: Number(localStorage.getItem('adminId')),
-      pendingUserId
-    });
+  rejectPendingUser(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/users/reject/${id}`);
   }
 
-  updateUser(id: number, user: Partial<AppUser>): Observable<AppUser> {
-    return this.http.put<AppUser>(`${this.apiUrl}/users/${id}`, user);
+  updateUser(id: number, body: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/users/${id}`, body);
   }
 
-  deleteUser(id: number): Observable<{ message: string }> {
-    return this.http.delete<{ message: string }>(
-      `${this.apiUrl}/users/${id}`
-    );
+  deleteUser(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/users/${id}`);
   }
 
-  // ================= GAMES =================
+  // ===================== GAMES =====================
 
-  getGames(): Observable<Game[]> {
-    return this.http.get<Game[]>(`${this.apiUrl}/games`);
+  getGames(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/games`);
   }
 
   getHangmanWords(): Observable<GameWord[]> {
@@ -83,118 +64,67 @@ export class AdminService {
     return this.http.get<MathOperation[]>(`${this.apiUrl}/games/math`);
   }
 
-  insertGameWord(word: GameWord): Observable<GameWord> {
-    return this.http.post<GameWord>(
-      `${this.apiUrl}/games/word`,
-      word
-    );
+  insertGameWord(body: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/games/word`, body);
   }
 
-  insertMathOperation(operation: MathOperation): Observable<MathOperation> {
-    return this.http.post<MathOperation>(
-      `${this.apiUrl}/games/math`,
-      operation
-    );
+  insertMathOperation(body: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/games/operation`, body);
   }
 
-  canUserPlayToday(userId: number, gameId: number): Observable<{ canPlay: boolean }> {
+  // ===================== REWARDS =====================
 
-    const params = new HttpParams()
-      .set('userId', userId)
-      .set('gameId', gameId);
-
-    return this.http.get<{ canPlay: boolean }>(
-      `${this.apiUrl}/games/canPlay`,
-      { params }
-    );
-  }
-
-  // ================= REWARDS =================
-
-  getDailyRewardRequests(): Observable<DailyGameReward[]> {
+  getRewards(): Observable<DailyGameReward[]> {
     return this.http.get<DailyGameReward[]>(`${this.apiUrl}/rewards`);
   }
 
-  approveDailyReward(userId: number, ipAddress?: string):
-    Observable<{ approved: boolean; message?: string }> {
-
-    return this.http.post<{ approved: boolean; message?: string }>(
-      `${this.apiUrl}/rewards/approve`,
-      { userId, ipAddress }
-    );
+  approveReward(userId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/rewards/${userId}/approve`, {});
   }
 
-  rejectDailyReward(rewardId: number): Observable<{ message: string }> {
-    return this.http.delete<{ message: string }>(
-      `${this.apiUrl}/rewards/${rewardId}`
-    );
+  rejectReward(userId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/rewards/${userId}/reject`, {});
   }
 
-  // ================= PAYMENTS =================
+  // ===================== EVENTS =====================
+
+  getEvents(filters?: any): Observable<SystemEvent[]> {
+    return this.http.get<SystemEvent[]>(`${this.apiUrl}/events`, {
+      params: filters
+    });
+  }
+
+  // ===================== ADMINS / PERMISSIONS =====================
+
+  getAdmins(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/admins`);
+  }
+
+  getPermissionsByDepartment(department: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/permissions/${department}`);
+  }
+
+  // ===================== PAYMENTS =====================
 
   getPayments(): Observable<Payment[]> {
     return this.http.get<Payment[]>(`${this.apiUrl}/payments`);
   }
 
-  getPaymentDetail(id: number): Observable<PaymentDetailResponse> {
-    return this.http.get<PaymentDetailResponse>(`${this.apiUrl}/payments/${id}`);
+  getPaymentById(id: number): Observable<Payment> {
+    return this.http.get<Payment>(`${this.apiUrl}/payments/${id}`);
   }
 
-  // ================= NOTIFICATIONS =================
-
-  getNotifications(): Observable<Notification[]> {
-    return this.http.get<Notification[]>(`${this.apiUrl}/notifications`);
+  getPaymentTraces(id: number): Observable<PaymentTrace[]> {
+    return this.http.get<PaymentTrace[]>(`${this.apiUrl}/payments/${id}/traces`);
   }
 
-  createNotification(data: any) {
-    return this.http.post(`${this.apiUrl}/notification`, data, {
-      headers: {
-        Authorization: `Bearer ${this.authService.getAccessToken()}`
-      }
-    });
+  // ===================== NOTIFICATIONS =====================
+
+  sendNotificationToUser(body: Notification): Observable<any> {
+    return this.http.post(`${this.apiUrl}/notifications/user`, body);
   }
 
-  createNotifications(data: any) {
-    return this.http.post(`${this.apiUrl}/notifications`, data, {
-      headers: {
-        Authorization: `Bearer ${this.authService.getAccessToken()}`
-      }
-    });
-  }
-
-  // ================= EVENTS =================
-
-  getEvents(): Observable<SystemEvent[]> {
-    return this.http.get<SystemEvent[]>(`${this.apiUrl}/events`);
-  }
-
-  // ================= ADMINS =================
-
-  getAdmins(): Observable<Admin[]> {
-    return this.http.get<Admin[]>(`${this.apiUrl}/admins`);
-  }
-
-  // ================= PERMISSIONS =================
-
-  getPermissionsByDepartment(department: string) {
-    return this.http
-      .get<Permissions>(`${this.apiUrl}/permissions/${department}`)
-      .pipe(tap(perms => this.setPermissions(perms)));
-  }
-
-  getPermissions(): Permissions {
-    const data = localStorage.getItem(this.storageKeyPermissions);
-
-    if (!data) return {};
-
-    try {return JSON.parse(data) as Permissions} catch (e) {return {}};
-  }
-
-  setPermissions(perms: Permissions) {
-    localStorage.setItem(this.storageKeyPermissions, JSON.stringify(perms));
-  }
-
-  clearPermissions(): void {
-    localStorage.removeItem(this.storageKeyPermissions);
+  sendNotificationToAll(body: Notification): Observable<any> {
+    return this.http.post(`${this.apiUrl}/notifications/all`, body);
   }
 }

@@ -1,8 +1,57 @@
-ion-list {
-    padding: 10px;
+.hover-zone {
+  position: fixed;
+  left: 0;
+  top: 60px;
+  width: 10px;
+  height: calc(100vh - 60px);
+  z-index: 999;
 }
 
-ion-item {
-    --padding-start: 16px;
-    cursor: pointer;
+.sidebar {
+  position: fixed;
+  top: 60px;
+  left: -260px;
+
+  width: 260px;
+  height: calc(100vh - 60px);
+
+  background: white;
+  border-right: 1px solid #ddd;
+
+  transition: left 0.25s ease;
+  z-index: 1000;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.pin {
+  padding: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+}
+
+.item {
+  padding: 14px 16px;
+  text-decoration: none;
+  color: #333;
+  display: block;
+}
+
+.item:hover {
+  background: #f2f2f2;
+}
+
+.item.active {
+  background: #e0e0e0;
+  font-weight: bold;
 }

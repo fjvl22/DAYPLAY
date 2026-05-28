@@ -1,9 +1,8 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Input } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { IonicModule, ModalController } from "@ionic/angular";
 import { AdminService } from "src/app/core/services/admin.service";
 import { PaymentTrace } from "src/app/core/interfaces/payment-trace";
-import { forkJoin } from "rxjs";
 
 @Component({
   selector: 'app-trace-detail-modal',
@@ -13,70 +12,47 @@ import { forkJoin } from "rxjs";
 })
 export class TraceDetailModalComponent implements OnInit {
 
-  paymentId!: number;
+  @Input() paymentId!: number;
 
   traces: PaymentTrace[] = [];
   filteredTraces: PaymentTrace[] = [];
 
-  loading = true;
+  loading = false;
   errorMessage = '';
 
-  userMap = new Map<number, string>();
-
-  constructor(
-    private adminService: AdminService,
-    private modalCtrl: ModalController
-  ) {}
+  constructor(private adminService: AdminService, private modalCtrl: ModalController) {}
 
   ngOnInit(): void {
-    this.loadUsersAndTraces();
+    this.loadTraces();
   }
 
-  loadUsersAndTraces(): void {
+  loadTraces(): void {
 
     this.loading = true;
-    this.errorMessage = '';
 
-    forkJoin({
-      admins: this.adminService.getAdmins(),
-      payment: this.adminService.getPaymentDetail(this.paymentId)
-    }).subscribe({
-      next: ({ admins, payment }) => {
-
-        admins.forEach(a => {
-          if (a.personId) {
-            this.userMap.set(a.personId, a.person.nickname);
-          }
-        });
-
-        this.traces = payment.traces;
-        this.filteredTraces = payment.traces;
-
+    this.adminService.getPaymentTraces(this.paymentId).subscribe({
+      next: (res) => {
+        this.traces = res;
+        this.filteredTraces = res;
         this.loading = false;
       },
       error: () => {
-        this.errorMessage = 'Error cargando los datos';
+        this.errorMessage = 'Error cargando trazas';
         this.loading = false;
       }
     });
   }
 
-  applyFilter(event: Event) {
+  applyFilter(event: any) {
 
-    const value = (event.target as HTMLInputElement).value?.toLowerCase() || '';
+    const value = event.target.value?.toLowerCase() || '';
 
-    this.filteredTraces = this.traces.filter(t =>
-      (t.action || '').toLowerCase().includes(value) ||
-      (this.getNickname(t.updatedBy) || '').toLowerCase().includes(value)
-    );
+    this.filteredTraces = this.traces.filter(t => t.action.toLowerCase().includes(value) || (t.notes || '').toLowerCase().includes(value));
   }
 
-  getNickname(adminId?: number): string {
-    if (!adminId) return '-';
-    return this.userMap.get(adminId) || `ID ${adminId}`;
-  }
+  close() { this.modalCtrl.dismiss(); }
 
-  close() {
-    this.modalCtrl.dismiss();
+  getNickname(trace: PaymentTrace): string {
+    return trace.updatedBy?.person?.nickname || 'Sistema';
   }
 }

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { ChangePasswordComponent } from './change-password.component';
+import { ChangePasswordComponent } from './change-password.modal.component';
 
 describe('ChangePasswordComponent', () => {
   let component: ChangePasswordComponent;

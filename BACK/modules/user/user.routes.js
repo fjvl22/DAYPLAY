@@ -1,17 +1,22 @@
 const router = require('express').Router();
 const controller = require('./user.controller');
-const { authGuard } = require('../../middlewares/auth.guard');
+const mw = require('../../middlewares');
 
-router.get('/leaderboard/:gameId', authGuard(), controller.getLeaderboard);
-router.post('/match', authGuard(), controller.registerMatch);
-router.post('/match/finish', authGuard(), controller.finishMatch);
-router.post('/streak', authGuard(), controller.updateStreak);
-router.post('/leaderboard', authGuard(), controller.updateLeaderboard);
-router.get('/games', authGuard(), controller.getGames);
-router.get('/hangman/words', authGuard(), controller.getHangmanWords);
-router.get('/wordle/words', authGuard(), controller.getWordleWords);
-router.get('/operations', authGuard(), controller.getMathOperations);
-router.get('/chapters', authGuard(), controller.getChapters);
-router.get('/users', authGuard(), controller.getUsers);
+router.use(mw.auth);
+router.use(mw.loadUser);
+
+router.get('/games', mw.requireUser, controller.getGames);
+
+router.post('/match', mw.requirePureAppUser, controller.registerMatch);
+router.post('/match/finish', mw.requirePureAppUser, controller.finishMatch);
+
+router.post('/streak', mw.requirePureAppUser, controller.updateStreak);
+
+router.post('/leaderboard', mw.requirePureAppUser, controller.updateLeaderboard);
+router.get('/leaderboard/:gameId', mw.requirePureAppUser, controller.getLeaderboard);
+
+router.get('/chapters', mw.requirePureAppUser, controller.getChapters);
+
+router.get('/users', mw.requirePureAppUser, controller.getUsers);
 
 module.exports = router;

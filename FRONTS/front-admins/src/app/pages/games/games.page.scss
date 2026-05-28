@@ -6,3 +6,11 @@ span {
     margin-right: 6px;
     font-weight: bold;
 }
+
+.empty-container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}

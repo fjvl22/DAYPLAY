@@ -1,221 +1,178 @@
-const admin = require('../../models/admin');
-const adminService = require('./admin.service');
+const service = require('./admin.service');
+
+const getAdmin = (req) => req.context.admin;
 
 exports.getUsers = async (req, res) => {
     try {
-        const data = await adminService.getUsers(req.admin);
+        const data = await service.getUsers();
         res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
+    } catch (e) {
+        res.status(400).json({ error: e.message });
     }
 };
 
 exports.getPendingUsers = async (req, res) => {
     try {
-        const data = await adminService.getPendingUsers(req.admin);
+        const data = await service.getPendingUsers();
         res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
+    } catch (e) {
+        res.status(400).json({ error: e.message });
     }
 };
 
 exports.approvePendingUser = async (req, res) => {
     try {
-        const { pendingUserId, plan } = req.body;
-        const data = await adminService.approvePendingUser(req.admin, pendingUserId, plan);
+        const data = await service.approvePendingUser(
+            getAdmin(req),
+            req.body.pendingUserId,
+            req.body.plan
+        );
         res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
+    } catch (e) {
+        res.status(400).json({ error: e.message });
     }
 };
 
 exports.rejectPendingUser = async (req, res) => {
     try {
-        const { id } = req.params;
-        const data = await adminService.rejectPendingUser(req.admin, id);
+        const data = await service.rejectPendingUser(req.params.id, getAdmin(req).personId);
         res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
+    } catch (e) {
+        res.status(400).json({ error: e.message });
     }
 };
 
 exports.updateUser = async (req, res) => {
     try {
-        const { id } = req.params;
-        const data = await adminService.updateUser(req.admin, id, req.body);
+        const data = await service.updateUser(req.params.id, req.body, getAdmin(req).personId);
         res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
+    } catch (e) {
+        res.status(400).json({ error: e.message });
     }
 };
 
 exports.deleteUser = async (req, res) => {
     try {
-        const { id } = req.params;
-        const data = await adminService.deleteUser(req.admin, id);
+        const data = await service.deleteUser(req.params.id, getAdmin(req).personId);
         res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
+    } catch (e) {
+        res.status(400).json({ error: e.message });
     }
 };
 
 exports.getGames = async (req, res) => {
-    try {
-        const data = await adminService.getGames(req.admin);
-        res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
+    res.json(await service.getGames());
 };
 
 exports.getHangmanWords = async (req, res) => {
-    try {
-        const data = await adminService.getHangmanWords(req.admin);
-        res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
+    res.json(await service.getHangmanWords());
 };
 
 exports.getWordleWords = async (req, res) => {
-    try {
-        const data = await adminService.getWordleWords(req.admin);
-        res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
+    res.json(await service.getWordleWords());
 };
 
 exports.getMathOperations = async (req, res) => {
-    try {
-        const data = await adminService.getMathOperations(req.admin);
-        res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
+    res.json(await service.getMathOperations());
 };
 
 exports.insertGameWord = async (req, res) => {
-    try {
-        const data = await adminService.insertGameWord(req.admin, req.body);
-        res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
+    res.json(await service.insertGameWord({...req.body, adminId: getAdmin(req).personId}));
 };
 
 exports.insertMathOperation = async (req, res) => {
+    res.json(await service.insertMathOperation({...req.body, adminId: getAdmin(req).personId}));
+};
+
+exports.getRewards = async (req, res) => {
     try {
-        const data = await adminService.insertMathOperation(req.admin, req.body);
+        const sortByDate = req.query.sortByDate === 'true';
+        const sortByScore = req.query.sortByScore === 'true';
+        const data = await service.getRewards({sortByDate, sortByScore});
         res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
+    } catch (e) {
+        res.status(400).json({ error: e.message });
     }
 };
 
-exports.canUserPlayToday = async (req, res) => {
+exports.approveReward = async (req, res) => {
     try {
-        const { userId, gameId } = req.query;
-        const data = await adminService.canUserPlayToday(req.admin, userId, gameId);
-        res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
+        const { userId } = req.params;
+        const chapter = await service.approveReward(Number(userId), getAdmin(req).personId);
+        res.json(chapter);
+    } catch (e) {
+        res.status(400).json({ error: e.message });
     }
 };
 
-exports.getDailyRewardRequests = async (req, res) => {
+exports.rejectReward = async (req, res) => {
     try {
-        const data = await adminService.getDailyRewardRequests(req.admin);
+        const { userId } = req.params;
+        const data = await service.rejectReward(Number(userId), getAdmin(req).personId);
         res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
+    } catch (e) {
+        res.status(400).json({ error: e.message });
     }
 };
 
-exports.approveDailyReward = async (req, res) => {
+exports.getAllEvents = async (req, res) => {
     try {
-        const { userId, ipAddress } = req.body;
-        const data = await adminService.approveDailyReward(req.admin, userId, ipAddress);
+        const data = await service.getAllEvents(req.query);
         res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-};
-
-exports.rejectDailyReward = async (req, res) => {
-    try {
-        const { rewardId } = req.params;
-        const data = await adminService.rejectDailyReward(req.admin, rewardId);
-        res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-};
-
-exports.getPayments = async (req, res) => {
-    try {
-        const data = await adminService.getPayments(req.admin);
-        res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-};
-
-exports.getPaymentDetail = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const data = await adminService.getPaymentDetail(req.admin, id);
-        res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-};
-
-exports.getNotifications = async (req, res) => {
-    try {
-        const data = await adminService.getNotifications(req.admin);
-        res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-};
-
-exports.getEvents = async (req, res) => {
-    try {
-        const data = await adminService.getEvents(req.admin);
-        res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
+    } catch (e) {
+        res.status(400).json({ error: e.message });
     }
 };
 
 exports.getAdmins = async (req, res) => {
-    try {
-        const data = await adminService.getAdmins(req.admin);
-        res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
+    res.json(await service.getAdmins());
 };
 
 exports.getPermissionsByDepartment = async (req, res) => {
+    res.json(await service.getPermissionsByDepartment(req.params.department));
+};
+
+exports.getAllPayments = async (req, res) => {
     try {
-        const { department } = req.params;
-        const data = await adminService.getPermissionsByDepartment(department);
+        const data = await service.getPayments();
         res.json(data);
-    } catch (error) {
-        res.status(400).json({ error: error.message });
+    } catch (e) {
+        res.status(400).json({ error: e.messgae });
     }
 };
 
-exports.sendNotification = async (req, res) => {
-    const { userId, title, message, type, createdBy } = req.body;
-    const notification = await adminService.sendNotification(userId, title, message, type, createdBy);
-    res.json(notification);
+exports.getPaymentById = async (req, res) => {
+    try {
+        const data = await service.getPaymentById(req.params.id);
+        res.json(data);
+    } catch (e) {
+        res.status(400).json({ error: e.message });
+    }
 };
 
-exports.sendNotifications = async (req, res) => {
-    const { title, message, type, createdBy } = req.body;
-    const notifications = await adminService.sendNotifications(title, message, type, createdBy);
-    res.json(notifications);
+exports.getPaymentTraces = async (req, res) => {
+    try {
+        const data = await service.getPaymentTraces(req.params.id);
+        res.json(data);
+    } catch (e) {
+        res.status(400).json({ error: e.message });
+    }
+};
+
+exports.sendToUser = async (req, res) => {
+    try {
+        const data = await service.sendToUser({...req.body, createdBy: getAdmin(req).personId});
+        res.json(data);
+    } catch (e) {
+        res.status(400).json({ error: e.message });
+    }
+};
+
+exports.sendToAllUsers = async (req, res) => {
+    try {
+        const data = await service.sendToAllUsers({...req.body, createdBy: req.user.personId});
+        res.json(data);
+    } catch (e) {
+        res.status(400).json({ error: e.message });
+    }
 };

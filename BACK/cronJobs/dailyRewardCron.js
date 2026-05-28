@@ -11,9 +11,9 @@ cron.schedule('0 0 * * *', async () => {
             console.log('No pending rewards');
             return;
         }
-        const systemAdmin = await Admin.findOne({ where: { adminType: 'GAME_ADMIN' } });
+        const systemAdmin = await Admin.findOne({ where: { department: 'GAME' } });
         if (!systemAdmin) {
-            console.error('No GAME_ADMIN found for auto-approval');
+            console.error('No game admin found for auto-approval');
             return;
         }
         for (const reward of pendingRewards) {

@@ -1,96 +1,59 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
-import { LoginResponse } from '../../interfaces/login-response';
-import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-
-import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
-  IonItem,
-  IonLabel,
-  IonInput,
-  IonButton,
-  IonText
-} from '@ionic/angular/standalone';
+import { Component, OnInit } from "@angular/core";
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { AuthService } from "src/app/services/auth.service";
+import { Router } from "@angular/router";
+import { CommonModule } from "@angular/common";
+import { IonicModule } from "@ionic/angular";
+import { LoginPayload } from "src/app/interfaces/login-payload";
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
-    IonItem,
-    IonLabel,
-    IonInput,
-    IonButton,
-    IonText
-  ],
+  imports: [CommonModule, ReactiveFormsModule, IonicModule],
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss']
 })
 export class LoginPage implements OnInit {
 
-  loginForm!: FormGroup;
+  form!: FormGroup;
   loading = false;
-  successMessage = '';
-  errorMessage = '';
+  error = '';
   rememberMe = false;
 
-  constructor(
-    private router: Router,
-    private fb: FormBuilder,
-    public auth: AuthService
-  ) {}
+  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {}
 
   ngOnInit(): void {
-    this.loginForm = this.fb.group({
+    this.form = this.fb.group({
       nickname: ['', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(4)]]
+      password: ['', Validators.required]
     });
   }
 
-  onCheckboxChange(event: any) {
-    this.rememberMe = event.detail.checked;
+  onRemember(e: any) {
+    this.rememberMe = e.detail.checked;
   }
 
-  onSubmit() {
-    if (this.loginForm.invalid) return;
+  login() {
+    if (this.form.invalid) return;
 
     this.loading = true;
-    this.errorMessage = '';
+    this.error = '';
 
-    const { nickname, password } = this.loginForm.value;
+    const payload: LoginPayload = {nickname: this.form.value.nickname, password: this.form.value.password, rememberMe: this.rememberMe};
 
-    this.auth.login(nickname, password, this.rememberMe).subscribe({
-      next: (res: LoginResponse) => {
-        localStorage.setItem('access-token', res.accessToken);
-        localStorage.setItem('refresh-token', res.refreshToken);
-        localStorage.setItem('nickname', nickname);
-
+    this.auth.login(payload).subscribe({
+      next: () => {
         this.loading = false;
-        setTimeout(() => {this.successMessage = 'Redirigiendo a la página principal...';}, 3000);
+
         this.router.navigate(['/choose-game']);
       },
       error: (err) => {
         this.loading = false;
-        this.errorMessage = err.error?.message || 'Error en login';
+
+        this.error =
+          err.error?.message ??
+          err.message ??
+          'Error en el login';
       }
     });
   }

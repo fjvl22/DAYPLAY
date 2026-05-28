@@ -10,7 +10,7 @@ import { AuthService } from "src/app/core/services/auth.service";
   selector: 'app-delete-account',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, IonicModule],
-  templateUrl: './delete-account.component.html'
+  templateUrl: './delete-account.modal.component.html'
 })
 export class DeleteAccountComponent {
 
@@ -48,7 +48,6 @@ export class DeleteAccountComponent {
 
         this.loading = false;
 
-        this.admin.clearPermissions();
         localStorage.removeItem('accessToken');
 
         this.modalCtrl.dismiss(true);

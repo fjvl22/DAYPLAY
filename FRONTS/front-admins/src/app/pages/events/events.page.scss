@@ -1,3 +1,8 @@
+.events-content {
+    --padding-top: 10px;
+    --padding-bottom: 10px;
+}
+
 .loading-container, .empty-container {
     height: 100%;
     display: flex;
@@ -13,7 +18,7 @@
 }
 
 ion-card {
-    margin: 16px;
+    margin: 12px;
     border-radius: 12px;
     box-shadow: 0px 3px 8px rgba(0,0,0,0.1);
 }

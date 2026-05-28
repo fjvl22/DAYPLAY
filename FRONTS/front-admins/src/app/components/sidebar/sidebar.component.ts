@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { IonicModule } from "@ionic/angular";
@@ -12,22 +12,43 @@ import { AuthService } from "src/app/core/services/auth.service";
   styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent {
-  
-  adminType = '';
 
-  private permissionsMap: any = {
-    GAME_ADMIN: ['users', 'pending-users', 'games', 'daily-rewards'],
-    PAYMENT_ADMIN: ['payments', 'payments/:id'],
-    EVENT_ADMIN: ['events'],
-    NOTIF_ADMIN: ['notifications']
-  };
+  @Input() pinned = false;
+  @Output() pinnedChange = new EventEmitter<boolean>();
+
+  visible = false;
+
+  department = '';
+
+  items = [
+    { label: 'Usuarios', route: '/layout/users', departments: ['GAME'] },
+    { label: 'Pendientes', route: '/layout/pending-users', departments: ['GAME'] },
+    { label: 'Recompensas', route: '/layout/daily-game-rewards', departments: ['GAME'] },
+    { label: 'Juegos', route: '/layout/games', departments: ['GAME'] },
+
+    { label: 'Pagos', route: '/layout/payments', departments: ['PAYMENT'] },
+
+    { label: 'Notificaciones', route: '/layout/notifications', departments: ['NOTIF'] },
+
+    { label: 'Eventos', route: '/layout/events', departments: ['EVENT'] }
+  ];
 
   constructor(private auth: AuthService) {
-    this.auth.adminType$.subscribe(type => {this.adminType = type;});
+    this.auth.department$.subscribe(dep => { this.department = dep; });
   }
 
-  canSee(route: string): boolean {
-    const allowed = this.permissionsMap[this.adminType] || [];
-    return allowed.includes(route);
+  canView(item: any): boolean { return item.departments.includes(this.department); }
+
+  togglePinned() {
+    this.pinned = !this.pinned;
+    this.pinnedChange.emit(this.pinned);
+  }
+
+  showSidebar() {
+    if (!this.pinned) this.visible = true;
+  }
+
+  hideSidebar() {
+    if (!this.pinned) this.visible = false;
   }
 }

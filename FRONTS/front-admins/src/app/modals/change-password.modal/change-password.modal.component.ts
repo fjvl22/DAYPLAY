@@ -10,7 +10,7 @@ import { Router } from "@angular/router";
   selector: 'app-change-password',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, IonicModule],
-  templateUrl: './change-password.component.html',
+  templateUrl: './change-password.modal.component.html',
 })
 export class ChangePasswordComponent {
 

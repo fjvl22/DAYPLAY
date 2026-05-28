@@ -11,21 +11,14 @@ const adminRoutes = require('./modules/admin/admin.routes');
 const authRoutes = require('./modules/auth/auth.routes');
 const userRoutes = require('./modules/user/user.routes');
 const jwtRoutes = require('./modules/jwt/jwt.routes');
-const paymentRoutes = require('./modules/payment/payment.routes');
 
 const app = express();
 
-/* ================================
-   MIDDLEWARES
-================================ */
-
 app.use(cors());
+
+// ESTO TIENE QUE IR ANTES DE LAS RUTAS
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-/* ================================
-   ROUTES
-================================ */
 
 app.get('/', (req, res) => {
     res.json({ message: 'API running 🚀' });
@@ -35,11 +28,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/jwt', jwtRoutes);
-app.use('/api/payments', paymentRoutes);
-
-/* ================================
-   GLOBAL ERROR HANDLER
-================================ */
 
 app.use((err, req, res, next) => {
     console.error(err);
@@ -47,10 +35,6 @@ app.use((err, req, res, next) => {
         message: 'Internal Server Error'
     });
 });
-
-/* ================================
-   SERVER + DATABASE START
-================================ */
 
 const PORT = config.PORT || 3000;
 

@@ -14,7 +14,7 @@
   <ion-item *ngIf="mode === 'one'">
     <ion-label>Usuario</ion-label>
     <ion-select [(ngModel)]="selectedUserId">
-      <ion-select-option *ngFor="let user of users" [value]="user.personId">{{ user.person.nickname }}</ion-select-option>
+      <ion-select-option *ngFor="let user of users" [value]="user.personId">{{ user.person?.nickname }}</ion-select-option>
     </ion-select>
   </ion-item>
 

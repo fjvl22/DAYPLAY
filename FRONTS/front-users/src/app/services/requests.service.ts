@@ -9,13 +9,14 @@ import { MessageResponse } from "../interfaces/message-response";
 import { MatchResponse } from "../interfaces/match-response";
 import { Chapter } from "../interfaces/chapter";
 import { AppUser } from "../interfaces/app-user";
+import { environment } from "src/environments/environment";
 
 @Injectable({
   providedIn: 'root'
 })
 export class RequestsService {
 
-  private API_URL = '/api/user';
+  private API_URL = `${environment.apiUrl}/user`;
 
   constructor(private http: HttpClient) {}
 

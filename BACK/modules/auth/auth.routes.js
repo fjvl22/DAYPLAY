@@ -1,15 +1,32 @@
 const router = require('express').Router();
 const controller = require('./auth.controller');
-const { authGuard } = require('../../middlewares/auth.guard');
+const mw = require('../../middlewares');
 
 router.post('/login', controller.login);
 router.post('/register/admin', controller.adminRegistration);
 router.post('/register/user', controller.userRegistration);
 
-router.post('/logout', authGuard(), controller.logout);
-router.delete('/delete-account', authGuard(), controller.deleteAccount);
-router.put('/change-password', authGuard(), controller.changePassword);
+router.post('/logout', mw.auth, mw.loadUser, controller.logout);
 
-router.get('/plan-types', authGuard(), controller.getPlanTypes);
+router.delete(
+    '/delete-account',
+    mw.auth,
+    mw.loadUser,
+    controller.deleteAccount
+);
+
+router.put(
+    '/change-password',
+    mw.auth,
+    mw.loadUser,
+    controller.changePassword
+);
+
+router.get(
+    '/plan-types',
+    mw.auth,
+    mw.loadUser,
+    controller.getPlanTypes
+);
 
 module.exports = router;

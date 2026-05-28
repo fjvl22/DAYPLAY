@@ -8,3 +8,11 @@
     border-radius: 8px;
     margin-bottom: 15px;
 }
+
+.empty-container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}

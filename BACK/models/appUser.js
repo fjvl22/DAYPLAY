@@ -1,34 +1,59 @@
-// models/appUser.js
 module.exports = (sequelize, DataTypes) => {
-    const AppUser = sequelize.define('AppUser', {
-      personId: { type: DataTypes.INTEGER.UNSIGNED, primaryKey: true },
-      subscriptionDate: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
-      planId: { type: DataTypes.INTEGER.UNSIGNED }
-    }, {
-      tableName: 'APP_USER',
-      timestamps: false
+
+  const AppUser = sequelize.define('AppUser', {
+
+    personId: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      primaryKey: true,
+      field: 'PERSON_ID'
+    },
+
+    subscriptionDate: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      field: 'SUBSCRIPTION_DATE'
+    },
+
+    planId: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      field: 'PLAN_ID'
+    },
+
+    stripeCustomerId: {
+      type: DataTypes.STRING(100),
+      field: 'STRIPE_CUSTOMER_ID'
+    },
+
+    subscriptionStatus: {
+      type: DataTypes.ENUM('NONE', 'ACTIVE', 'PAST_DUE', 'CANCELED'),
+      defaultValue: 'NONE',
+      field: 'SUBSCRIPTION_STATUS'
+    }
+
+  }, {
+    tableName: 'app_user',
+    timestamps: false
+  });
+
+  AppUser.associate = (models) => {
+
+    AppUser.belongsTo(models.Person, {
+      foreignKey: 'personId',
+      targetKey: 'id'
     });
 
-    AppUser.associate = (models) => {
-      AppUser.belongsTo(models.Person, { foreignKey: 'PERSON_ID' });
-      AppUser.belongsTo(models.UserPlan, { foreignKey: 'PLAN_ID' });
-  
-      AppUser.hasMany(models.BankCard, { foreignKey: 'USER_ID' });
-      AppUser.hasMany(models.GameMatch, { foreignKey: 'USER_ID' });
-      AppUser.hasMany(models.DailyGameReward, { foreignKey: 'USER_ID' });
-      AppUser.hasMany(models.Streak, { foreignKey: 'USER_ID' });
-      AppUser.hasMany(models.Leaderboard, { foreignKey: 'USER_ID' });
-      AppUser.hasMany(models.Payment, { foreignKey: 'USER_ID' });
-      AppUser.hasMany(models.Notification, { foreignKey: 'USER_ID' });
-      AppUser.hasMany(models.SystemEvent, { foreignKey: 'USER_ID' });
-      AppUser.hasMany(models.StoryAccess, { foreignKey: 'USER_ID' });
-  
-      AppUser.belongsToMany(models.Game, {
-          through: models.UserGame,
-          foreignKey: 'USER_ID'
-      });
-    };
-  
-    return AppUser;
+    AppUser.belongsTo(models.UserPlan, {
+      foreignKey: 'planId',
+      targetKey: 'id'
+    });
+
+    AppUser.hasMany(models.SystemEvent, {
+      foreignKey: 'actorId',
+      sourceKey: 'personId',
+      constraints: false,
+      scope: { actorType: 'USER' }
+    });
   };
-  
+
+  return AppUser;
+};

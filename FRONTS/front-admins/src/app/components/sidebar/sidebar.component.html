@@ -1,17 +1,35 @@
-<ion-list>
+<div
+  class="hover-zone"
+  *ngIf="!visible && !pinned"
+  (mouseenter)="showSidebar()">
+</div>
 
-  <ion-item *ngIf="canSee('users')" routerLink="/layout/users">Usuarios</ion-item>
+<aside
+  class="sidebar"
+  [class.open]="visible || pinned"
+  (mouseleave)="hideSidebar()">
 
-  <ion-item *ngIf="canSee('pending-users')" routerLink="/layout/pending-users">Usuarios Pendientes</ion-item>
+  <div class="pin">
+    <button (click)="togglePinned()">
+      <ion-icon
+        [name]="pinned ? 'lock-closed-outline' : 'lock-open-outline'">
+      </ion-icon>
+    </button>
+  </div>
 
-  <ion-item *ngIf="canSee('games')" routerLink="/layout/games">Juegos</ion-item>
+  <nav class="menu">
 
-  <ion-item *ngIf="canSee('daily-rewards')" routerLink="/layout/daily-rewards">Capítulos</ion-item>
-  
-  <ion-item *ngIf="canSee('payments')" routerLink="/layout/payments">Pagos</ion-item>
+    <ng-container *ngFor="let item of items">
+      <a
+        *ngIf="canView(item)"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        class="item">
 
-  <ion-item *ngIf="canSee('notifications')" routerLink="/layout/notifications">Notificaciones</ion-item>
+        {{ item.label }}
+      </a>
+    </ng-container>
 
-  <ion-item *ngIf="canSee('events')" routerLink="/layout/events">Eventos</ion-item>
+  </nav>
 
-</ion-list>
+</aside>

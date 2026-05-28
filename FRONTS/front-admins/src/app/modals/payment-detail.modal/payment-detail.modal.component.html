@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Detalle de pago</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div class="ion-text-center" *ngIf="loading"><ion-spinner></ion-spinner></div>
+
+  <ng-container *ngIf="!loading && payment">
+
+    <ion-card>
+
+      <ion-card-header><ion-card-title>Pago #{{ payment.id }}</ion-card-title></ion-card-header>
+
+      <ion-card-content>
+
+        <p><b>Usuario ID:</b> {{ payment.userId }}</p>
+
+        <p><b>Nombre de usuario:</b>{{ payment.appUser?.person?.nickname || '-' }}</p>
+
+        <p><b>Correo electrónico:</b>{{ payment.appUser?.person?.email || '-' }}</p>
+
+        <hr>
+
+        <p><b>Cantidad:</b>{{ payment.amount }}€</p>
+        <p><b>Estado:</b>{{ payment.status }}€</p>
+        <p><b>Métodp:</b>{{ payment.paymentMethod }}€</p>
+        <p><b>Transacción:</b>{{ payment.transactionId || '-' }}€</p>
+        <p><b>Fecha:</b>{{ payment.date | date:'medium' }}€</p>
+
+      </ion-card-content>
+
+    </ion-card>
+
+    <ion-button expand="block" (click)="openTraces()">Ver trazas del pago</ion-button>
+
+  </ng-container>
+
+</ion-content>

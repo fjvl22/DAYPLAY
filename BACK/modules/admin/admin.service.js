@@ -1,47 +1,45 @@
-const { Op } = require('sequelize');
 const sequelize = require('../../config/database');
-
-const { Person } = require('../../models');
-const { Admin } = require('../../models');
-const { AppUser } = require('../../models');
-const { UserPending } = require('../../models');
-const { Game } = require('../../models');
-const { GameWord } = require('../../models');
-const { MathOperation } = require('../../models');
-const { MathOption } = require('../../models');
-const { GameMatch } = require('../../models');
-const { DailyGameReward } = require('../../models');
-const { Story } = require('../../models');
-const { StoryAccess } = require('../../models');
-const { Chapter } = require('../../models');
-const { Payment } = require('../../models');
-const { PaymentTrace } = require('../../models');
-const { Notification } = require('../../models');
-const { SystemEvent } = require('../../models');
-const { UserPlan } = require('../../models');
+const {
+    Admin,
+    AppUser,
+    Person,
+    UserPending,
+    Game,
+    GameWord,
+    MathOperation,
+    MathOption,
+    DailyGameReward,
+    Story,
+    StoryAccess,
+    Chapter,
+    Payment,
+    PaymentTrace,
+    Notification,
+    SystemEvent,
+    UserPlan
+} = require('../../models');
 
 const { chargeUser } = require('../payment/payment.service');
 const { sendEmail } = require('../../services/email.service');
 const { createNotification } = require('../../services/notification.service');
+const { Op, or } = require('sequelize');
 
-exports.getUsers = async (adminId) => {
-    let admin = await Admin.findByPk(adminId);
-    if (!['GAME_ADMIN', 'PAYMENT_ADMIN'].includes(admin.adminType)) throw new Error('Permission denied');
+const { createEvent } = require('../../services/systemEvent.service');
+
+const getAdmin = (admin) => {
+    if (!admin) throw new Error('Admin required');
+    return admin;
+};
+
+exports.getUsers = async () => {
     return await AppUser.findAll({ include: Person });
 };
 
-exports.getPendingUsers = async (adminId) => {
-    let admin = await Admin.findByPk(adminId);
-    if (admin.adminType !== 'GAME_ADMIN') throw new Error('Permission denied');
+exports.getPendingUsers = async () => {
     return await UserPending.findAll({ include: Person });
 };
 
-exports.approvePendingUser = async (adminId, pendingUserId, plan) => {
-
-    const admin = await Admin.findByPk(adminId);
-    if (!admin || admin.adminType !== 'PAYMENT_ADMIN') {
-        throw new Error('Permission denied');
-    }
+exports.approvePendingUser = async (admin, pendingUserId, plan) => {
 
     const transaction = await sequelize.transaction();
 
@@ -58,451 +56,546 @@ exports.approvePendingUser = async (adminId, pendingUserId, plan) => {
 
         const amount = userPlan.planType === 'BASIC' ? 10 : 15;
 
-        const paymentResult = await chargeUser(pending.personId, admin.personId, amount);
+        const paymentResult = await chargeUser(
+            pending.personId,
+            admin.personId,
+            amount
+        );
 
         const appUser = await AppUser.create({
             personId: pending.personId,
             subscriptionDate: new Date(),
-            planId: userPlan.id,
-            status: 'PENDING_PAYMENT'
+            planId: userPlan.id
         }, { transaction });
 
         await pending.destroy({ transaction });
 
-        await transaction.commit();
-
-        await SystemEvent.create({
-            adminId: admin.personId,
-            userId: pending.personId,
+        await createEvent({
+            actorType: 'ADMIN',
+            actorId: admin.personId,
+            targetType: 'USER',
+            targetId: appUser.personId,
             eventType: 'USER_APPROVED',
-            description: `Usuario aprobado con plan ${userPlan.planType}`,
-            category: 'USER_MANAGEMENT'
+            category: 'USER_MANAGEMENT',
+            description: `Usuario aprobado con plan ${userPlan.planType}`
         });
 
-        return {
-            clientSecret: paymentResult.clientSecret,
-            paymentId: paymentResult.paymentId,
-            appUserId: appUser.personId,
-            amount
-        };
-    } catch (error) {
+        await transaction.commit();
+
+        return paymentResult;
+
+    } catch (err) {
         await transaction.rollback();
-        throw error;
+        throw err;
     }
 };
 
-exports.rejectPendingUser = async (adminId, pendingUserId) => {
-    let admin = await Admin.findByPk(adminId);
-    if (admin.adminType !== 'GAME_ADMIN') throw new Error('Permission denied');
+exports.rejectPendingUser = async (pendingUserId, adminId) => {
+
     const pending = await UserPending.findByPk(pendingUserId);
+
     if (!pending) throw new Error('Pending user not found');
+
     await pending.destroy();
-    const person = await Person.findByPk(pending.personId);
-    if (person) await person.destroy();
-    await SystemEvent.create({
-        adminId: admin.personId,
-        userId: pending.personId,
+
+    await createEvent({
+        actorType: 'ADMIN',
+        actorId: adminId,
+        targetType: 'USER',
+        targetId: pending.personId,
         eventType: 'USER_REJECTED',
-        description: 'Usuario rechazado y eliminado',
-        category: 'USER_MANAGEMENT'
+        category: 'USER_MANAGEMENT',
+        description: 'Usuario pendiente rechazado'
     });
-    return { message: 'User rejected and removed from pending list' };
+
+    return { message: 'User rejected' };
 };
 
-exports.updateUser = async (adminId, id, data) => {
-    let admin = await Admin.findByPk(adminId);
-    if (!['GAME_ADMIN', 'PAYMENT_ADMIN'].includes(admin.adminType)) throw new Error('Permission denied');
+exports.updateUser = async (id, data, adminId) => {
+
     const user = await AppUser.findByPk(id);
+
     if (!user) throw new Error('User not found');
+
     await user.update(data);
-    await SystemEvent.create({
-        adminId: admin.personId,
-        userId: id,
+
+    await createEvent({
+        actorType: 'ADMIN',
+        actorId: adminId,
+        targetType: 'USER',
+        targetId: user.personId,
         eventType: 'USER_UPDATED',
-        description: 'Datos de usuario actualizados',
-        category: 'USER_MANAGEMENT'
+        category: 'USER_MANAGEMENT',
+        description: 'Datos del usuario actualizados'
     });
+
     return user;
 };
 
-exports.deleteUser = async (adminId, id) => {
-    let admin = await Admin.findByPk(adminId);
-    if (admin.adminType!=='GAME_ADMIN') throw new Error('Permission denied');
+exports.deleteUser = async (id, adminId) => {
+
+    const person = await Person.findByPk(id);
+
+    if (!person) throw new Error('Person not found');
+
+    person.active = false;
+    await person.save();
+
     const user = await AppUser.findByPk(id);
-    if (!user) throw new Error('User not found');
-    await user.destroy();
-    await SystemEvent.create({
-        adminId: admin.personId,
-        userId: id,
-        eventType: 'USER_DELETED',
-        description: 'Usuario eliminado por admin',
-        category: 'USER_MANAGEMENT'
+
+    await createEvent({
+        actorType: 'ADMIN',
+        actorId: adminId,
+        targetType: 'USER',
+        targetId: id,
+        eventType: 'USER_DEACTIVATED',
+        category: 'USER_MANAGEMENT',
+        description: 'Usuario desactivado por administrador'
     });
-    return { message: 'User correctly deleted' };
+
+    return { message: 'Person deactivated' };
 };
 
-exports.getGames = async (adminId) => {
-    let admin = await Admin.findByPk(adminId);
-    if (admin.adminType !== 'GAME_ADMIN') throw new Error('Permission denied');
-    return await Game.findAll();
-};
+exports.getGames = async () => Game.findAll();
 
-exports.getHangmanWords = async (adminId) => {
-    let admin = await Admin.findByPk(adminId);
-    if (admin.adminType !== 'GAME_ADMIN') throw new Error('Permission denied');
-    const words = await GameWord.findAll({ where: { gameId: 1 } });
-    return words;
-};
+exports.getHangmanWords = async () =>
+    GameWord.findAll({ where: { gameId: 1 } });
 
-exports.getWordleWords = async (adminId) => {
-    let admin = await Admin.findByPk(adminId);
-    if (admin.adminType !== 'GAME_ADMIN') throw new Error('Permission denied');
-    const words = await GameWord.findAll({ where: { gameId: 4 } });
-    return words;
-};
+exports.getWordleWords = async () =>
+    GameWord.findAll({ where: { gameId: 4 } });
 
-exports.getMathOperations = async (adminId) => {
-    let admin = await Admin.findByPk(adminId);
-    return await MathOperation.findAll({
-        include: [{
-            model: MathOption,
-            attributes: ['id', 'optionValue'],
-            required: false
-        }],
-        order: [
-            ['id', 'ASC'],
-            [MathOption, 'id', 'ASC']
-        ]
-    });
-};
+exports.getMathOperations = async () =>
+    MathOperation.findAll({ include: [MathOption] });
 
-exports.insertGameWord = async (adminId, data) => {
-    let admin = await Admin.findByPk(adminId);
-    if (admin.adminType !== 'GAME_ADMIN') throw new Error('Permission denied');
-    const { gameId, word, language } = data;
-    if (!gameId || !word) throw new Error('gameId and word are required');
-    if (gameId !== 1 && gameId !== 4) throw new Error('Invalid gameId');
-    const game = await Game.findByPk(gameId);
-    if (!game) throw new Error('Game not found');
-    const gameName = game.name;
-    const newWord = await GameWord.create({
-        gameId,
-        word: word.toLowerCase(),
-        language: language || 'ES',
-        active: true
-    });
-    await SystemEvent.create({
-        adminId: admin.personId,
-        eventType: 'GAME_WORD_CREATED',
-        description: `Nueva palabra "${word}" añadida al juego ${gameName}`,
-        category: 'GAME_MANAGEMENT'
-    });
-    return newWord;
-};
+exports.insertGameWord = async (data) => {
+    const { gameId, word, language, adminId } = data;
 
-exports.insertMathOperation = async (adminId, data) => {
-    let admin = await Admin.findByPk(adminId);
-    if (admin.adminType !== 'GAME_ADMIN') throw new Error('Permission denied');
-    const { gameId, operation, result, options } = data;
-    if (!gameId || !operation || !result) throw new Error('gameId, operation and result are required');
-    if (gameId !== 3) throw new Error('Invalid gameId');
-    if (!options || options.length !== 4) throw new Error('Exactly 4 options are required');
-    const game = await Game.findByPk(gameId);
-    if (!game) throw new Error('Gme not found');
     const transaction = await sequelize.transaction();
+
     try {
-        const mathOperation = await MathOperation.create({
+        const createdWord = await GameWord.create({
+            gameId,
+            word: word.toLowerCase(),
+            language: language || 'ES'
+        }, { transaction });
+
+        await createEvent({
+            actorType: 'ADMIN',
+            actorId: adminId,
+            targetType: 'GAME',
+            targetId: gameId,
+            eventType: 'GAME_WORD_CREATED',
+            category: 'GAME_MANAGEMENT',
+            description: `Nueva palabra añadida al juego ${gameId}`
+        });
+
+        await transaction.commit();
+        return createdWord;
+
+    } catch (err) {
+        await transaction.rollback();
+        throw err;
+    }
+};
+
+exports.insertMathOperation = async (data) => {
+    const { gameId, operation, result, options, adminId } = data;
+
+    if (!gameId || !operation || !result)
+        throw new Error('Missing fields');
+
+    const transaction = await sequelize.transaction();
+
+    try {
+        const mathOp = await MathOperation.create({
             gameId,
             operation,
             result
         }, { transaction });
-        for (const op of options) {
+
+        for (const opt of options) {
             await MathOption.create({
-                optionValue: op,
-                operationId: mathOperation.id
+                operationId: mathOp.id,
+                optionValue: opt
             }, { transaction });
         }
-        await SystemEvent.create({
-            adminId: admin.personId,
+
+        await createEvent({
+            actorType: 'ADMIN',
+            actorId: adminId,
+            targetType: 'GAME',
+            targetId: gameId,
             eventType: 'MATH_OPERATION_CREATED',
-            description: `Operación matemática creada: ${operation}`,
-            category: 'GAME_MANAGEMENT'
-        }, { transaction });
+            category: 'GAME_MANAGEMENT',
+            description: `Nueva operación matemática añadida al juego ${gameId}`
+        });
+
         await transaction.commit();
-        return {
-            message: 'Math operation correctly created',
-            operation: mathOperation
-        };
-    } catch (error) {
+
+        return mathOp;
+
+    } catch (err) {
         await transaction.rollback();
-        throw error;
+        throw err;
     }
 };
 
-exports.canUserPlayToday = async (adminId, userId, gameId) => {
-    let admin = await Admin.findByPk(adminId);
-    if (admin.adminType !== 'GAME_ADMIN') throw new Error('Permission denied');
-    const todayStart = new Date();
-    todayStart.setHours(0,0,0,0);
-    const todayEnd = new Date();
-    todayEnd.setHours(23,59,59,999);
-    const match = await GameMatch.findOne({
+exports.getRewards = async ({ sortByDate = false, sortByScore = false } = {}) => {
+
+    const order = [];
+
+    if (sortByDate) order.push(['rewardDate', 'DESC']);
+
+    if (sortByScore) order.push(['totalScore', 'DESC']);
+
+    if (order.length === 0) order.push(['id', 'DESC']);
+
+    return await DailyGameReward.findAll({
+        include: [
+            {
+                model: AppUser,
+                include: [Person]
+            }
+        ],
+        order
+    });
+};
+
+exports.approveReward = async (userId, adminId) => {
+
+    const reward = await DailyGameReward.findOne({ where: { userId } });
+    if (!reward) throw new Error('Reward not found');
+
+    const currentYearMonth = new Date().toISOString().slice(0, 7);
+
+    const story = await Story.findOne({ where: { monthYear: currentYearMonth } });
+    if (!story) throw new Error('Month story not found');
+
+    const admin = await Admin.findByPk(adminId);
+    if (!admin) throw new Error('Admin not found');
+
+    await StoryAccess.create({
+        storyId: story.id,
+        userId,
+        grantedBy: admin.personId,
+        accessGranted: true,
+        grantDate: new Date(),
+        revokeDate: null,
+        notes: `Acceso concedido por recompensa diaria`
+    });
+
+    await reward.destroy();
+
+    const chapter = await Chapter.findOne({
         where: {
-            userId,
-            gameId,
-            date: { [Op.between]: [todayStart, todayEnd] }
+            storyId: story.id,
+            dayNumber: new Date().getDate()
         }
     });
-    return { canPlay: !match };
-};
 
-exports.getDailyRewardRequests = async (adminId) => {
-    let admin = await Admin.findByPk(adminId);
-    if (admin.adminType !== 'GAME_ADMIN') throw new Error('Permission denied');
-    return await DailyGameReward.findAll({ include: Person });
-};
-
-exports.approveDailyReward = async (adminId, userId, ipAddress = null) => {
-    let admin = await Admin.findByPk(adminId);
-    if (!admin || admin.adminType !== 'GAME_ADMIN') throw new Error('Permission denied.');
-    const dailyGameReward = await DailyGameReward.findOne({ where: { userId } });
-    if (!dailyGameReward) return { approved: false, message: 'No pending daily reward' };
-    const games = await Game.findAll({ attributes: ['id'] });
-    const gameIds = games.map(g => g.id);
-    if (!gameIds.length) throw new Error('No games configured in system');
-    const todayStart = new Date();
-    const todayEnd = new Date();
-    todayStart.setHours(0,0,0,0);
-    todayEnd.setHours(23,59,59,999);
-    const yesterdayStart = new Date(todayStart);
-    const yesterdayEnd = new Date(todayEnd);
-    yesterdayStart.setDate(yesterdayStart.getDate()-1);
-    yesterdayEnd.setDate(yesterdayEnd.getDate()-1);
-    const wonYesterday = await GameMatch.count({
-        where: {
-            userId,
-            gameId: { [Op.in]: gameIds },
-            score: { [Op.gt]: 0 },
-            createdAt: { [Op.between]: [yesterdayStart, yesterdayEnd] }
-        },
-        distinct: true,
-        col: 'gameId'
+    await createEvent({
+        actorType: 'ADMIN',
+        actorId: adminId,
+        targetType: 'USER',
+        targetId: userId,
+        eventType: 'REWARD_APPROVED',
+        category: 'REWARDS',
+        description: 'Recompensa diaria aprobada'
     });
-    const wonToday = await GameMatch.count({
-        where: {
-            userId,
-            gameId: { [Op.in]: gameIds },
-            score: { [Op.gt]: 0 },
-            createdAt: { [Op.between]: [todayStart, todayEnd] }
-        },
-        distinct: true,
-        col: 'gameId'
-    });
-    const isFirstDay = wonYesterday === 0;
-    const isEligible = (wonToday === gameIds.length) && (wonYesterday === gameIds.length || isFirstDay);
-    const currentMonth = todayStart.toLocaleString('default', { month: 'long' });
-    const story = await Story.findOne({ where: { monthYear: currentMonth } });
-    if (!story) throw new Error('Story not found for current month');
-    const chapter = await Chapter.findOne({ where: { storyId: story.id, dayNumber: todayStart.getDate() } });
-    if (!chapter) throw new Error('Chapter not found for today');
-    const user = await AppUser.findByPk(userId, { include: [UserPlan] });
-    const tomorrowMidnight = new Date(todayStart);
-    tomorrowMidnight.setDate(tomorrowMidnight.getDate()+1);
-    let revokeDate = null;
-    let notes = 'Daily chapter auto-approved';
-    const plan = await UserPlan.findByPk(user.planId);
-    if (isEligible && plan.planType === 'BASIC') {
-        revokeDate = tomorrowMidnight;
-        notes += ' (expires at midnight)';
-    }
-    const existingAccess = await StoryAccess.findOne({ where: { storyId: story.id, userId } });
-    if (!existingAccess) {
-        await StoryAccess.create({
-            storyId: story.id,
-            userId,
-            grantedBy: adminId,
-            accessGranted: isEligible,
-            grantDate: isEligible ? new Date() : null,
-            revokeDate,
-            notes: isEligible ? notes : 'Daily chapter auto-rejected'
-        });
-    }
-    await dailyGameReward.destroy();
-    if (isEligible) {
-        let extraMessage = '';
-        if (plan.planType === 'BASIC') extraMessage = '<p><strong>⚠ IMPORTANTE:</strong>Al tener plan básico, el acceso estará disponible solo hasta las 00:00.</p>';
-        const person = await Person.findByPk(userId);
-        await sendEmail({
-            to: person.email,
-            subject: '¡Nuevo capítulo desbloqueado!',
-            html: `
-                <h2>¡Felicidades, ${user.nickname}!</h2>
-                <p>Has desbloqueado el capítulo <strong>${chapter.title}</strong>
-                de la historia <strong>${story.title}</strong>.</p>
-                ${extraMessage}
-            `
-        });
-        await createNotification({
-            userId,
-            title: plan.planType === 'BASIC' ? `Capítulo ${chapter.title} disponible hasta las 00:00` : `Ya puedes leer el capítulo ${chapter.title}`,
-            type: 'DAILY_REWARD'
-        });
-        await SystemEvent.create({
-            adminId: admin.personId,
-            userId,
-            eventType: 'DAILY_REWARD_GRANTED',
-            description: `Capítulo ${chapter.title} concedido (${plan.planType})`,
-            category: 'REWARDS',
-            ipAddress
-        });
-    } else {
-        await SystemEvent.create({
-            adminId: admin.personId,
-            userId,
-            eventType: 'DAILY_REWARD_REJECTED',
-            description: isFirstDay ? 'Usuario nuevo: primer día no cumplió requisitos' : 'Usuario no cumplía requisitos',
-            category: 'REWARDS'
-        });
-    }
+
+    return chapter;
 };
 
-exports.rejectDailyReward = async (adminId, rewardId) => {
-    let admin = await Admin.findByPk(adminId);
-    if (admin.adminType !== 'GAME_ADMIN') throw new Error('Permission denied');
-    const reward = await DailyGameReward.findByPk(rewardId);
+exports.rejectReward = async (userId, adminId) => {
+
+    const reward = await DailyGameReward.findOne({ where: { userId } });
     if (!reward) throw new Error('Reward not found');
+
+    const currentYearMonth = new Date().toISOString().slice(0, 7);
+
+    const story = await Story.findOne({ where: { monthYear: currentYearMonth } });
+    if (!story) throw new Error('Month story not found');
+
+    const admin = await Admin.findByPk(adminId);
+    if (!admin) throw new Error('Admin not found');
+
+    await StoryAccess.create({
+        storyId: story.id,
+        userId,
+        grantedBy: admin.personId,
+        accessGranted: false,
+        revokeDate: new Date(),
+        notes: `Acceso rechazado por administrador`
+    });
+
     await reward.destroy();
-    await SystemEvent.create({
-        adminId: admin.personId,
-        userId: reward.userId,
-        eventType: 'DAILY_REWARD_MANUAL_REJECT',
-        description: 'Recompensa diaria rechazada manualmente',
-        category: 'REWARDS'
+
+    await createEvent({
+        actorType: 'ADMIN',
+        actorId: adminId,
+        targetType: 'USER',
+        targetId: userId,
+        eventType: 'REWARD_REJECTED',
+        category: 'REWARDS',
+        description: 'Recompensa diaria rechazada'
     });
-    return { message: 'Daily reward rejected' };
+
+    return { success: true };
 };
 
-exports.getPayments = async (adminId) => {
-    let admin = await Admin.findByPk(adminId);
-    if (admin.adminType !== 'PAYMENT_ADMIN') throw new Error('Permission denied');
-    return await Payment.findAll({
-        include: ['user'],
-        order: [['date', 'DESC']]
-    });
-};
+exports.sendToUser = async ({ userId, title, message, type, createdBy }) => {
 
-exports.getPaymentDetail = async (adminId, paymentId) => {
-    let admin = await Admin.findByPk(adminId);
-    if (admin.adminType !== 'PAYMENT_ADMIN') throw new Error('Permission denied');
-    const payment = await Payment.findByPk(paymentId);
-    if (!payment) throw new Error('Payment not found');
-    const traces = await PaymentTrace.findAll({ where: { paymentId }, order: [['traceDate', 'ASC']] });
-    await SystemEvent.create({
-        adminId: admin.personId,
-        eventType: 'PAYMENT_VIEWED',
-        description: `Detalle de pago ${paymentId} consultado`,
-        category: 'PAYMENT'
-    });
-    return { payment, traces };
-};
+    const user = await AppUser.findByPk(userId, { include: [Person] });
+    if (!user) throw new Error('User not found');
 
-exports.getNotifications = async (adminId) => {
-    let admin = await Admin.findByPk(adminId);
-    if (admin.adminType !== 'NOTIF_ADMIN')
-        throw new Error('Permission denied');
+    await createNotification({ userId, title, message, type, createdBy });
 
-    return await Notification.findAll({
-        order: [['createdAt', 'DESC']]
-    });
-};
-
-exports.sendNotification = async (userId, title, message, type, createdBy) => {
-    let admin = await Admin.findByPk(createdBy);
-    if (admin.adminType !== 'NOTIF_ADMIN')
-        throw new Error('Permission denied');
     await sendEmail({
-        to: userId,
+        to: user.Person.email,
         subject: title,
         html: `<p>${message}</p>`
     });
-    await createNotification({
-        userId: userId,
-        type: type,
-        title: title,
-        message: message,
-        createdBy: createdBy
-    });
-    await SystemEvent.create({
-        adminId: createdBy,
-        userId,
-        eventType: 'NOTIFICATION_SENT',
-        description: `Notificación enviada a usuario ${userId}`,
-        category: 'NOTIFICATION'
-    });
-    return { message: 'Notifications and emails sent.' }
-}
 
-exports.sendNotifications = async (title, message, type, createdBy) => {
-    let admin = await Admin.findByPk(createdBy);
-    if (admin.adminType !== 'NOTIF_ADMIN')
-        throw new Error('Permission denied');
-    let users = await AppUser.findAll();
-    users.forEach( async (user) => {
+    await createEvent({
+        actorType: 'ADMIN',
+        actorId: createdBy,
+        targetType: 'USER',
+        targetId: userId,
+        eventType: 'NOTIFICATION_SENT',
+        category: 'NOTIFICATION',
+        description: `Notificación enviada al usuario: ${title}`
+    });
+
+    return { success: true };
+};
+
+exports.sendToAllUsers = async ({ title, message, type, createdBy }) => {
+
+    const users = await AppUser.findAll({ include: [Person] });
+
+    for (const user of users) {
+        await createNotification({
+            userId: user.id,
+            title,
+            message,
+            type,
+            createdBy
+        });
+
         await sendEmail({
-            to: user.personId,
+            to: user.Person.email,
             subject: title,
             html: `<p>${message}</p>`
         });
-        await createNotification({
-            userId: user.personId,
-            type: type,
-            title: title,
-            message: message,
-            createdBy: createdBy
-        });
-    });
-    await SystemEvent.create({
-        adminId: createdBy,
-        eventType: 'MASS_NOTIFICATION_SENT',
-        description: 'Notificación masiva enviada',
-        category: 'NOTIFICATION'
-    });
-}
-
-exports.getEvents = async (adminId) => {
-    const admin = await Admin.findByPk(adminId);
-
-    if (!admin) {
-        throw new Error('Permission denied');
     }
 
-    const allowedCategories = {
-        GAME_ADMIN: ['GAME_MANAGEMENT', 'GAMEPLAY', 'REWARDS'],
-        PAYMENT_ADMIN: ['PAYMENT', 'USER_MANAGEMENT'],
-        NOTIF_ADMIN: ['NOTIFICATION'],
-        EVENT_ADMIN: ['AUTH', 'USER_MANAGEMENT', 'GAME_MANAGEMENT', 'GAMEPLAY', 'REWARDS', 'PAYMENT', 'NOTIFICATION', 'SYSTEM']
-    };
-
-    return await SystemEvent.findAll({
-        where: {
-            category: allowedCategories[admin.adminType]
-        },
-        order: [['createdAt', 'DESC']]
+    await createEvent({
+        actorType: 'ADMIN',
+        actorId: createdBy,
+        targetType: 'NONE',
+        targetId: null,
+        eventType: 'GLOBAL_NOTIFICATION_SENT',
+        category: 'NOTIFICATION',
+        description: `Notificación global enviada: ${title}`
     });
+
+    return { success: true, sent: users.length };
 };
 
-exports.getAdmins = async (adminId) => {
-    let admin = await Admin.findByPk(adminId);
-    if (!admin) throw new Error('Permission denied');
-    return await Admin.findAll();
+exports.getAdmins = async () => {
+    return await Admin.findAll({
+        include: [Person]
+    });
 };
 
 exports.getPermissionsByDepartment = async (department) => {
-    const permissionsMap = {
-        GAME: { canManageGames: true, canApproveRewards: true },
-        PAYMENT: { canChargeUsers: true, canManagePlans: true },
-        EVENT: { canCreateEvents: true, canManageEvents: true },
-        NOTIF: { canSendNotifications: true, canManageNotifications: true }
+    const map = {
+        GAME: { canManageGames: true },
+        PAYMENT: { canChargeUsers: true },
+        NOTIF: { canSendNotifications: true },
+        EVENT: { canCreateEvents: true }
     };
-    return permissionsMap[department] || {};
+
+    return map[department] || {};
+};
+
+exports.getAllEvents = async (filters) => {
+
+    const where = {};
+
+    if (filters.eventType) where.eventType = filters.eventType;
+    if (filters.category) where.category = filters.category;
+
+    if (filters.adminId) where.actorId = filters.adminId;
+    if (filters.userId) where.targetId = filters.userId;
+
+    if (filters.from && filters.to) {
+        where.eventDate = {
+            [Op.between]: [new Date(filters.from), new Date(filters.to)]
+        };
+    }
+
+    const events = await SystemEvent.findAll({
+        where,
+        include: [
+            {
+                model: Admin,
+                as: 'actorAdmin',
+                required: false,
+                include: [
+                    {
+                        model: Person,
+                        attributes: ['nickname']
+                    }
+                ]
+            },
+            {
+                model: AppUser,
+                as: 'actorUser',
+                required: false,
+                include: [
+                    {
+                        model: Person,
+                        attributes: ['nickname']
+                    }
+                ]
+            }
+        ],
+        order: [['eventDate', 'DESC']]
+    });
+
+    return events.map(e => ({
+        id: e.id,
+        actorType: e.actorType,
+        actorId: e.actorId,
+        targetType: e.targetType,
+        targetId: e.targetId,
+        eventType: e.eventType,
+        description: e.description,
+        category: e.category,
+        eventDate: e.eventDate,
+        ipAddress: e.ipAddress,
+
+        admin: e.actorAdmin ? {
+            id: e.actorAdmin.id,
+            person: e.actorAdmin.Person ? {
+                nickname: e.actorAdmin.Person.nickname
+            } : undefined
+        } : undefined,
+
+        appUser: e.actorUser ? {
+            id: e.actorUser.id,
+            person: e.actorUser.Person ? {
+                nickname: e.actorUser.Person.nickname
+            } : undefined
+        } : undefined
+    }));
+};
+
+
+exports.getPayments = async () => {
+
+    const payments = await Payment.findAll({
+        include: [
+            {
+                model: AppUser,
+                required: false,
+                include: [
+                    {
+                        model: Person,
+                        attributes: ['nickname', 'email']
+                    }
+                ]
+            }
+        ],
+        order: [['id', 'DESC']]
+    });
+
+    return payments.map(p => ({
+        id: p.id,
+        userId: p.userId,
+        amount: p.amount,
+        status: p.status,
+        date: p.createdAt || p.date,
+        paymentMethod: p.paymentMethod,
+        transactionId: p.transactionId,
+        appUser: p.AppUser ? {
+            id: p.AppUser.id,
+            person: p.AppUser.Person ? {
+                nickname: p.AppUser.Person.nickname,
+                email: p.AppUser.Person.email
+            } : undefined
+        } : undefined
+    }));
+};
+
+exports.getPaymentById = async (id) => {
+
+    const p = await Payment.findByPk(id, {
+        include: [
+            {
+                model: AppUser,
+                required: false,
+                include: [
+                    {
+                        model: Person,
+                        attributes: ['nickname', 'email']
+                    }
+                ]
+            }
+        ]
+    });
+
+    if (!p) throw new Error('Payment not found');
+
+    return {
+        id: p.id,
+        userId: p.userId,
+        amount: p.amount,
+        status: p.status,
+        date: p.createdAt || p.date,
+        paymentMethod: p.paymentMethod,
+        transactionId: p.transactionId,
+        appUser: p.AppUser ? {
+            id: p.AppUser.id,
+            person: p.AppUser.Person ? {
+                nickname: p.AppUser.Person.nickname,
+                email: p.AppUser.Person.email
+            } : undefined
+        } : undefined
+    };
+};
+
+exports.getPaymentTraces = async (paymentId) => {
+
+    const traces = await PaymentTrace.findAll({
+        where: { paymentId },
+        order: [['id', 'DESC']],
+        include: [
+            {
+                model: Admin,
+                required: false,
+                include: [
+                    {
+                        model: Person,
+                        attributes: ['nickname']
+                    }
+                ]
+            }
+        ]
+    });
+
+    return traces.map(t => ({
+        id: t.id,
+        paymentId: t.paymentId,
+        traceDate: t.createdAt || t.traceDate,
+        action: t.action,
+        notes: t.notes,
+        updatedBy: t.Admin ? {
+            id: t.Admin.id,
+            person: t.Admin.Person ? {
+                nickname: t.Admin.Person.nickname
+            } : undefined
+        } : undefined
+    }));
 };

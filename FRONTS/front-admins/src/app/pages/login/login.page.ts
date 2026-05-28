@@ -1,87 +1,81 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService } from 'src/app/core/services/auth.service';
-import { LoginResponse } from 'src/app/core/interfaces/login-response';
-import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-
-import {
-  IonItem,
-  IonLabel,
-  IonInput,
-  IonButton,
-  IonText,
-  IonCheckbox
-} from '@ionic/angular/standalone';
+import { Component, OnInit } from "@angular/core";
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
+import { AuthService } from "src/app/core/services/auth.service";
+import { Router } from "@angular/router";
+import { CommonModule } from "@angular/common";
+import { IonicModule } from "@ionic/angular";
+import { LoginPayload } from "src/app/core/interfaces/login-payload";
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-
-    IonItem,
-    IonLabel,
-    IonInput,
-    IonButton,
-    IonText,
-    IonCheckbox
-  ],
+  imports: [CommonModule, ReactiveFormsModule, IonicModule],
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss']
 })
 export class LoginPage implements OnInit {
 
-  loginForm!: FormGroup;
+  form!: FormGroup;
   loading = false;
-  successMessage = '';
-  errorMessage = '';
+  error = '';
   rememberMe = false;
 
-  constructor(
-    private router: Router,
-    private fb: FormBuilder,
-    public auth: AuthService
-  ) {}
+  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {}
 
   ngOnInit(): void {
-    this.loginForm = this.fb.group({
+    this.form = this.fb.group({
       nickname: ['', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(4)]]
+      password: ['', Validators.required]
     });
   }
 
-  onCheckboxChange(event: any) {
-    this.rememberMe = event.detail.checked;
+  onRemember(e: any) {
+    this.rememberMe = e.detail.checked;
+  }
+
+  private getDefault(dep: string): string {
+    const map: Record<string, string> = {
+      GAME: '/layout/users',
+      PAYMENT: '/layout/payments',
+      EVENT: '/layout/events',
+      NOTIF: '/layout/notifications'
+    };
+
+    return map[dep] ?? '/login';
   }
 
   login() {
-    if (this.loginForm.invalid) return;
+    if (this.form.invalid) return;
 
     this.loading = true;
-    this.errorMessage = '';
+    this.error = '';
 
-    const { nickname, password } = this.loginForm.value;
+    const payload: LoginPayload = {
+      nickname: this.form.value.nickname,
+      password: this.form.value.password,
+      rememberMe: this.form.value.rememberMe
+    };
 
-    this.auth.login(nickname, password, this.rememberMe).subscribe({
-      next: (res: LoginResponse) => {
-        localStorage.setItem('access-token', res.accessToken);
-        localStorage.setItem('refresh-token', res.refreshToken);
-        localStorage.setItem('nickname', nickname);
-
+    this.auth.login(payload).subscribe({
+      next: () => {
         this.loading = false;
-        setTimeout(() => {this.successMessage = 'Redirigiendo a la página principal...';}, 3000);
-        this.router.navigate(['/layout/users']);
+
+        const dep = this.auth.getDepartment();
+
+        if (!dep) {
+          this.router.navigate(['/login']);
+          return;
+        }
+
+        this.router.navigate([this.getDefault(dep)]);
       },
       error: (err) => {
         this.loading = false;
-        this.errorMessage = err.error?.message || 'Error en login';
+
+        this.error = err.error?.message ?? err.message ?? 'Error en el login';
       }
     });
   }
-
-  get f() {return this.loginForm.controls;}
 
   goToRegister() {
     this.router.navigate(['/register']);

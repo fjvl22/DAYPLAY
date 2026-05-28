@@ -2,13 +2,12 @@ const service = require('./user.service');
 
 async function getLeaderboard(req, res) {
     try {
-        const userId = req.user.id;
+        const userId = req.user.personId;
         const gameId = parseInt(req.params.gameId);
         const sortBy = req.query.sortBy || 'score';
-        if (!gameId) return res.status(400).json({ message: 'gameId required' });
 
-        const leaderboard = await service.getLeaderboard(userId, gameId, sortBy);
-        res.json(leaderboard);
+        const result = await service.getLeaderboard(userId, gameId, sortBy);
+        res.json(result);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -16,10 +15,11 @@ async function getLeaderboard(req, res) {
 
 async function registerMatch(req, res) {
     try {
-        const userId = req.user.id;
+        const userId = req.user.personId;
         const { gameId } = req.body;
+
         const match = await service.createMatch(userId, gameId);
-        res.json({ message: 'Match created', match });
+        res.json(match);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -28,8 +28,9 @@ async function registerMatch(req, res) {
 async function finishMatch(req, res) {
     try {
         const { matchId, score, extraData } = req.body;
-        await service.finishMatch(matchId, score, extraData);
-        res.json({ message: 'Match finished successfully' });
+
+        const result = await service.finishMatch(matchId, score, extraData);
+        res.json(result);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -37,10 +38,11 @@ async function finishMatch(req, res) {
 
 async function updateStreak(req, res) {
     try {
-        const userId = req.user.id;
+        const userId = req.user.personId;
         const { gameId } = req.body;
+
         const streak = await service.updateStreak(userId, gameId);
-        res.json({ message: 'Streak updated', currentStreak: streak.currentStreak });
+        res.json(streak);
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -48,71 +50,34 @@ async function updateStreak(req, res) {
 
 async function updateLeaderboard(req, res) {
     try {
-        const userId = req.user.id;
+        const userId = req.user.personId;
         const { gameId, score } = req.body;
+
         await service.updateLeaderboard(userId, gameId, score);
-        res.json({ message: 'Leaderboard updated' });
+        res.json({ message: 'ok' });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 }
 
 async function getGames(req, res) {
-    try {
-        const games = await service.getGames();
-        res.json(games);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-}
-
-async function getHangmanWords(req, res) {
-    try {
-        const words = await service.getHangmanWords();
-        res.json(words);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-}
-
-async function getWordleWords(req, res) {
-    try {
-        const words = await service.getWordleWords();
-        res.json(words);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-}
-
-async function getMathOperations(req, res) {
-    try {
-        const page = parseInt(req.query.page) || 1;
-        const operations = await service.getMathOperations(page);
-        res.json(operations);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+    const games = await service.getGames();
+    res.json(games);
 }
 
 async function getChapters(req, res) {
     try {
         const userId = req.user.personId;
         const chapters = await service.getAvailableChapters(userId);
-        res.json({ success: true, chapters });
+        res.json({ chapters });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ success: false, message: 'Error fetching chapters' });
+        res.status(500).json({ message: err.message });
     }
 }
 
 async function getUsers(req, res) {
-    try {
-        const users = await service.getUsers();
-        res.json(users);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Error fetching users' });
-    }
+    const users = await service.getUsers();
+    res.json(users);
 }
 
 module.exports = {
@@ -122,9 +87,6 @@ module.exports = {
     updateStreak,
     updateLeaderboard,
     getGames,
-    getHangmanWords,
-    getWordleWords,
-    getMathOperations,
     getChapters,
     getUsers
 };

@@ -51,7 +51,9 @@ export class PendingUsersPage {
 
   approve(id: number, plan: string) {
 
-    let nickname: string = this.auth.getNickname();
+    let nickname: string;
+
+    this.auth.nickname$.subscribe(value => { nickname = value; });
 
     let admins: Admin[];
 
@@ -71,7 +73,7 @@ export class PendingUsersPage {
 
               adminId = admin.personId;
 
-              this.admin.approveUserPending(adminId, id, plan).subscribe(async (res: ApproveResponse) => {
+              this.admin.approvePendingUser({ adminId, id, plan }).subscribe(async (res: ApproveResponse) => {
 
                 this.approveResponse.clientSecret = res.clientSecret;
                 this.approveResponse.paymentId = res.paymentId;
@@ -107,7 +109,7 @@ export class PendingUsersPage {
   }
 
   reject(id: number) {
-    this.admin.rejectUserPending(id).subscribe({
+    this.admin.rejectPendingUser(id).subscribe({
       next: () => {
         console.log('Usuario rechazado correctamente');
         this.load();

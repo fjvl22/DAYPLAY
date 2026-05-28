@@ -1,15 +1,33 @@
-<ion-header>
+<header class="topbar">
 
-  <ion-toolbar>
+  <div class="left">
 
-    <ion-title>BIENVENIDO/A, {{ nickname }}</ion-title>
+    <img src="assets/logo.png" alt="LOGO DAYPLAY" class="logo">
 
-    <ion-buttons slot="end">
-      <ion-button (click)="openMenu()">
-        <ion-icon name="person-circle"></ion-icon>
-      </ion-button>
-    </ion-buttons>
+  </div>
 
-  </ion-toolbar>
+  <div class="center">
+    <h1>BIENVENID@, {{ nickname$ | async }}</h1>
+  </div>
 
-</ion-header>
+  <div class="right">
+
+    <div class="user-menu" (click)="toggleDropdown()">
+
+      <ion-icon name="person-circle-outline" size="large"></ion-icon>
+
+      <div class="dropdown" *ngIf="dropdownOpen">
+
+        <a (click)="openChangePassword()">Cambiar Contraseña</a>
+
+        <a (click)="logout()">Cerrar Sesión</a>
+
+        <a (click)="openDeleteAccount()">Eliminar Cuenta</a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</header>

@@ -1,7 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { IonicModule } from "@ionic/angular";
-
+import { IonicModule, AlertController } from "@ionic/angular";
+import { addIcons } from 'ionicons';
+import { documentOutline } from 'ionicons/icons';
 import { AdminService } from "src/app/core/services/admin.service";
 import { SystemEvent } from "src/app/core/interfaces/system-event";
 
@@ -17,9 +18,9 @@ export class EventsPage implements OnInit {
   events: SystemEvent[] = [];
   loading = true;
 
-  constructor(private adminService: AdminService) {}
+  constructor(private adminService: AdminService, private alertCtrl: AlertController) {addIcons({ 'document-outline': documentOutline })}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadEvents();
   }
 
@@ -33,9 +34,21 @@ export class EventsPage implements OnInit {
       },
       error: (err) => {
         console.error(err);
+        this.presentAlert();
         this.loading = false;
       }
     });
+  }
+
+  async presentAlert() {
+    const alert = await this.alertCtrl.create({
+      header: 'Error',
+      subHeader: 'Carga de eventos fallida',
+      message: 'No se pudieron cargar los eventos del sistema',
+      buttons: ['OK']
+    });
+
+    await alert.present();
   }
 
   getCategoryColor(category: string): string {

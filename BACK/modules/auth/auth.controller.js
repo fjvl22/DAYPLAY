@@ -1,13 +1,28 @@
 const authService = require('./auth.service');
+
 exports.login = async (req, res, next) => {
+
     try {
         const { nickname, password, rememberMe } = req.body;
-        const token = await authService.login(nickname, password, rememberMe);
-        res.json({ token });
+        const tokens = await authService.login(nickname, password, rememberMe);
+        res.json(tokens);
     } catch (error) {
         next(error);
     }
 };
+
+exports.logout = async (req, res, next) => {
+    try {
+        const accessToken = req.headers.authorization?.split(' ')[1];
+        const refreshToken = req.body.refreshToken;
+
+        const result = await authService.logout(accessToken, refreshToken);
+        res.json(result);
+    } catch (error) {
+        next(error);
+    }
+};
+
 exports.adminRegistration = async (req, res, next) => {
     try {
         const result = await authService.adminRegistration(req.body);
@@ -16,6 +31,7 @@ exports.adminRegistration = async (req, res, next) => {
         next(error);
     }
 };
+
 exports.userRegistration = async (req, res, next) => {
     try {
         const result = await authService.userRegistration(req.body);
@@ -24,35 +40,32 @@ exports.userRegistration = async (req, res, next) => {
         next(error);
     }
 };
-exports.logout = async (req, res, next) => {
-    try {
-        const result = await authService.logout(req.token);
-        res.json(result);
-    } catch (error) {
-        next(error);
-    }
-};
+
 exports.deleteAccount = async (req, res, next) => {
     try {
-        const result = await authService.deleteAccount(req.user.id, req.body.password);
-        res.json(result);
-    } catch (error) {
-        next(error);
-    }
-};
-exports.changePassword = async (req, res, next) => {
-    try {
-        const { currentPassword, newPassword } = req.body;
-        const result = await authService.changePassword(
-            req.user.id,
-            currentPassword,
-            newPassword
+        const result = await authService.deleteAccount(
+            req.user.personId,
+            req.body.password
         );
         res.json(result);
     } catch (error) {
         next(error);
     }
 };
+
+exports.changePassword = async (req, res, next) => {
+    try {
+        const result = await authService.changePassword(
+            req.user.personId,
+            req.body.currentPassword,
+            req.body.newPassword
+        );
+        res.json(result);
+    } catch (error) {
+        next(error);
+    }
+};
+
 exports.getPlanTypes = async (req, res, next) => {
     try {
         const types = await authService.getPlanTypes();

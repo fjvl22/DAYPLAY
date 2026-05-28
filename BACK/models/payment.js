@@ -1,4 +1,3 @@
-// models/payment.js
 module.exports = (sequelize, DataTypes) => {
   const Payment = sequelize.define('Payment', {
     id: {
@@ -18,7 +17,14 @@ module.exports = (sequelize, DataTypes) => {
       field: 'AMOUNT'
     },
     status: {
-      type: DataTypes.ENUM('PENDING', 'CONFIRMED', 'FAILED'),
+      type: DataTypes.ENUM(
+        'PENDING',
+        'PROCESSING',
+        'CONFIRMED',
+        'FAILED',
+        'CANCELED',
+        'REFUNDED'
+      ),
       allowNull: false,
       field: 'STATUS'
     },
@@ -35,17 +41,34 @@ module.exports = (sequelize, DataTypes) => {
     },
     transactionId: {
       type: DataTypes.STRING(100),
-      allowNull: true,
       field: 'TRANSACTION_ID'
+    },
+    stripePaymentIntentId: {
+      type: DataTypes.STRING(100),
+      unique: true,
+      field: 'STRIPE_PAYMENT_INTENT_ID'
+    },
+    failureReason: {
+      type: DataTypes.TEXT,
+      field: 'FAILURE_REASON'
+    },
+    confirmedAt: {
+      type: DataTypes.DATE,
+      field: 'CONFIRMED_AT'
+    },
+    currency: {
+      type: DataTypes.CHAR(3),
+      defaultValue: 'EUR',
+      field: 'CURRENCY'
     }
   }, {
-    tableName: 'PAYMENT',
+    tableName: 'payment',
     timestamps: false
   });
 
   Payment.associate = (models) => {
-    Payment.belongsTo(models.AppUser, { foreignKey: 'USER_ID' });
-    Payment.hasMany(models.PaymentTrace, { foreignKey: 'PAYMENT_ID' });
+    Payment.belongsTo(models.AppUser, { foreignKey: 'userId' });
+    Payment.hasMany(models.PaymentTrace, { foreignKey: 'paymentId' });
   };
 
   return Payment;

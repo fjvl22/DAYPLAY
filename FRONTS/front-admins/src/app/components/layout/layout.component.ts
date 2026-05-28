@@ -1,14 +1,18 @@
-import { Component } from "@angular/core";
-import { IonicModule } from "@ionic/angular";
-import { SidebarComponent } from '../sidebar/sidebar.component';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { TopbarComponent } from '../topbar/topbar.component';
-import { RouterModule } from "@angular/router";
+import { SidebarComponent } from '../sidebar/sidebar.component';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [IonicModule, SidebarComponent, TopbarComponent, RouterModule],
+  imports: [ CommonModule, RouterOutlet, TopbarComponent, SidebarComponent ],
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss']
 })
-export class LayoutComponent {}
+export class LayoutComponent {
+  
+  sidebarPinned = false;
+
+}

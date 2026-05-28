@@ -1,10 +1,8 @@
-// payment.service.js
 const Stripe = require('stripe');
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-const Payment = require('../../models/payment');
-const PaymentTrace = require('../../models/paymentTrace');
-const SystemEvent = require('../../models/systemEvent');
+const { Payment, PaymentTrace } = require('../../models');
+const { createEvent } = require('../../services/systemEvent.service');
 
 async function chargeUser(userId, adminId, amount) {
 
@@ -15,12 +13,14 @@ async function chargeUser(userId, adminId, amount) {
         status: 'PENDING'
     });
 
-    await SystemEvent.create({
-        userId,
-        adminId,
+    await createEvent({
+        actorType: 'ADMIN',
+        actorId: adminId,
+        targetType: 'USER',
+        targetId: userId,
         eventType: 'PAYMENT_CREATED',
-        description: `Pago de ${amount}€ creado`,
-        category: 'PAYMENT'
+        category: 'PAYMENT',
+        description: `Pago de ${amount}€ creado`
     });
 
     await PaymentTrace.create({
@@ -30,12 +30,19 @@ async function chargeUser(userId, adminId, amount) {
         updatedBy: adminId
     });
 
+    payment.status = 'PROCESSING';
+    await payment.save();
+
     const paymentIntent = await stripe.paymentIntents.create({
         amount: amount * 100,
         currency: 'eur',
         automatic_payment_methods: { enabled: true },
         metadata: { paymentId: payment.id, userId }
     });
+
+    payment.stripePaymentIntentId = paymentIntent.id;
+
+    await payment.save();
 
     return { clientSecret: paymentIntent.client_secret, paymentId: payment.id };
 }

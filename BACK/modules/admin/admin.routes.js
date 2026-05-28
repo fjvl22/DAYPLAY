@@ -1,46 +1,51 @@
 const router = require('express').Router();
 const admin = require('./admin.controller');
-const auth = require('../../middlewares/checkRole');
-const stripeWebhook = require('../payment/webhook');
 
-router.use(auth(['GAME_ADMIN', 'PAYMENT_ADMIN', 'NOTIF_ADMIN', 'EVENT_ADMIN']));
+const {
+  auth,
+  loadUser,
+  requireAdmin,
+  requireAdminDepartment
+} = require('../../middlewares');
 
-router.get('/users',admin.getUsers);
-router.get('/users/pending',admin.getPendingUsers);
-router.post('/users/approve',admin.approvePendingUser);
-router.delete('/users/reject/:id',admin.rejectPendingUser);
-router.put('/users/:id',admin.updateUser);
-router.delete('/users/:id',admin.deleteUser);
+// base
+router.use(auth);
+router.use(loadUser);
+router.use(requireAdmin);
 
-router.get('/games',admin.getGames);
-router.get('/games/hangman',admin.getHangmanWords);
-router.get('/games/wordle',admin.getWordleWords);
-router.get('/games/math',admin.getMathOperations);
+// USERS
+router.get('/users', requireAdminDepartment(['GAME', 'PAYMENT', 'NOTIF']), admin.getUsers);
+router.get('/users/pending', requireAdminDepartment(['GAME']), admin.getPendingUsers);
+router.post('/users/approve', requireAdminDepartment(['PAYMENT']), admin.approvePendingUser);
+router.delete('/users/reject/:id', requireAdminDepartment(['GAME']), admin.rejectPendingUser);
+router.put('/users/:id', requireAdminDepartment(['GAME', 'PAYMENT']), admin.updateUser);
+router.delete('/users/:id', requireAdminDepartment(['GAME']), admin.deleteUser);
 
-router.post('/games/word',admin.insertGameWord);
-router.post('/games/math',admin.insertMathOperation);
+// GAMES
+router.get('/games', requireAdminDepartment(['GAME']), admin.getGames);
+router.get('/games/hangman', requireAdminDepartment(['GAME']), admin.getHangmanWords);
+router.get('/games/wordle', requireAdminDepartment(['GAME']), admin.getWordleWords);
+router.get('/games/math', requireAdminDepartment(['GAME']), admin.getMathOperations);
 
-router.get('/games/canPlay',admin.canUserPlayToday);
+router.post('/games/word', requireAdminDepartment(['GAME']), admin.insertGameWord);
+router.post('/games/operation', requireAdminDepartment(['GAME']), admin.insertMathOperation);
+router.get('/rewards', requireAdminDepartment(['GAME']), admin.getRewards);
+router.post('/rewards/:userId/approve', requireAdminDepartment(['GAME']), admin.approveReward);
+router.post('/rewards/:userId/reject', requireAdminDepartment(['GAME']), admin.rejectReward);
 
-router.get('/rewards',admin.getDailyRewardRequests);
-router.post('/rewards/approve',admin.approveDailyReward);
-router.delete('/rewards/:rewardId',admin.rejectDailyReward);
+// EVENTS
+router.get('/events', requireAdminDepartment(['EVENT']), admin.getAllEvents);
+router.get('/admins', admin.getAdmins);
 
-router.get('/payments',admin.getPayments);
-router.get('/payments/:id',admin.getPaymentDetail);
+router.get('/permissions/:department', admin.getPermissionsByDepartment);
 
-router.get('/notifications',admin.getNotifications);
+// PAYMENTS
+router.get('/payments', requireAdminDepartment(['PAYMENT']), admin.getAllPayments);
+router.get('/payments/:id', requireAdminDepartment(['PAYMENT']), admin.getPaymentById);
+router.get('/payments/:id/traces', requireAdminDepartment(['PAYMENT']), admin.getPaymentTraces);
 
-router.get('/events',admin.getEvents);
-
-router.get('/admins',admin.getAdmins);
-
-router.get('/permissions/:department',admin.getPermissionsByDepartment);
-
-router.post('/notification',admin.sendNotification);
-
-router.post('/notifications',admin.sendNotifications);
-
-router.post('/stripe', require('express').json(), stripeWebhook);
+// NOTIFICATIONS
+router.post('/notifications/user', requireAdminDepartment(['NOTIF']), admin.sendToUser);
+router.post('/notifications/all', requireAdminDepartment(['NOTIF']), admin.sendToAllUsers);
 
 module.exports = router;
