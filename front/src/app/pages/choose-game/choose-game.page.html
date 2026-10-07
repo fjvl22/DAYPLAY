@@ -1,0 +1,21 @@
+<ion-content [fullscreen]="true">
+  <div class="page-container">
+
+    <h1>¿A QUÉ QUIERES JUGAR?</h1>
+
+    <div class="games-grid">
+
+      @for (game of games; track game.id) {
+        <div class="game-cell" (click)="goToGame(game)">
+          <img [src]="game.url" [alt]="game.title">
+
+          <div class="overlay">
+            <span>{{ game.description }}</span>
+          </div>
+        </div>
+      }
+
+    </div>
+    
+  </div>
+</ion-content>

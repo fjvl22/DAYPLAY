@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>REGISTRO DE USUARIOS</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div class="form-container">
+
+    <h1>Regístrate</h1>
+
+    <form (ngSubmit)="register()">
+
+      <ion-item>
+        <ion-label position="stacked">Nombre de Usuario</ion-label>
+
+        <ion-input type="text" [(ngModel)]="nickname" name="nickname" placeholder="Introduce tu nombre de usuario"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Contraseña</ion-label>
+
+        <ion-input type="password" [(ngModel)]="password" name="password" placeholder="Introduce tu contraseña"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Confirma tu Contraseña</ion-label>
+
+        <ion-input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" placeholder="Confirma tu Contraseña"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Correo Electrónico</ion-label>
+
+        <ion-input type="email" [(ngModel)]="email" name="email" placeholder="Introduce tu correo electrónico"></ion-input>
+      </ion-item>
+
+      <ion-item>
+
+        <ion-label position="stacked">Plan</ion-label>
+
+        <ion-select [(ngModel)]="selectedPlan" name="plan" placeholder="Selecciona un plan">
+
+          @for (plan of plans; track plan.id) {
+
+            <ion-select-option [value]="plan.id">{{ plan.name }}</ion-select-option>
+
+          }
+
+        </ion-select>
+
+      </ion-item>
+
+      <ion-button expand="block" type="submit">Registrarse</ion-button>
+
+    </form>
+
+  </div>
+
+</ion-content>

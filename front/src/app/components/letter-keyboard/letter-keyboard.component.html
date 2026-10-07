@@ -1,0 +1,49 @@
+<div class="keyboard">
+
+  <div class="keyboard-row">
+
+    @for (key of row1; track key) {
+
+      <ion-button class="key" [class.key-pressed]="isPressed(key)" [disabled]="isPressed(key)" (click)="pressKey(key)">{{ key }}</ion-button>
+
+    }
+
+  </div>
+
+  <div class="keyboard-row row-offset-1">
+
+    @for (key of row2; track key) {
+
+      <ion-button class="key" [class.key-pressed]="isPressed(key)" [disabled]="isPressed(key)" (click)="pressKey(key)">{{ key }}</ion-button>
+
+    }
+
+  </div>
+
+  <div class="keyboard-row row-offset-2">
+
+    @for (key of row3; track key) {
+
+      <ion-button class="key" [class.key-pressed]="isPressed(key)" [disabled]="isPressed(key)" (click)="pressKey(key)">{{ key }}</ion-button>
+
+    }
+
+  </div>
+
+  <div class="special-row">
+
+    <ion-button class="special-key delete-key" [disabled]="!deleteEnabled" (click)="delete()">
+
+      <ion-icon slot="icon-only" name="backspace-outline"></ion-icon>
+
+    </ion-button>
+
+    <ion-button class="special-key enter-key" [disabled]="!enterEnabled" (click)="enter()">
+
+      <ion-icon slot="icon-only" name="enter-outline"></ion-icon>
+
+    </ion-button>
+
+  </div>
+
+</div>

@@ -1,0 +1,39 @@
+<ion-header>
+
+  <ion-toolbar>
+
+    <ion-title>WORDLE</ion-title>
+
+  </ion-toolbar>
+
+</ion-header>
+
+<ion-content>
+
+  <div class="wordle">
+
+    <h1>WORDLE</h1>
+
+    <div class="board">
+
+      @for (row of board; track $index) {
+
+        <div class="board-row">
+
+          @for (cell of row; track $index) {
+
+            <div class="board-cell">{{ cell }}</div>
+
+          }
+
+        </div>
+
+      }
+
+    </div>
+
+    <app-letter-keyboard [deleteEnabled]="true" [enterEnabled]="false" (keyPressed)="onKeyPressed($event)" (deletePressed)="onDeletePressed()" (enterPressed)="onEnterPressed()"></app-letter-keyboard>
+
+  </div>
+
+</ion-content>

@@ -1,0 +1,57 @@
+<div class="numeric-keyboard">
+
+  <div class="numeric-row">
+
+    @for (number of row1; track number) {
+
+      <ion-button class="number-key" (click)="pressNumber(number)">{{ number }}</ion-button>
+
+    }
+
+  </div>
+
+  <div class="numeric-row">
+
+    @for (number of row2; track number) {
+
+      <ion-button class="number-key" (click)="pressNumber(number)">{{ number }}</ion-button>
+
+    }
+
+  </div>
+
+  <div class="numeric-row">
+
+    @for (number of row3; track number) {
+
+      <ion-button class="number-key" (click)="pressNumber(number)">{{ number }}</ion-button>
+
+    }
+
+  </div>
+
+  <div class="numeric-row">
+
+    <ion-button class="number-key special-key" [disabled]="!deleteEnabled" (click)="delete()">
+
+      <ion-icon slot="icon-only" name="backspace-outline"></ion-icon>
+
+    </ion-button>
+
+    <ion-button class="special-key enter-key" [disabled]="!enterEnabled" (click)="enter()">
+
+      <ion-icon slot="icon-only" name="enter-outline"></ion-icon>
+
+    </ion-button>
+
+    <ion-button class="number-key" (click)="pressNumber(0)">0</ion-button>
+
+    <ion-button class="number-key special-key" [disabled]="!enterEnabled" (click)="enter()">
+
+      <ion-icon slot="icon-only" name="enter-outline"></ion-icon>
+
+    </ion-button>
+
+  </div>
+
+</div>

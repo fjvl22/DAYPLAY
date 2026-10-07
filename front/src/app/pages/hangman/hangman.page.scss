@@ -1,0 +1,46 @@
+.hangman {
+    min-height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 20px;
+
+    padding: 20px;
+}
+
+h1 { text-align: center; }
+
+.hangman-image {
+    width: 250px;
+    height: 250px;
+
+    object-fit: contain;
+}
+
+.word-row {
+    display: flex;
+
+    justify-content: center;
+
+    gap: 6px;
+
+    margin: 10px 0;
+}
+
+.word-cell {
+    width: 45px;
+    height: 50px;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    border-bottom: 3px solid var(--ion-color-dark);
+
+    font-size: 24px;
+    font-weight: bold;
+}

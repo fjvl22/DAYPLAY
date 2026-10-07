@@ -1,0 +1,30 @@
+.numeric-keyboard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 6px;
+}
+
+.numeric-row {
+    display: grid;
+
+    grid-template-columns: repeat(3, 70px);
+
+    gap: 6px;
+}
+
+.number-key {
+    width: 70px;
+    height: 55px;
+
+    margin: 0;
+
+    font-size: 20px;
+    font-weight: bold;
+
+    --background: var(--ion-color-light);
+    --color: var(--ion-color-dark);
+}
+
+.special-key { --background: var(--ion-color-primary); }

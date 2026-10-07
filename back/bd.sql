@@ -1,0 +1,498 @@
+CREATE DATABASE IF NOT EXISTS DAYPLAY;
+USE DAYPLAY;
+
+-- ============================================================
+-- PERSON
+-- ============================================================
+CREATE TABLE PERSON (
+    ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    NICKNAME VARCHAR(50) NOT NULL UNIQUE,
+    PASSWORD_HASH VARCHAR(255) NOT NULL,
+    EMAIL VARCHAR(100) NOT NULL UNIQUE,
+    REGISTRATION_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ACTIVE BOOLEAN NOT NULL DEFAULT TRUE,
+    PERSON_TYPE ENUM('USER', 'ADMIN') NOT NULL
+);
+
+
+-- ============================================================
+-- USER_PLAN
+-- ============================================================
+CREATE TABLE USER_PLAN (
+    ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    PLAN_TYPE ENUM('BASIC', 'PREMIUM') NOT NULL,
+    PRICE DECIMAL(10,2) NOT NULL,
+    ACTIVE BOOLEAN NOT NULL DEFAULT FALSE,
+    STRIPE_PRICE_ID VARCHAR(100)
+);
+
+
+-- ============================================================
+-- ADMIN
+-- ============================================================
+CREATE TABLE ADMIN (
+    PERSON_ID INT UNSIGNED PRIMARY KEY,
+    DEPARTMENT ENUM('GAME', 'PAYMENT', 'EVENT', 'NOTIF', 'SUPREME') NOT NULL,
+
+    FOREIGN KEY (PERSON_ID)
+        REFERENCES PERSON(ID)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================================
+-- ADMIN_INVITATION
+-- ============================================================
+CREATE TABLE ADMIN_INVITATION (
+    ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    EMAIL VARCHAR(100) NOT NULL,
+    TOKEN TEXT NOT NULL,
+    EXPIRES_AT DATETIME NOT NULL,
+    USED BOOLEAN NOT NULL DEFAULT FALSE,
+    CREATED_AT DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CREATED_BY INT UNSIGNED,
+
+    FOREIGN KEY (CREATED_BY)
+        REFERENCES ADMIN(PERSON_ID)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================================
+-- APP_USER
+-- ============================================================
+CREATE TABLE APP_USER (
+    PERSON_ID INT UNSIGNED PRIMARY KEY,
+    SUBSCRIPTION_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PLAN_ID INT UNSIGNED,
+    STRIPE_CUSTOMER_ID VARCHAR(100),
+    SUBSCRIPTION_STATUS ENUM(
+        'NONE',
+        'INCOMPLETE',
+        'ACTIVE',
+        'PAST_DUE',
+        'CANCELED'
+    ) NOT NULL DEFAULT 'NONE',
+    STRIPE_SUBSCRIPTION_ID VARCHAR(100),
+    APPROVED_BY INT UNSIGNED,
+
+    FOREIGN KEY (PERSON_ID)
+        REFERENCES PERSON(ID)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (PLAN_ID)
+        REFERENCES USER_PLAN(ID)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (APPROVED_BY)
+        REFERENCES ADMIN(PERSON_ID)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================================
+-- USER_PENDING
+-- ============================================================
+CREATE TABLE USER_PENDING (
+    PERSON_ID INT UNSIGNED PRIMARY KEY,
+    PLAN_ID INT UNSIGNED NOT NULL,
+
+    FOREIGN KEY (PERSON_ID)
+        REFERENCES PERSON(ID)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (PLAN_ID)
+        REFERENCES USER_PLAN(ID)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================================
+-- GAME
+-- ============================================================
+CREATE TABLE GAME (
+    ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    NAME VARCHAR(50) NOT NULL UNIQUE,
+    DESCRIPTION VARCHAR(255) NOT NULL,
+    URL VARCHAR(255) NOT NULL UNIQUE
+);
+
+
+-- ============================================================
+-- GAME_WORD
+-- ============================================================
+CREATE TABLE GAME_WORD (
+    ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    GAME_ID INT UNSIGNED NOT NULL,
+    WORD VARCHAR(50) NOT NULL,
+    LANGUAGE CHAR(2) NOT NULL DEFAULT 'ES',
+    ACTIVE BOOLEAN NOT NULL DEFAULT TRUE,
+    CREATION_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE KEY (GAME_ID, WORD),
+
+    FOREIGN KEY (GAME_ID)
+        REFERENCES GAME(ID)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================================
+-- GAME_MATCH
+-- ============================================================
+CREATE TABLE GAME_MATCH (
+    ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    USER_ID INT UNSIGNED NOT NULL,
+    GAME_ID INT UNSIGNED NOT NULL,
+    DATE DATE NOT NULL DEFAULT (CURRENT_DATE),
+    SCORE INT NOT NULL,
+    EXTRA_DATA JSON,
+
+    UNIQUE KEY (USER_ID, GAME_ID, DATE),
+
+    FOREIGN KEY (USER_ID)
+        REFERENCES APP_USER(PERSON_ID)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (GAME_ID)
+        REFERENCES GAME(ID)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================================
+-- STREAK
+-- ============================================================
+CREATE TABLE STREAK (
+    ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    USER_ID INT UNSIGNED NOT NULL,
+    GAME_ID INT UNSIGNED NOT NULL,
+    CURRENT_STREAK INT NOT NULL DEFAULT 0,
+    LAST_DATE DATE NOT NULL,
+    UPDATED_AT DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    UNIQUE KEY (USER_ID, GAME_ID),
+
+    FOREIGN KEY (USER_ID)
+        REFERENCES APP_USER(PERSON_ID)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (GAME_ID)
+        REFERENCES GAME(ID)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================================
+-- LEADERBOARD
+-- ============================================================
+CREATE TABLE LEADERBOARD (
+    ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    USER_ID INT UNSIGNED NOT NULL,
+    GAME_ID INT UNSIGNED NOT NULL,
+    TOTAL_POINTS INT NOT NULL DEFAULT 0,
+    LAST_UPDATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    UNIQUE KEY (USER_ID, GAME_ID),
+
+    FOREIGN KEY (USER_ID)
+        REFERENCES APP_USER(PERSON_ID)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (GAME_ID)
+        REFERENCES GAME(ID)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================================
+-- PAYMENT
+-- ============================================================
+CREATE TABLE PAYMENT (
+    ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    USER_ID INT UNSIGNED NOT NULL,
+    AMOUNT DECIMAL(10,2) NOT NULL,
+    STATUS ENUM(
+        'PENDING',
+        'PROCESSING',
+        'CONFIRMED',
+        'FAILED',
+        'CANCELED',
+        'REFUNDED'
+    ) NOT NULL,
+    DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PAYMENT_METHOD VARCHAR(50),
+    TRANSACTION_ID VARCHAR(100),
+    STRIPE_PAYMENT_INTENT_ID VARCHAR(100) UNIQUE,
+    FAILURE_REASON TEXT,
+    CONFIRMED_AT DATETIME,
+    CURRENCY CHAR(3) NOT NULL DEFAULT 'EUR',
+    STRIPE_SESSION_ID VARCHAR(100) UNIQUE,
+    STRIPE_SUBSCRIPTION_ID VARCHAR(100),
+
+    FOREIGN KEY (USER_ID)
+        REFERENCES APP_USER(PERSON_ID)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================================
+-- PAYMENT_TRACE
+-- ============================================================
+CREATE TABLE PAYMENT_TRACE (
+    ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    PAYMENT_ID INT UNSIGNED NOT NULL,
+    TRACE_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ACTION VARCHAR(50) NOT NULL,
+    NOTES TEXT,
+    UPDATED_BY INT UNSIGNED,
+
+    FOREIGN KEY (PAYMENT_ID)
+        REFERENCES PAYMENT(ID)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (UPDATED_BY)
+        REFERENCES ADMIN(PERSON_ID)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================================
+-- NOTIFICATION
+-- ============================================================
+CREATE TABLE NOTIFICATION (
+    ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    USER_ID INT UNSIGNED NOT NULL,
+    TYPE VARCHAR(50) NOT NULL,
+    TITLE VARCHAR(100),
+    MESSAGE TEXT NOT NULL,
+    SENT_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CREATED_BY INT UNSIGNED,
+    READ_FLAG TINYINT(1) NOT NULL DEFAULT 0,
+
+    FOREIGN KEY (USER_ID)
+        REFERENCES APP_USER(PERSON_ID)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (CREATED_BY)
+        REFERENCES ADMIN(PERSON_ID)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================================
+-- STORY
+-- ============================================================
+CREATE TABLE STORY (
+    ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    TITLE VARCHAR(100) NOT NULL,
+    MONTH_YEAR CHAR(7) NOT NULL UNIQUE,
+    DESCRIPTION TEXT,
+    ACTIVE BOOLEAN NOT NULL DEFAULT TRUE,
+    CREATION_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- ============================================================
+-- CHAPTER
+-- ============================================================
+CREATE TABLE CHAPTER (
+    ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    STORY_ID INT UNSIGNED NOT NULL,
+    DAY_NUMBER TINYINT UNSIGNED NOT NULL,
+    TITLE VARCHAR(100) NOT NULL,
+    CONTENT TEXT NOT NULL,
+    UNLOCK_CONDITION VARCHAR(255) NOT NULL DEFAULT 'Win 4 games',
+
+    UNIQUE KEY (STORY_ID, DAY_NUMBER),
+
+    FOREIGN KEY (STORY_ID)
+        REFERENCES STORY(ID)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================================
+-- STORY_ACCESS
+-- ============================================================
+CREATE TABLE STORY_ACCESS (
+    ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    STORY_ID INT UNSIGNED NOT NULL,
+    USER_ID INT UNSIGNED NOT NULL,
+    GRANTED_BY INT UNSIGNED NOT NULL,
+    ACCESS_GRANTED BOOLEAN NOT NULL DEFAULT TRUE,
+    GRANT_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    REVOKE_DATE DATETIME,
+    NOTES VARCHAR(255),
+
+    UNIQUE KEY (USER_ID, STORY_ID),
+
+    FOREIGN KEY (STORY_ID)
+        REFERENCES STORY(ID)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (USER_ID)
+        REFERENCES APP_USER(PERSON_ID)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (GRANTED_BY)
+        REFERENCES ADMIN(PERSON_ID)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================================
+-- DAILY_GAME_REWARD
+-- ============================================================
+CREATE TABLE DAILY_GAME_REWARD (
+    ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    USER_ID INT UNSIGNED NOT NULL,
+    REWARD_DATE DATE NOT NULL,
+    TOTAL_SCORE INT NOT NULL,
+    CREATED_AT DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE KEY (USER_ID, REWARD_DATE),
+
+    FOREIGN KEY (USER_ID)
+        REFERENCES APP_USER(PERSON_ID)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================================
+-- USER_GAME
+-- ============================================================
+CREATE TABLE USER_GAME (
+    USER_ID INT UNSIGNED NOT NULL,
+    GAME_ID INT UNSIGNED NOT NULL,
+    ACTIVE BOOLEAN NOT NULL DEFAULT FALSE,
+
+    PRIMARY KEY (USER_ID, GAME_ID),
+
+    FOREIGN KEY (USER_ID)
+        REFERENCES APP_USER(PERSON_ID)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (GAME_ID)
+        REFERENCES GAME(ID)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================================
+-- SYSTEM_EVENT
+-- ============================================================
+CREATE TABLE SYSTEM_EVENT (
+    ID BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ACTOR_TYPE ENUM(
+        'ADMIN',
+        'USER',
+        'PENDING',
+        'SYSTEM'
+    ) NOT NULL,
+    ACTOR_ID INT UNSIGNED,
+
+    TARGET_TYPE ENUM(
+        'ADMIN',
+        'USER',
+        'PENDING',
+        'GAME',
+        'PAYMENT',
+        'STORY',
+        'NONE'
+    ) NOT NULL,
+
+    TARGET_ID INT UNSIGNED,
+
+    EVENT_TYPE VARCHAR(100) NOT NULL,
+
+    CATEGORY ENUM(
+        'AUTH',
+        'USER_MANAGEMENT',
+        'GAME_MANAGEMENT',
+        'GAMEPLAY',
+        'REWARDS',
+        'PAYMENT',
+        'NOTIFICATION',
+        'SYSTEM'
+    ) NOT NULL,
+
+    DESCRIPTION TEXT,
+    EVENT_DATE DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    IP_ADDRESS VARCHAR(45)
+);
+
+
+-- ============================================================
+-- TOKEN_BLACKLIST
+-- ============================================================
+CREATE TABLE TOKEN_BLACKLIST (
+    ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    TOKEN TEXT NOT NULL,
+    EXPIRES_AT DATETIME NOT NULL,
+    CREATED_AT DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UPDATED_AT DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+-- ============================================================
+-- MATH_OPERATION
+-- ============================================================
+CREATE TABLE MATH_OPERATION (
+    ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    OPERATION VARCHAR(20) NOT NULL,
+    RESULT VARCHAR(20) NOT NULL,
+    GAME_ID INT UNSIGNED NOT NULL,
+
+    FOREIGN KEY (GAME_ID)
+        REFERENCES GAME(ID)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================================
+-- MATH_OPTION
+-- ============================================================
+CREATE TABLE MATH_OPTION (
+    ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ID_OPERATION INT UNSIGNED NOT NULL,
+    OPTION_NUMBER VARCHAR(20) NOT NULL,
+
+    FOREIGN KEY (ID_OPERATION)
+        REFERENCES MATH_OPERATION(ID)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================================
+-- REGISTRATION_PENDING
+-- ============================================================
+CREATE TABLE REGISTRATION_PENDING (
+    ID INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    NICKNAME VARCHAR(50) NOT NULL,
+    PASSWORD_HASH VARCHAR(255) NOT NULL,
+    EMAIL VARCHAR(100) NOT NULL,
+    DEPARTMENT ENUM('GAME', 'PAYMENT', 'EVENT', 'NOTIF', 'SUPREME'),
+    PLAN_ID INT UNSIGNED,
+    TOKEN_HASH VARCHAR(255) NOT NULL UNIQUE,
+    EXPIRES_AT DATETIME NOT NULL,
+    CREATED_AT DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INVITATION_ID INT UNSIGNED,
+    USED BOOLEAN DEFAULT FALSE,
+
+    FOREIGN KEY (PLAN_ID)
+        REFERENCES USER_PLAN(ID)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (INVITATION_ID)
+        REFERENCES ADMIN_INVITATION(ID)
+        ON DELETE CASCADE
+);
+
+
+-- ============================================================
+-- FIN
+-- ============================================================

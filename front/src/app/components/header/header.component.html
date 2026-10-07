@@ -1,0 +1,29 @@
+<header class="header">
+
+  <div class="header-left">
+    <img src="assets/images/logo.png" alt="LOGO DAYPLAY">
+  </div>
+
+  <div class="header-center">
+    <p>DAYPLAY (HAY QUE CAMBIARLO)</p>
+  </div>
+
+  <div class="header-right">
+
+    <img src="assets/images/donut_mordido.jpg" alt="Menú" class="menu-image" (click)="toggleMenu()">
+
+    @if (menuOpen) {
+      <div class="dropdown">
+
+        <button (click)="optionSelected(1)">Cerrar Sesión</button>
+
+        <button (click)="optionSelected(2)">Cambiar Contraseña</button>
+        
+        <button (click)="optionSelected(3)">Eliminar Cuenta</button>
+
+      </div>
+    }
+
+  </div>
+
+</header>

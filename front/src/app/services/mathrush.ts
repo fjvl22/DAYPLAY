@@ -6,7 +6,7 @@ export class Mathrush {
   private readonly TOTAL_OPTIONS = 4;
   private readonly _questions = signal<MathOperation[]>([]);
   private readonly _currentQuestion = signal<number>(0);
-  private readonly _results = signal<number[]>([]);
+  private readonly _results = signal<MathResult[]>([]);
   private readonly _correctAnswers = signal<number>(0);
   private readonly _gameFinished = signal<boolean>(false);
   private readonly _gameStarted = signal<boolean>(false);

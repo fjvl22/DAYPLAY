@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>REGISTRO DE ADMINISTRADORES</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <div class="form-container">
+
+    <h1>Registro de Administradores</h1>
+
+    <form (ngSubmit)="register()">
+
+      <ion-item>
+        <ion-label position="stacked">Nombre de Usuario</ion-label>
+        
+        <ion-input type="text" [(ngModel)]="nickname" name="nickname" placeholder="Introduce tu nombre de usuario"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Contraseña</ion-label>
+        
+        <ion-input type="password" [(ngModel)]="password" name="password" placeholder="Introduce tu contraseña"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Confirmaión de Contraseña</ion-label>
+        
+        <ion-input type="text" [(ngModel)]="passwordConfirmation" name="passwordConfirmation" placeholder="Confirma tu contraseña"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Correo Electrónico</ion-label>
+        
+        <ion-input type="email" [(ngModel)]="email" name="email" placeholder="Introduce tu correo electrónico"></ion-input>
+      </ion-item>
+
+      <ion-button expand="block" type="submit">Registrarse</ion-button>
+
+    </form>
+
+  </div>
+
+</ion-content>

@@ -1,0 +1,22 @@
+.form-container {
+    max-width: 500px;
+
+    margin: 0 auto;
+
+    padding: 25px;
+}
+
+h1 {
+    text-align: center;
+
+    margin-bottom: 30px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+
+    gap: 15px;
+}
+
+ion-item { --padding-start: 0; }

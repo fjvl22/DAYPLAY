@@ -1,0 +1,33 @@
+<ion-header>
+
+  <ion-toolbar>
+
+    <ion-title>AHORCADO</ion-title>
+
+  </ion-toolbar>
+
+</ion-header>
+
+<ion-content>
+
+  <div class="hangman">
+
+    <h1>AHORCADO</h1>
+
+    <img class="hangman-image" [src]="imageUrl" alt="Ahorcado">
+
+    <div class="word-row">
+
+      @for (cell of cells; track $index) {
+
+        <div class="word-cell">{{ cell }}</div>
+
+      }
+
+    </div>
+
+    <app-keyboard [deleteEnabled]="false" [enterEnabled]="false" (keyPressed)="onKeyPressed($event)" (deletePressed)="onDeletePressed()" (enterPressed)="onEnterPressed()"></app-keyboard>
+
+  </div>
+
+</ion-content>
